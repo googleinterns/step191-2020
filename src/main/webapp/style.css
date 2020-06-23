@@ -4,7 +4,13 @@
   width: 650px;
   margin-top: 20px;
 }
-
+.myContainer{
+    width: 100%;
+    margin-top: 20px;
+    padding: 5% 5%;
+    background-color: lavenderblush;
+    min-height: 200px;
+}
 #greeting-container {
   margin-top: 20px;
 }
