@@ -1,3 +1,12 @@
+/*Global Styles*/
+.myContainer{
+    width: 100%;
+    margin-top: 20px;
+    padding: 5% 5%;
+    min-height: 200px;
+}
+
+/*Header Section*/
 #content {
   margin-left: auto;
   margin-right: auto;
@@ -6,21 +15,34 @@
 #content .textContainer{
     padding: 10px 5%;
     display:inline-block;
+    max-width: 800px;
 }
 .profile-img {
   width: 216px;
+  float: left;
   display: inline;
   margin-left: 30px;
   height: 216px;
   object-fit: cover;
 }
-.myContainer{
-    width: 100%;
-    margin-top: 20px;
-    padding: 5% 5%;
-    background-color: lavenderblush;
-    min-height: 200px;
-}
 #greeting-container {
   margin-top: 20px;
+}
+
+/*Project Section*/
+#projects{
+    background-color: lavenderblush;
+}
+#projects .navbar-dark{
+    background-color: #3a5688;
+    cursor: pointer;
+    border: solid 1px white;
+}
+#projects h2{
+    margin-bottom: 20px;
+}
+.project-desc{
+    display:none;
+    background-color: white;
+    padding: 5%;
 }
