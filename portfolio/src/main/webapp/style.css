@@ -1,9 +1,12 @@
 #content {
   margin-left: auto;
   margin-right: auto;
-  width: 650px;
+  background-color: red;
 }
 
 #greeting-container {
   margin-top: 20px;
+}
+.jumbotron-image {
+    max-height:100%;
 }
