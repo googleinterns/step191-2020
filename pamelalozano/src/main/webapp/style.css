@@ -41,8 +41,13 @@
 #projects h2{
     margin-bottom: 20px;
 }
-.project-desc{
+.project .project-desc{
     display:none;
+    background-color: white;
+    padding: 5%;
+}
+.open .project-desc{
+    display:block;
     background-color: white;
     padding: 5%;
 }
