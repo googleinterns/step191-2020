@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display+SC:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap');
 #content {
   margin-left: auto;
   margin-right: auto;
@@ -14,12 +14,31 @@
 }
 .display-4 {
   font-family: 'Playfair Display SC', serif;
+  font-weight: 400 !important;
 }
-p{
+p.lead{
   font-family: 'Playfair Display SC', serif;
-  font-weight: 400;
 }
 .jumbotron {
   color: white;
   background-color: black !important;
+}
+.about-title {
+  font-family: 'Playfair Display SC', serif;
+  font-weight: bold;
+}
+.about-p{
+  font-family: 'Playfair Display SC', serif;
+  font-size: large;
+  text-align: justify;
+}
+.text {
+  flex-direction: column-reverse;
+  display: flex;
+}
+
+#toasty {
+  height: 200px !important;
+  position: absolute;
+  right: 0;
 }
