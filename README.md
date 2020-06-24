@@ -1,5 +1,5 @@
 # step191-2020
 
-Repo for the Awesome Pod!
+Repo for the Awesome Pod! 🔥
 
-TODO(interns): Come up with name maybe based on your capstone or even anything else!
+TODO(interns): Come up with name maybe based on your capstone or even anything else
