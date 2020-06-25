@@ -31,4 +31,3 @@ document.getElementById("projects").addEventListener("click", function (event) {
     event.target.closest('.project').classList.toggle("open");
     location.href = "#c-"+event.target.closest('.project').id;
 });
-
