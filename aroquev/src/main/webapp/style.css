@@ -7,3 +7,8 @@
 #greeting-container {
   margin-top: 20px;
 }
+
+#main-photo {
+    width: 600px;
+    height: 400px;
+}
