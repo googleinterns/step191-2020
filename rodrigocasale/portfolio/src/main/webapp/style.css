@@ -31,6 +31,7 @@ p.lead{
   font-family: 'Playfair Display SC', serif;
   font-size: large;
   text-align: justify;
+  text-indent:40px;
 }
 .text {
   flex-direction: column-reverse;
@@ -41,4 +42,21 @@ p.lead{
   height: 200px !important;
   position: absolute;
   right: 0;
+}
+img.about-img{
+  /* height: 500px !important; */
+}
+h2{
+  font-family: 'Playfair Display SC', serif;
+  font-weight: bold;
+  text-indent:20px;
+}
+h5 {
+
+  font-family: 'Playfair Display SC', serif;
+  font-weight: bold !important;
+}
+.card-text{
+
+  font-family: 'Playfair Display SC', serif;
 }
