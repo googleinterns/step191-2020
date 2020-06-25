@@ -13,8 +13,12 @@
     height: 400px;
 }
 
-#external-links a {
+#github-link {
     color: rgb(132, 0, 255);
+}
+
+#linkedin-link {
+    color: rgb(0, 81, 255);
 }
 
 #external-links img {
