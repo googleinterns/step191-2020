@@ -16,6 +16,7 @@
  * Adds a random greeting to the page.
  */
 function addRandomGreeting() {
+    console.log("Hi1");
   const greetings =
       ['Hello world!', '¡Hola Mundo!', '你好，世界！', 'Bonjour le monde!'];
 
@@ -25,4 +26,18 @@ function addRandomGreeting() {
   // Add it to the page.
   const greetingContainer = document.getElementById('greeting-container');
   greetingContainer.innerText = greeting;
+}
+
+/**
+ * Adds Armandos age to the page.
+ */
+function calculateArmandoAge() {
+    // Calculate age, Armando was born on May 13, 2000.
+    const diffMs = new Date() - new Date(2000, 5, 13);
+    const ageDt = new Date(diffMs); 
+    
+    // Add it to the page.
+    const ageContainer = document.getElementById('armando-age-container');
+    ageContainer.innerText = Math.abs(ageDt.getUTCFullYear() - 1970);
+    
 }
