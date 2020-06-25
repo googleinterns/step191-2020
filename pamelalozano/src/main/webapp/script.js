@@ -16,7 +16,6 @@
  * Adds a random greeting to the page.
  */
 function addRandomGreeting() {
-
   const greetings =
       ['Hello world!', '¡Hola Mundo!', '你好，世界！', 'Bonjour le monde!'];
 
@@ -28,16 +27,14 @@ function addRandomGreeting() {
   greetingContainer.innerText = greeting;
 }
 
-/**
- * Adds Armandos age to the page.
- */
-function calculateArmandoAge() {
-    // Calculate age, Armando was born on May 13, 2000.
-    const diffMs = new Date() - new Date(2000, 5, 13);
-    const ageDt = new Date(diffMs); 
-    
-    // Add it to the page.
-    const ageContainer = document.getElementById('armando-age-container');
-    ageContainer.innerText = Math.abs(ageDt.getUTCFullYear() - 1970);
-    
+function projectToggle(id){
+    //the id for each button is proj[i], i being the index
+    //c-proj[i] is the id for the div with the description of each project
+
+    if($("#c-"+id)[0].style.display!="block"){
+        $("#c-"+id)[0].style.display="block"
+        location.href = "#c-"+id;
+    } else{
+          $("#c-"+id)[0].style.display="none"
+    };
 }
