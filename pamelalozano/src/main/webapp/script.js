@@ -27,9 +27,8 @@ function addRandomGreeting() {
   greetingContainer.innerText = greeting;
 }
 
-document.querySelectorAll('.project').forEach(item => {
-  item.addEventListener('click', event => {
-    item.classList.toggle("open");
-    location.href = "#c-"+item.id;
-  })
-})
+document.getElementById("projects").addEventListener("click", function (event) {
+    event.target.closest('.project').classList.toggle("open");
+    location.href = "#c-"+event.target.closest('.project').id;
+});
+
