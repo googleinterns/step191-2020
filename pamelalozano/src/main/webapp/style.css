@@ -51,3 +51,26 @@
     background-color: white;
     padding: 5%;
 }
+/*Social Media Section*/
+#socialMedia{
+    margin:20px 0;
+}
+#socialMedia .fa {
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+  text-decoration: none;
+  margin: 5px 10px;
+  border-radius: 50%;
+}
+#socialMedia .fa:hover {
+    opacity: 0.7;
+}
+#socialMedia .fa-github {
+  background: #252c30;
+  color: white;
+}
+.fa-linkedin {
+  background: #007bb5;
+  color: white;
+}
