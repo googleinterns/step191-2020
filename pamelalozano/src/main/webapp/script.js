@@ -27,14 +27,9 @@ function addRandomGreeting() {
   greetingContainer.innerText = greeting;
 }
 
-function projectToggle(id){
-    //the id for each button is proj[i], i being the index
-    //c-proj[i] is the id for the div with the description of each project
-
-    if($("#c-"+id)[0].style.display!="block"){
-        $("#c-"+id)[0].style.display="block"
-        location.href = "#c-"+id;
-    } else{
-          $("#c-"+id)[0].style.display="none"
-    };
-}
+document.getElementById("projects").addEventListener("click", function (event) {
+    if(event.target.classList[0]=="navbar"){
+    event.target.closest('.project').classList.toggle("open");
+    location.href = "#c-"+event.target.closest('.project').id;
+    }
+});
