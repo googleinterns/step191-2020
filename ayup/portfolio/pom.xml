@@ -35,11 +35,7 @@
         <version>2.2.0</version>
         <configuration>
           <!-- TODO: set project ID. -->
-<<<<<<< HEAD
           <deploy.projectId>ayup-step-2020</deploy.projectId>
-=======
-          <deploy.projectId>YOUR_PROJECT_ID_HERE</deploy.projectId>
->>>>>>> upstream/master
           <deploy.version>1</deploy.version>
         </configuration>
       </plugin>
