@@ -94,3 +94,11 @@
     object-position: 50% 50%; 
     height: 600px;
 }
+
+/*Skills Section*/
+#skills{
+    margin: 40px;
+}
+.col-md-6 {
+    margin: 10px 0;
+}
