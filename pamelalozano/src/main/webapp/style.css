@@ -41,8 +41,64 @@
 #projects h2{
     margin-bottom: 20px;
 }
-.project-desc{
+.project .project-desc{
     display:none;
     background-color: white;
     padding: 5%;
+}
+.open .project-desc{
+    display:block;
+    background-color: white;
+    padding: 5%;
+}
+/*Social Media Section*/
+#socialMedia{
+    margin:20px 0;
+}
+#socialMedia .fa {
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+  text-decoration: none;
+  margin: 5px 10px;
+  border-radius: 50%;
+}
+#socialMedia .fa:hover {
+    opacity: 0.7;
+}
+#socialMedia .fa-github {
+  background: #252c30;
+  color: white;
+}
+.fa-linkedin {
+  background: #007bb5;
+  color: white;
+}
+
+/*Gallery Section*/
+#gallery{
+    height: 600px;
+    padding: 0 0;
+    margin: 0 0;
+    margin-bottom: 20px;
+}
+#gallery h3{
+    margin: 20px 20px;
+    background-color: rgba(255,255,255,0.5);
+    position: absolute;
+    padding: 10px 10px;
+    z-index: 10;
+}
+.w-100 { /*Bootstrap slide images class*/
+    object-fit: cover;
+    object-position: 50% 50%; 
+    height: 600px;
+}
+
+/*Skills Section*/
+#skills{
+    margin: 40px;
+}
+.col-md-6 {
+    margin: 10px 0;
 }
