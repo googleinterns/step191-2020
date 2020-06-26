@@ -1,3 +1,5 @@
+Deployed app: http://pamelalozano-step-2020.appspot.com/
+
 This directory is where you'll write all of your code!
 
 By default it contains a barebones web app. To run a local server, execute this
