@@ -37,6 +37,17 @@
   right: 0;
 }
 
-.card-text{
+.card-text {
   font-family: 'Playfair Display SC', serif;
+}
+
+.img-desciption {
+  font-family: 'Playfair Display SC', serif;
+  font-size: 15px;
+  margin-top: 5px;
+  margin-bottom: 3px;
+}
+
+#img-snow {
+  margin-top: 5px;
 }
