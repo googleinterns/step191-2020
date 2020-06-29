@@ -42,7 +42,7 @@ function calculateArmandoAge() {
 calculateArmandoAge();
 
 // Scripts for the image gallery
-var slideIndex = 1;
+var slideIndex = 0;
 
 function initSlides() {
   showSlides(slideIndex);
@@ -50,13 +50,13 @@ function initSlides() {
 
 // Next control
 function showNextSlide() {
-	slideIndex ++;
+	slideIndex++;
 	showSlides(slideIndex);
 }
 
 // Previous control
 function showPreviousSlide() {
-	slideIndex --;
+	slideIndex--;
 	showSlides(slideIndex);
 }
 
@@ -68,23 +68,19 @@ function updateCurrentSlide(n) {
 
 function showSlides(n) {
   var slides = document.getElementsByClassName("mySlides");
-  var dots = document.getElementsByClassName("dot");
-  if (n > slides.length) {
-    slideIndex = 1;
+	var dots = document.getElementsByClassName("dot");
+  slideIndex = n % slides.length;
+  if (slideIndex == -1) {
+    slideIndex = slides.length - 1;
   }
-  if (n < 1) {
-    slideIndex = slides.length;
-  }
-
   for (const slide of slides) {
     slide.style.display = "none";
   }
   for (const dot of dots) {
       dot.classList.remove("active");
   }
-  
-  slides[slideIndex-1].style.display = "block";
-  dots[slideIndex-1].classList.add("active");
+  slides[slideIndex].style.display = "block";
+  dots[slideIndex].classList.add("active");
 }
 
 initSlides();
