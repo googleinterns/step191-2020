@@ -16,8 +16,7 @@
  * Adds a random greeting to the page.
  */
 function addRandomGreeting() {
-  const greetings =
-      ['Hello world!', '¡Hola Mundo!', '你好，世界！', 'Bonjour le monde!'];
+  const greetings = ['Hello world!', '¡Hola Mundo!', '你好，世界！', 'Bonjour le monde!'];
 
   // Pick a random greeting.
   const greeting = greetings[Math.floor(Math.random() * greetings.length)];
@@ -31,12 +30,57 @@ function addRandomGreeting() {
  * Adds Armandos age to the page.
  */
 function calculateArmandoAge() {
-    // Calculate age, Armando was born on May 13, 2000.
-    const diffMs = new Date() - new Date(2000, 5, 13);
-    const ageDt = new Date(diffMs); 
-    
-    // Add it to the page.
-    const ageContainer = document.getElementById('armando-age-container');
-    ageContainer.innerText = Math.abs(ageDt.getUTCFullYear() - 1970);
-    
+  // Calculate age, Armando was born on May 13, 2000.
+  const diffMs = new Date() - new Date(2000, 5, 13);
+  const ageDt = new Date(diffMs); 
+  
+  // Add it to the page.
+  const ageContainer = document.getElementById('armando-age-container');
+  ageContainer.innerText = Math.abs(ageDt.getUTCFullYear() - 1970);   
 }
+
+calculateArmandoAge();
+
+// Scripts for the image gallery
+var slideIndex = 0;
+
+function initSlides() {
+  showSlides(slideIndex);
+}
+
+// Next control
+function showNextSlide() {
+	slideIndex++;
+	showSlides(slideIndex);
+}
+
+// Previous control
+function showPreviousSlide() {
+	slideIndex--;
+	showSlides(slideIndex);
+}
+
+// Thumbnail image controls
+function updateCurrentSlide(n) {
+  slideIndex = n;
+  showSlides(slideIndex);
+}
+
+function showSlides(n) {
+  var slides = document.getElementsByClassName("mySlides");
+	var dots = document.getElementsByClassName("dot");
+  slideIndex = n % slides.length;
+  if (slideIndex == -1) {
+    slideIndex = slides.length - 1;
+  }
+  for (const slide of slides) {
+    slide.style.display = "none";
+  }
+  for (const dot of dots) {
+      dot.classList.remove("active");
+  }
+  slides[slideIndex].style.display = "block";
+  dots[slideIndex].classList.add("active");
+}
+
+initSlides();
