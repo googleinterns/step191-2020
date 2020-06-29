@@ -14,5 +14,5 @@ jobs:
           GIPHY_API_KEY: ${{ secrets.GIPHY_TOKEN }}
         with:
           trigger: '["(?i)^lgtm$"]'
-          override: true
+          overide: true # [sic]
           source: 'giphy'
