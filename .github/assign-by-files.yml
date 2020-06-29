@@ -10,6 +10,6 @@
   - aroquev00
   - thefredo1000
 
-'.github/**/*.yml':
+'.github/**/*.*':
   - aroquev00
   - thefredo1000
