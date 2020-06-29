@@ -9,8 +9,7 @@ on:
     types: [opened, edited]
   pull_request_review_comment:
     types: [created, edited]
-  
-   
+
 jobs:
   giphy-generator:
     runs-on: ubuntu-latest
