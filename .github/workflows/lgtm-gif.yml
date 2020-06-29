@@ -7,10 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: micnncim/action-lgtm-reaction@master # Set some version.
+      - name: LGTM Reaction
+        uses: micnncim/action-lgtm-reaction@v0.6.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
+          GIPHY_API_KEY: ${{ secrets.GIPHY_TOKEN }}
         with:
           trigger: '["^(?i)lgtm$"]'
           override: true
