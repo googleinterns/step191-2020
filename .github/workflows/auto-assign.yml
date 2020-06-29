@@ -1,7 +1,8 @@
 name: Auto Assign Reviewers
 
 on:
-  - pull_request
+  schedule:
+    - cron: "*/5 * * * *"
 
 jobs:
   assign_reviewer:
