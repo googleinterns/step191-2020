@@ -1,1 +1,4 @@
 name: Auto Assign Reviewers
+
+on:
+  - pull_request
