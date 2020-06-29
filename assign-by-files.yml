@@ -1,0 +1,15 @@
+'aroquev/**/*.*':
+  - pamelalozano16
+  - thefredo1000
+
+'ayup/**/*.*':
+  - aroquev00
+  - pamelalozano16
+
+'pamelalozano/**/*.*':
+  - aroquev00
+  - thefredo1000
+
+'.github/**/*.yml':
+  - aroquev00
+  - thefredo1000
