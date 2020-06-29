@@ -25,14 +25,16 @@ function addRandomFact() {
     "🐕 I have three dogs!"];
   
   // Pick a random fact.
-  var fact = facts[Math.floor(Math.random() * facts.length)];
+  var newFact = facts[Math.floor(Math.random() * facts.length)];
 
-  // Add it to the page.
-  const factContainer = document.getElementById('fact-container');
+  // Get the current fact
+  const factContainer = document.getElementById('js-fact-container');
+  currentFact = factContainer.innerHTML;
 
-  while(factContainer.innerHTML == fact) {
-    fact = facts[Math.floor(Math.random() * facts.length)]; 
+  // While the current fact it's the same as the new fact we try with another fact
+  while(currentFact == newFact) {
+    newFact = facts[Math.floor(Math.random() * facts.length)]; 
   }
-  factContainer.innerHTML = fact;
+  factContainer.innerHTML = newFact;
 }
 
