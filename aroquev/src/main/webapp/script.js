@@ -21,66 +21,77 @@ function getRandomCar() {
 			name: "McLaren 720S",
 			power: "720 hp",
 			country: "England",
-			funFact: "Just look at it, it is beautiful!"
+			funFact: "Just look at it, it is beautiful!",
+			path: "images/720s.jpg"
 		},
 		{
 			name: "Porsche 918 Spyder",
 			power: "720 hp",
 			country: "Germany",
-			funFact: "Hybrid power for the win!"
+			funFact: "Hybrid power for the win!",
+			path: "images/porsche.jpeg"
 		},
 		{
 			name: "Ferrari FXX Evoluzione",
 			power: "848 hp",
 			country: "Italy",
-			funFact: "You should really listen to the sound this one makes"
+			funFact: "You should really listen to the sound this one makes",
+			path: "images/ferrari.jpg"
 		},
 		{
 			name: "Lamborghini Sesto Elemento",
 			power: "562 hp",
 			country: "Italy",
-			funFact: "The whole thing weights less that a tonne thanks to carbon fiber!"
+			funFact: "The whole thing weights less that a tonne thanks to carbon fiber!",
+			path: "images/lambo.jpg"
 		},
 		{
 			name: "Mercedes-AMG G63 6x6",
 			power: "536 hp",
 			country: "Germany",
-			funFact: "Taking offroading to a whole new level."
+			funFact: "Taking offroading to a whole new level.",
+			path: "images/mercedes.jpeg"
 		},
 		{
 			name: "Subaru WRX STI",
 			power: "536 hp",
 			country: "Japan",
-			funFact: "Boxster engines rock!"
+			funFact: "Boxster engines rock!",
+			path: "images/subaru.jpg"
 		},
 		{
 			name: "Mini JCW",
 			power: "306 hp",
 			country: "England",
-			funFact: "I currently own a Mini :)."
+			funFact: "I currently own a Mini :).",
+			path: "images/mini.jpeg"
 		},
 		{
 			name: "Volkswagen Sedan",
 			power: "Unlimited hp",
 			country: "Germany",
-			funFact: "Grandpa's car <3, learned to drive in it."
+			funFact: "Grandpa's car <3, learned to drive in it.",
+			path: "images/vw.jpg"
 		}
     ];
 
     // Pick a random car.
     const car = cars[Math.floor(Math.random() * cars.length)];
 
-    // Add it to the page.
-    const carNameContainer = document.getElementById('car-name-container');
+		// Add it to the page.
+		const carImageContainer = document.getElementById('js-car-image');
+		carImageContainer.src = car.path;
+
+    const carNameContainer = document.getElementById('js-car-name-container');
     carNameContainer.innerText = "Name: " + car.name;
 
-    const carPowerContainer = document.getElementById('car-power-container');
+    const carPowerContainer = document.getElementById('js-car-power-container');
     carPowerContainer.innerText = "Power: " + car.power;
 
-    const carCountryContainer = document.getElementById('car-country-container');
+    const carCountryContainer = document.getElementById('js-car-country-container');
     carCountryContainer.innerText = "Country: " + car.country;
 
-    const carFunFactContainer = document.getElementById('car-funFact-container');
+    const carFunFactContainer = document.getElementById('js-car-funFact-container');
     carFunFactContainer.innerText = "Why I like this car? " + car.funFact;
 }
 
