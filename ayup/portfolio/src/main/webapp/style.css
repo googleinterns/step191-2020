@@ -1,26 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display+SC:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap');
 
-#greeting-container {
-  margin-top: 20px;
+.playfair-font {
+  font-family: 'Playfair Display SC', serif;
 }
 
-.card {
-  font-family: 'Playfair Display SC', serif;
+#greeting-container {
+  margin-top: 20px;
 }
 
 #jumbotron-intro {
   background-color: black ;
   color: white;
-  font-family: 'Playfair Display SC', serif;
 }
 
 .about-title {
-  font-family: 'Playfair Display SC', serif;
   font-weight: bold;
 }
 
 .about-p{
-  font-family: 'Playfair Display SC', serif;
   font-size: large;
   text-align: justify;
   text-indent: 40px;
@@ -37,12 +34,7 @@
   right: 0;
 }
 
-.card-text {
-  font-family: 'Playfair Display SC', serif;
-}
-
 .img-desciption {
-  font-family: 'Playfair Display SC', serif;
   font-size: 15px;
   margin-top: 5px;
   margin-bottom: 3px;
@@ -50,4 +42,27 @@
 
 #img-snow {
   margin-top: 5px;
+}
+
+#about-button {
+  font-weight: bold;
+  font-size: larger;
+  margin: 10px;
+}
+
+#fact-container {
+  font-weight: 400;
+}
+
+.footer {
+  padding-bottom: 5px;
+  background-color: black;
+  color: white;
+  width: 100%;
+  margin: 0px;
+  text-align: center;
+}
+
+.links-icons {
+  height: 32px;
 }

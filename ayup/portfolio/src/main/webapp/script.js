@@ -13,18 +13,28 @@
 // limitations under the License.
 
 /**
- * Adds a random greeting to the page.
+ * Adds a random fact to the page.
  */
-function addRandomGreeting() {
-  const greetings =
-      ['Yes!', 'No!', 'Maybe', 'Ask again', 'I cannot answer that for you...'];
+function addRandomFact() {
+  const facts = [
+    "🎮 I develop Nintendo GameBoy Advance ROMs in my spare time",
+    "📹 I was a YouTube star back in the days <a href='https://youtube.com/thefredo1000'>Check out my channel</a>",
+    "🤓 I am a huge Star Wars fan",
+    "🎵 I love Weezer, they are my favorite band",
+    "🎸 I can play the bass (Still a rookie)",
+    "🐕 I have three dogs!"];
   
-  // Pick a random greeting.
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+  // Pick a random fact.
+  var newFact = facts[Math.floor(Math.random() * facts.length)];
 
-  // Add it to the page.
-  const greetingContainer = document.getElementById('greeting-container');
-  greetingContainer.innerText = greeting;
-  
+  // Get the current fact
+  const factContainer = document.getElementById('js-fact-container');
+  const currentFact = factContainer.innerHTML;
+
+  // While the current fact it's the same as the new fact we try with another fact
+  while(currentFact == newFact) {
+    newFact = facts[Math.floor(Math.random() * facts.length)]; 
+  }
+  factContainer.innerHTML = newFact;
 }
 
