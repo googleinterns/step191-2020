@@ -29,7 +29,7 @@ function addRandomFact() {
 
   // Get the current fact
   const factContainer = document.getElementById('js-fact-container');
-  currentFact = factContainer.innerHTML;
+  const currentFact = factContainer.innerHTML;
 
   // While the current fact it's the same as the new fact we try with another fact
   while(currentFact == newFact) {
