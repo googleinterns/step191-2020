@@ -14,6 +14,10 @@
 
 package com.google.sps.servlets;
 
+import java.util.*;  
+import com.google.gson.Gson;
+import org.json.JSONObject;
+import org.json.JSONArray;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -23,10 +27,19 @@ import javax.servlet.http.HttpServletResponse;
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
+     
+     JSONArray ja = new JSONArray();
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Comment prueba = new Comment("Title", "Msg");
+     JSONObject jo = new JSONObject();
+     jo.put("Subject",prueba.getSubject());
+     jo.put("Comment",prueba.getMessage());
+     jo.put("Date",new Date(System.currentTimeMillis()));
+     ja.put(jo);
+
     response.setContentType("text/html;");
-    response.getWriter().println("<h1>Hello world!</h1>");
+    response.getWriter().println(ja);
   }
 }
