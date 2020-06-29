@@ -13,6 +13,79 @@
 // limitations under the License.
 
 /**
+ * Adds a random greeting to the page.
+ */
+function addRandomGreeting() {
+	const greetings =
+		['Hello world!', '¡Hola Mundo!', '你好，世界！', 'Bonjour le monde!'];
+
+	// Pick a random greeting.
+	const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+
+	// Add it to the page.
+	const greetingContainer = document.getElementById('greeting-container');
+	greetingContainer.innerText = greeting;
+}
+
+/**
+ * Adds Armandos age to the page.
+ */
+function calculateArmandoAge() {
+	// Calculate age, Armando was born on May 13, 2000.
+	const diffMs = new Date() - new Date(2000, 5, 13);
+	const ageDt = new Date(diffMs);
+
+	// Add it to the page.
+	const ageContainer = document.getElementById('armando-age-container');
+	ageContainer.innerText = Math.abs(ageDt.getUTCFullYear() - 1970);
+
+}
+
+// Scripts for the image gallery
+var slideIndex = 0;
+
+function initSlides() {
+	showSlides(slideIndex);
+}
+
+// Next control
+function showNextSlide() {
+	slideIndex++;
+	showSlides(slideIndex);
+}
+
+// Previous control
+function showPreviousSlide() {
+	slideIndex--;
+	showSlides(slideIndex);
+}
+
+// Thumbnail image controls
+function updateCurrentSlide(n) {
+	slideIndex = n;
+	showSlides(slideIndex);
+}
+
+function showSlides(n) {
+	var slides = document.getElementsByClassName("mySlides");
+	var dots = document.getElementsByClassName("dot");
+	slideIndex = n % slides.length;
+	if (slideIndex == -1) {
+		slideIndex = slides.length - 1;
+	}
+	for (const slide of slides) {
+		slide.style.display = "none";
+	}
+	for (const dot of dots) {
+		dot.classList.remove("active");
+	}
+	slides[slideIndex].style.display = "block";
+	dots[slideIndex].classList.add("active");
+}
+
+initSlides();
+
+/**
  * Adds a random car and its data to the page.
  */
 function getRandomCar() {
@@ -73,86 +146,24 @@ function getRandomCar() {
 			funFact: "Grandpa's car <3, learned to drive in it.",
 			path: "images/vw.jpg"
 		}
-    ];
+	];
 
-    // Pick a random car.
-    const car = cars[Math.floor(Math.random() * cars.length)];
+	// Pick a random car.
+	const car = cars[Math.floor(Math.random() * cars.length)];
 
-		// Add it to the page.
-		const carImageContainer = document.getElementById('js-car-image');
-		carImageContainer.src = car.path;
+	// Add it to the page.
+	const carImageContainer = document.getElementById('js-car-image');
+	carImageContainer.src = car.path;
 
-    const carNameContainer = document.getElementById('js-car-name-container');
-    carNameContainer.innerText = "Name: " + car.name;
+	const carNameContainer = document.getElementById('js-car-name-container');
+	carNameContainer.innerText = "Name: " + car.name;
 
-    const carPowerContainer = document.getElementById('js-car-power-container');
-    carPowerContainer.innerText = "Power: " + car.power;
+	const carPowerContainer = document.getElementById('js-car-power-container');
+	carPowerContainer.innerText = "Power: " + car.power;
 
-    const carCountryContainer = document.getElementById('js-car-country-container');
-    carCountryContainer.innerText = "Country: " + car.country;
+	const carCountryContainer = document.getElementById('js-car-country-container');
+	carCountryContainer.innerText = "Country: " + car.country;
 
-    const carFunFactContainer = document.getElementById('js-car-funFact-container');
-    carFunFactContainer.innerText = "Why I like this car? " + car.funFact;
-}
-
-/**
- * Adds a random greeting to the page.
- */
-function addRandomGreeting() {
-  const greetings =
-      ['Hello world!', '¡Hola Mundo!', '你好，世界！', 'Bonjour le monde!'];
-
-  // Pick a random greeting.
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
-
-  // Add it to the page.
-  const greetingContainer = document.getElementById('greeting-container');
-  greetingContainer.innerText = greeting;
-}
-
-/**
- * Adds Armandos age to the page.
- */
-function calculateArmandoAge() {
-    // Calculate age, Armando was born on May 13, 2000.
-    const diffMs = new Date() - new Date(2000, 5, 13);
-    const ageDt = new Date(diffMs); 
-    
-    // Add it to the page.
-    const ageContainer = document.getElementById('armando-age-container');
-    ageContainer.innerText = Math.abs(ageDt.getUTCFullYear() - 1970);
-    
-}
-
-// Scripts for the image gallery
-var slideIndex = 1;
-
-function initSlides() {
-  showSlides(slideIndex);
-}
-
-// Next/previous controls
-function plusSlides(n) {
-  showSlides(slideIndex += n);
-}
-
-// Thumbnail image controls
-function currentSlide(n) {
-  showSlides(slideIndex = n);
-}
-
-function showSlides(n) {
-  var i;
-  var slides = document.getElementsByClassName("mySlides");
-  var dots = document.getElementsByClassName("dot");
-  if (n > slides.length) {slideIndex = 1}
-  if (n < 1) {slideIndex = slides.length}
-  for (i = 0; i < slides.length; i++) {
-      slides[i].style.display = "none";
-  }
-  for (i = 0; i < dots.length; i++) {
-      dots[i].className = dots[i].className.replace(" active", "");
-  }
-  slides[slideIndex-1].style.display = "block";
-  dots[slideIndex-1].className += " active";
+	const carFunFactContainer = document.getElementById('js-car-funFact-container');
+	carFunFactContainer.innerText = "Why I like this car? " + car.funFact;
 }
