@@ -13,6 +13,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GIPHY_API_KEY: ${{ secrets.GIPHY_TOKEN }}
         with:
-          trigger: '["^(?i)lgtm$"]'
+          trigger: '["(?i)^lgtm$"]'
           override: true
           source: 'giphy'
