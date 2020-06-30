@@ -36,4 +36,9 @@ public class Comment {
   public Date getDate() {
       return this.date;
   }
+  public String toJson() {
+    Gson gson = new Gson();
+    String json = gson.toJson(this);
+    return json;
+  }
 };

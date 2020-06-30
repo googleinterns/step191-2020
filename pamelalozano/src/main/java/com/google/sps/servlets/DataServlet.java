@@ -14,10 +14,8 @@
 
 package com.google.sps.servlets;
 
-import java.util.ArrayList;  
-import java.util.List;  
-import java.util.Date;  
-import com.google.gson.Gson;
+import java.util.ArrayList; 
+import java.util.Date; 
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -32,24 +30,17 @@ public class DataServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     
     Comment prueba = new Comment("Title", "Msg", new Date(System.currentTimeMillis()));
-
+    String commentJson = prueba.toJson();
     /*
       This array will just be needed once to create the comments, and then it 
       will not be needed since I'll obtain it from the get request of the comments
     */
-    ArrayList<Comment> comments = new ArrayList<Comment>();  
+    ArrayList<String> comments = new ArrayList<String>();  
         
-    comments.add(prueba);  
-
-    String commentsJson = convertToJsonUsingGson(comments);  
+    comments.add(commentJson);  
 
     response.setContentType("application/json;");
-    response.getWriter().println(commentsJson);
+    response.getWriter().println(comments);
   }
 
-   private String convertToJsonUsingGson(List<Comment> comments) {
-    Gson gson = new Gson();
-    String json = gson.toJson(comments);
-    return json;
-  }
 }
