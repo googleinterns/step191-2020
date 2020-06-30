@@ -5,3 +5,7 @@ steps:
   - name: maven
     entrypoint: mvn
     args: ['-f', './aroquev', 'package']
+  - name: maven
+    entrypoint: mvn
+    args: ['-f', './ayup/portfolio', 'package']
+
