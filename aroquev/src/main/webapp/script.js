@@ -187,3 +187,12 @@ function getRandomCar() {
   const carView = buildCarView(car);
   carContainer.replaceWith(carView);
 }
+
+/**
+ * Fetch message from Java servlet and add it to the DOM
+ */
+function getServletMessage() {
+  fetch('/data').then(response => response.text()).then((greeting)=> {
+    document.getElementById('js-servlet-container').innerHTML = greeting;
+  });
+}
