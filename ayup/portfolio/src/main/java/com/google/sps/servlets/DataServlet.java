@@ -15,7 +15,7 @@
 package com.google.sps.servlets;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import com.google.common.collect.ImmutableList; 
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -26,23 +26,17 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
-  static private ArrayList<String> facts;
-
-  @Override
-  public void init() {
-    facts = new ArrayList<>();
-    facts.add("I develop Nintendo GameBoy Advance ROMs in my spare time");
-    facts.add("I was a YouTube star back in the days <a href='https://youtube.com/thefredo1000'>Check out my channel</a>");
-    facts.add("I am a huge Star Wars fan");
-    facts.add("I love Weezer, they are my favorite band");
-    facts.add("I can play the bass (Still a rookie)");
-    facts.add("I have three dogs!");
-  }
-
+  private static final ImmutableList<String> FUN_FACTS = ImmutableList.of(
+    "I develop Nintendo GameBoy Advance ROMs in my spare time",
+    "I was a YouTube star back in the days <a href='https://youtube.com/thefredo1000'>Check out my channel</a>",
+    "I am a huge Star Wars fan",
+    "I love Weezer, they are my favorite band",
+    "I can play the bass (Still a rookie)",
+    "I have three dogs!");
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String fact = facts.get((int) (Math.random() * facts.size()));
+    String fact = FUN_FACTS.get((int) (Math.random() * FUN_FACTS.size()));
 
     response.setContentType("text/html;");
     response.getWriter().println(fact);
