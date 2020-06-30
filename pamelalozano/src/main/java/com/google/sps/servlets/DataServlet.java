@@ -14,10 +14,10 @@
 
 package com.google.sps.servlets;
 
-import java.util.*;  
+import java.util.ArrayList;  
+import java.util.List;  
+import java.util.Date;  
 import com.google.gson.Gson;
-import org.json.JSONObject;
-import org.json.JSONArray;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -27,19 +27,29 @@ import javax.servlet.http.HttpServletResponse;
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
-     
-     JSONArray ja = new JSONArray();
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Comment prueba = new Comment("Title", "Msg");
-     JSONObject jo = new JSONObject();
-     jo.put("Subject",prueba.getSubject());
-     jo.put("Comment",prueba.getMessage());
-     jo.put("Date",new Date(System.currentTimeMillis()));
-     ja.put(jo);
+    
+    Comment prueba = new Comment("Title", "Msg", new Date(System.currentTimeMillis()));
 
-    response.setContentType("text/html;");
-    response.getWriter().println(ja);
+    /*
+      This array will just be needed once to create the comments, and then it 
+      will not be needed since I'll obtain it from the get request of the comments
+    */
+    ArrayList<Comment> comments = new ArrayList<Comment>();  
+        
+    comments.add(prueba);  
+
+    String commentsJson = convertToJsonUsingGson(comments);  
+
+    response.setContentType("application/json;");
+    response.getWriter().println(commentsJson);
+  }
+
+   private String convertToJsonUsingGson(List<Comment> comments) {
+    Gson gson = new Gson();
+    String json = gson.toJson(comments);
+    return json;
   }
 }
