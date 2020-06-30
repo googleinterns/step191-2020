@@ -38,28 +38,3 @@ function addRandomFact() {
   factContainer.innerHTML = newFact;
 }
 
-
-async function getRandomFactUsingAsyncAwait() {
-  const response = await fetch('/data');
-  const fact = await response.text();
-  document.getElementById('js-fact-container').innerHTML = fact;
-}
-
-function createParaElement(text) {
-  const liElement = document.createElement('p');
-  liElement.innerHTML = text;
-  return liElement;
-}
-function getServerFacts() {
-  fetch('/data').then(response => response.json()).then((serverFacts) => {
-    // stats is an object, not a string, so we have to
-    // reference its fields to create HTML content
-
-    const statsListElement = document.getElementById('js-fact-container');
-    statsListElement.innerHTML = '';
-    statsListElement.appendChild( createParaElement('Comment 1: ' + serverFacts.comment0));
-    statsListElement.appendChild( createParaElement('Comment 2: ' + serverFacts.comment1));
-    statsListElement.appendChild( createParaElement('Comment 3: ' + serverFacts.comment2));
-    statsListElement.appendChild( createParaElement('Comment 4: ' + serverFacts.comment3));
-  });
-}
