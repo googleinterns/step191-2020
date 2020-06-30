@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns some example content. TODO: modify this file to handle comments data */
+/** Servlet that returns some example content.*/
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
     
@@ -40,20 +40,24 @@ public class DataServlet extends HttpServlet {
     // Get the input from the form.
     Comment newComment = getComment(request);
 
+    //If there's an empty input the subject will be "error"
     if (newComment.getSubject()=="error") {
       response.setContentType("text/html");
-      System.out.println("Subject and comment are needed");
       response.getWriter().println("Subject and comment are needed");
       return;
     }
+
     String commentJson = newComment.toJson();
     comments.add(commentJson);
-    // Redirect back to the HTML page.
-    response.sendRedirect("/");
+
+    // Redirect back to the page in the comments section.
+    //ToDo: Successful comment post alert
+    response.sendRedirect("/#comments");
   }
 
-  /** Returns the comment posted or a comment with subject error if somehting is missing. */
+  /** Returns the comment posted or a comment with subject error if something is missing. */
   private Comment getComment(HttpServletRequest request) {
+      
     // Get the input from the form.
     String subject = request.getParameter("subject");
     String msg = request.getParameter("msg");
