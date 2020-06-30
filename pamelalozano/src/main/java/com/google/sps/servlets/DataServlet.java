@@ -42,6 +42,7 @@ public class DataServlet extends HttpServlet {
 
     if (newComment.getSubject()=="error") {
       response.setContentType("text/html");
+      System.out.println("Subject and comment are needed");
       response.getWriter().println("Subject and comment are needed");
       return;
     }
@@ -56,7 +57,8 @@ public class DataServlet extends HttpServlet {
     // Get the input from the form.
     String subject = request.getParameter("subject");
     String msg = request.getParameter("msg");
-    if (subject=="" || msg=="") {
+
+    if (subject == null || subject.isEmpty() || msg == null || msg.isEmpty()) {
       System.err.println("Subject and comment are needed");
       return (new Comment("error","",null));
     }
