@@ -74,9 +74,13 @@ function createCommentElement(comment) {
   const titleElement = document.createElement('span');
   titleElement.innerText = comment.title;
 
-  const deleteButtonElement = document.createElement('button');
-  deleteButtonElement.innerText = 'Delete';
-  deleteButtonElement.className = "btn btn-danger"
+  const descriptionElement = document.createElement('span');
+  descriptionElement.innerText = comment.description;
+  
+  const usernameElement = document.createElement('span');
+  usernameElement.innerText = comment.username;
+
+  const deleteButtonElement = createDeleteButton()
   deleteButtonElement.addEventListener('click', () => {
     deleteComment(comment);
 
@@ -85,6 +89,8 @@ function createCommentElement(comment) {
   });
 
   commentElement.appendChild(titleElement);
+  commentElement.appendChild(descriptionElement);
+  commentElement.appendChild(usernameElement);
   commentElement.appendChild(deleteButtonElement);
   return commentElement;
 }
@@ -94,4 +100,11 @@ function deleteComment(comment) {
   const params = new URLSearchParams();
   params.append('id', comment.id);
   fetch('/delete-comment', {method: 'POST', body: params});
+}
+
+function createDeleteButton() {
+  const deleteButtonElement = document.createElement('button');
+  deleteButtonElement.innerText = 'Delete';
+  deleteButtonElement.className = "btn btn-danger";
+  return deleteButtonElement;
 }
