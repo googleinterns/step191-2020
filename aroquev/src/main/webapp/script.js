@@ -150,6 +150,7 @@ const cars = [
  */
 function buildCarView(car) {
   const carView = document.createElement('div');
+  carView.id = 'js-car-container';
 
   const image = document.createElement('img');
   image.src = car.path;
@@ -182,7 +183,7 @@ function buildCarView(car) {
 function getRandomCar() {
   // Pick a random car.
   const car = cars[Math.floor(Math.random() * cars.length)];
-  
+
   const carContainer = document.getElementById('js-car-container');
   const carView = buildCarView(car);
   carContainer.replaceWith(carView);
@@ -192,7 +193,7 @@ function getRandomCar() {
  * Fetch message from Java servlet and add it to the DOM
  */
 function getServletMessage() {
-  fetch('/data').then(response => response.json()).then((comments)=> {
+  fetch('/data').then(response => response.json()).then((comments) => {
     // Get the cities container
     const citiesContainer = document.getElementById('js-comments-container');
     citiesContainer.innerHTML = '';
