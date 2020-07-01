@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
-  private static final ArrayList<String> comments = new ArrayList<String>( Arrays.asList("I would like to live in NYC.", "Berlin looks like a nice place to have fun.", "I gotta go visit Japan one day!") );  
+  private static final ArrayList<String> comments = new ArrayList<String>();  
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
