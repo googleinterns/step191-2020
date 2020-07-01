@@ -12,20 +12,20 @@ public class Comment {
   private String msg;
   private Date date;
 
-  public Comment(String s, String m, Date d) {
-    this.subject = s;
-    this.msg = m;
-    this.date = d;
+  public Comment(String subject, String message, Date date) {
+    this.subject = subject;
+    this.msg = message;
+    this.date = date;
   }
   
-  public void setSubject(String s) {
-      this.subject = s;
+  public void setSubject(String subject) {
+      this.subject = subject;
   }
-  public void setMessage(String m) {
-      this.msg = m;
+  public void setMessage(String message) {
+      this.msg = message;
   }
-  public void setDate(Date d) {
-      this.date = d;
+  public void setDate(Date date) {
+      this.date = date;
   }
   public String getSubject() {
       return this.subject;
@@ -35,5 +35,10 @@ public class Comment {
   }
   public Date getDate() {
       return this.date;
+  }
+  public String toJson() {
+    Gson gson = new Gson();
+    String json = gson.toJson(this);
+    return json;
   }
 };

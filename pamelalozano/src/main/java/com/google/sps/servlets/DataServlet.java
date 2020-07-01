@@ -14,42 +14,66 @@
 
 package com.google.sps.servlets;
 
-import java.util.ArrayList;  
-import java.util.List;  
-import java.util.Date;  
-import com.google.gson.Gson;
+import java.util.ArrayList; 
+import java.util.Date; 
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns some example content. TODO: modify this file to handle comments data */
+/** Servlet that returns some example content.*/
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
+    
+  ArrayList<String> comments = new ArrayList<>();  
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    
-    Comment prueba = new Comment("Title", "Msg", new Date(System.currentTimeMillis()));
-
-    /*
-      This array will just be needed once to create the comments, and then it 
-      will not be needed since I'll obtain it from the get request of the comments
-    */
-    ArrayList<Comment> comments = new ArrayList<Comment>();  
-        
-    comments.add(prueba);  
-
-    String commentsJson = convertToJsonUsingGson(comments);  
-
     response.setContentType("application/json;");
-    response.getWriter().println(commentsJson);
+    response.getWriter().println(comments);
+  }
+  
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    // Get the input from the form.
+    Comment newComment = getComment(request);
+
+    if (!validateComment(newComment)){
+      response.setContentType("text/html");
+      response.getWriter().println("Subject and comment are required");
+      return;
+    }
+
+    String commentJson = newComment.toJson();
+    comments.add(commentJson);
+
+    // Redirect back to the page in the comments section.
+    //ToDo: Successful comment post alert
+    response.sendRedirect("/#comments");
   }
 
-   private String convertToJsonUsingGson(List<Comment> comments) {
-    Gson gson = new Gson();
-    String json = gson.toJson(comments);
-    return json;
+  /** Returns the comment posted or a comment with subject error if something is missing. */
+  private Comment getComment(HttpServletRequest request) {
+    // Get the input from the form.
+    String subject = request.getParameter("subject");
+    String msg = request.getParameter("msg");
+
+    Comment newComment = new Comment(subject, msg, new Date(System.currentTimeMillis()));
+
+    return newComment;
+  }
+
+  /*Checks if an input is missing from comment*/
+  private boolean validateComment(Comment comment) {
+
+    String subject = comment.getSubject();
+    String msg = comment.getMessage();
+
+    if (subject == null || subject.isEmpty() || msg == null || msg.isEmpty()) {
+      return false;
+    }
+
+    return true;
   }
 }
