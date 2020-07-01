@@ -192,7 +192,21 @@ function getRandomCar() {
  * Fetch message from Java servlet and add it to the DOM
  */
 function getServletMessage() {
-  fetch('/data').then(response => response.text()).then((greeting)=> {
-    document.getElementById('js-servlet-container').innerHTML = greeting;
+  fetch('/data').then(response => response.json()).then((comments)=> {
+    // Get the cities container
+    const citiesContainer = document.getElementById('js-servlet-container');
+    citiesContainer.innerHTML = '';
+    
+    for (const comment of comments) {
+      // Add each comment as a <li> to the container
+      citiesContainer.appendChild(createListElement(comment));
+    }
   });
+}
+
+/** Creates an <li> element containing text. */
+function createListElement(text) {
+  const liElement = document.createElement('li');
+  liElement.innerText = text;
+  return liElement;
 }
