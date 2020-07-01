@@ -24,17 +24,17 @@ document.getElementById("projects").addEventListener("click", function (event) {
 async function loadComments() {
   let response = await fetch('/data');
   let comments = await response.json();
-  if(comments.length==0) {
+  if(comments.length == 0) {
       document.getElementById("comments-section").innerHTML="No comments";
   } 
   else {
     let commentSection = document.getElementById("comments-section");
     
     //The newest comments at the top
-    for(let i=comments.length-1; 0<=i; i--){
-        let newCard = createCard(comments[i]);
+    comments.forEach(comment => {
+        let newCard = createCard(comment);
         commentSection.append(newCard);
-    };
+    });
 
   };
 }

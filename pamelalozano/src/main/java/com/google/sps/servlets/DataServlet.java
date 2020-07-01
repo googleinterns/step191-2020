@@ -46,7 +46,7 @@ public class DataServlet extends HttpServlet {
     }
 
     String commentJson = newComment.toJson();
-    comments.add(commentJson);
+    comments.add(0, commentJson);
 
     // Redirect back to the page in the comments section.
     //ToDo: Successful comment post alert
