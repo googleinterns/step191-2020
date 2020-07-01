@@ -195,12 +195,19 @@ function getRandomCar() {
 function getServletMessage() {
   fetch('/data').then(response => response.json()).then((comments) => {
     // Get the cities container
-    const citiesContainer = document.getElementById('js-servlet-container');
+    const citiesContainer = document.getElementById('js-comments-container');
     citiesContainer.innerHTML = '';
-
-    for (const comment of comments) {
-      // Add each comment as a <li> to the container
-      citiesContainer.appendChild(createListElement(comment));
+    
+    // Check if the array of comments is empty
+    if (!Array.isArray(comments) || !comments.length) {
+      const pElement = document.createElement('p');
+      pElement.innerText = "Looks like there are no comments yet. Be the first one to comment!"
+      citiesContainer.appendChild(pElement);
+    } else {
+      for (const comment of comments) {
+        // Add each comment as a <li> to the container
+        citiesContainer.appendChild(createListElement(comment));
+      }
     }
   });
 }
