@@ -10,7 +10,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
     <script src="script.js"></script>
   </head>
-  <body onload="loadComments()" onchange="loadComments()">      
+  <body onload="loadComments()">      
         <div class="jumbotron jumbotron-fluid playfair-font" id="jumbotron-intro">
             <div class="container">
                 <div class="row">
@@ -170,10 +170,12 @@
                         <h3><span class="about-subtitle">Recieving feedback it's always good!</span></h3>
                         <br>
                         <form method="POST" action="/new-comment">
+                            <h5 class="font-weight-bold">Title</h5>
                             <input type="text" name="title" />
                             <br>
-                            <input type="text" name="description" />
+                            <h5 class="font-weight-bold">Description</h5><input type="text" name="description" />
                             <br>
+                            <h5 class="font-weight-bold">Username</h5>
                             <input type="text" name="username" />
                             <br>
                             <button class="btn btn-danger" id="about-button">Submit</button>

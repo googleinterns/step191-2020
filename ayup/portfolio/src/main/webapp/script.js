@@ -66,19 +66,20 @@ function loadComments() {
   });
 }
 
-/** Creates an element that represents a comment, including its delete button. */
+/** Creates an element that represents a title, a description, a username and its delete button. */
 function createCommentElement(comment) {
   const commentElement = document.createElement('li');
   commentElement.className = 'comment';
 
   const titleElement = document.createElement('span');
   titleElement.innerText = comment.title;
+  titleElement.className = "font-weight-bold";
 
   const descriptionElement = document.createElement('span');
   descriptionElement.innerText = comment.description;
-  
+
   const usernameElement = document.createElement('span');
-  usernameElement.innerText = comment.username;
+  usernameElement.innerText = "By: " + comment.username;
 
   const deleteButtonElement = createDeleteButton()
   deleteButtonElement.addEventListener('click', () => {
@@ -89,9 +90,13 @@ function createCommentElement(comment) {
   });
 
   commentElement.appendChild(titleElement);
+  commentElement.appendChild(document.createElement("br"));
   commentElement.appendChild(descriptionElement);
+  commentElement.appendChild(document.createElement("br"));
   commentElement.appendChild(usernameElement);
+  commentElement.appendChild(document.createElement("br"));
   commentElement.appendChild(deleteButtonElement);
+  commentElement.appendChild(document.createElement("hr"));
   return commentElement;
 }
 
