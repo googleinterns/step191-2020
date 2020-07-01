@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
-  private static final ArrayList<String> comments = new ArrayList<String>();  
+  private final ArrayList<String> comments = new ArrayList<String>();  
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -43,7 +43,7 @@ public class DataServlet extends HttpServlet {
     // probaby verify that message is not empty
     String comment = request.getParameter("comments-body-input");
     comments.add(comment);
-    response.sendRedirect("/index.html");
+    response.sendRedirect("/");
   }
 
   /**
