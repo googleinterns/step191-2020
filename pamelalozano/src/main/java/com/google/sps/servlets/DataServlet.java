@@ -39,10 +39,9 @@ public class DataServlet extends HttpServlet {
     // Get the input from the form.
     Comment newComment = getComment(request);
 
-    //If there's an empty input the subject will be "error"
-    if (newComment.getSubject()=="error") {
+    if (!validateComment(newComment)){
       response.setContentType("text/html");
-      response.getWriter().println("Subject and comment are needed");
+      response.getWriter().println("Subject and comment are required");
       return;
     }
 
@@ -60,14 +59,21 @@ public class DataServlet extends HttpServlet {
     String subject = request.getParameter("subject");
     String msg = request.getParameter("msg");
 
-    if (subject == null || subject.isEmpty() || msg == null || msg.isEmpty()) {
-      System.err.println("Subject and comment are needed");
-      return (new Comment("error","",null));
-    }
-
     Comment newComment = new Comment(subject, msg, new Date(System.currentTimeMillis()));
 
     return newComment;
   }
 
+  /*Checks if an input is missing from comment*/
+  private boolean validateComment(Comment comment) {
+
+    String subject = comment.getSubject();
+    String msg = comment.getMessage();
+
+    if (subject == null || subject.isEmpty() || msg == null || msg.isEmpty()) {
+      return false;
+    }
+
+    return true;
+  }
 }
