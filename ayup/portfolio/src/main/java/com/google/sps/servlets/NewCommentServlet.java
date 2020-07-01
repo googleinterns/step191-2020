@@ -38,7 +38,7 @@ public class NewCommentServlet extends HttpServlet {
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(commentEntity);
-    System.out.println("cvh");
+    
     response.sendRedirect("/index.html");
   }
 }

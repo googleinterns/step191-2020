@@ -57,13 +57,10 @@ async function getRandomFactUsingAsyncAwait() {
 
 /** Fetches comments from the server and adds them to the DOM. */
 function loadComments() {
-  console.log("part 1");
   fetch('/list-comments').then(response => response.json()).then((comments) => {
-    console.log("part 2");
     const commentListElement = document.getElementById('comment-list');
     console.log(comments)
     comments.forEach((comment) => {
-      console.log("part 3");
       commentListElement.appendChild(createCommentElement(comment));
     })
   });
@@ -71,7 +68,6 @@ function loadComments() {
 
 /** Creates an element that represents a comment, including its delete button. */
 function createCommentElement(comment) {
-  console.log("part 4");
   const commentElement = document.createElement('li');
   commentElement.className = 'comment';
 
@@ -84,7 +80,6 @@ function createCommentElement(comment) {
   deleteButtonElement.addEventListener('click', () => {
     deleteComment(comment);
 
-    console.log("part 5");
     // Remove the comment from the DOM.
     commentElement.remove();
   });
