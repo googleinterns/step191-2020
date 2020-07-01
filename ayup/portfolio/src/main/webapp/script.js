@@ -54,3 +54,49 @@ async function getRandomFactUsingAsyncAwait() {
   var a = document.getElementById('js-fact-container');
   a.parentNode.replaceChild(newFactContainer, a);
 }
+
+/** Fetches comments from the server and adds them to the DOM. */
+function loadComments() {
+  console.log("part 1");
+  fetch('/list-comments').then(response => response.json()).then((comments) => {
+    console.log("part 2");
+    const commentListElement = document.getElementById('comment-list');
+    console.log(comments)
+    comments.forEach((comment) => {
+      console.log("part 3");
+      commentListElement.appendChild(createCommentElement(comment));
+    })
+  });
+}
+
+/** Creates an element that represents a comment, including its delete button. */
+function createCommentElement(comment) {
+  console.log("part 4");
+  const commentElement = document.createElement('li');
+  commentElement.className = 'comment';
+
+  const titleElement = document.createElement('span');
+  titleElement.innerText = comment.title;
+
+  const deleteButtonElement = document.createElement('button');
+  deleteButtonElement.innerText = 'Delete';
+  deleteButtonElement.className = "btn btn-danger"
+  deleteButtonElement.addEventListener('click', () => {
+    deleteComment(comment);
+
+    console.log("part 5");
+    // Remove the comment from the DOM.
+    commentElement.remove();
+  });
+
+  commentElement.appendChild(titleElement);
+  commentElement.appendChild(deleteButtonElement);
+  return commentElement;
+}
+
+/** Tells the server to delete the comment. */
+function deleteComment(comment) {
+  const params = new URLSearchParams();
+  params.append('id', comment.id);
+  fetch('/delete-comment', {method: 'POST', body: params});
+}
