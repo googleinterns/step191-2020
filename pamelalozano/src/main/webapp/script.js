@@ -12,24 +12,71 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * Adds a random greeting to the page.
- */
-function addRandomGreeting() {
-  const greetings =
-      ['Hello world!', '¡Hola Mundo!', '你好，世界！', 'Bonjour le monde!'];
-
-  // Pick a random greeting.
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
-
-  // Add it to the page.
-  const greetingContainer = document.getElementById('greeting-container');
-  greetingContainer.innerText = greeting;
-}
-
+/** Toggles the project's section */
 document.getElementById("projects").addEventListener("click", function (event) {
     if(event.target.classList[0]=="navbar"){
     event.target.closest('.project').classList.toggle("open");
     location.href = "#c-"+event.target.closest('.project').id;
     }
 });
+
+/** Loads existing Comments */
+async function loadComments() {
+  let response = await fetch('/data');
+  let comments = await response.json();
+  if(comments.length == 0) {
+      document.getElementById("comments-section").innerHTML="No comments";
+  } 
+  else {
+    let commentSection = document.getElementById("comments-section");
+    
+    //The newest comments at the top
+    comments.forEach(comment => {
+        let newCard = createCard(comment);
+        commentSection.append(newCard);
+    });
+
+  };
+}
+
+/** Creates a card element containing the comment. */
+function createCard(comment) {
+  let newCard = document.createElement('div');
+  newCard.classList.add('w3-card-4');
+  newCard.append(createCardHeader(comment.subject));
+  newCard.append(createCardComment(comment.msg));
+  newCard.append(createCardFooter(comment.date));
+  return newCard;
+}
+
+/** Creates the comment's header. */
+function createCardHeader(text){
+  let header = document.createElement('header');
+  header.classList.add('w3-container');
+  let headerText = document.createElement('h3');
+  headerText.innerHTML=text;
+  header.append(headerText);
+  return header;
+}
+
+/** Creates the comment's text. */
+function createCardComment(text){
+  let comment = document.createElement('div');
+  comment.classList.add('w3-container');
+  let commentText = document.createElement('p');
+  commentText.innerHTML=text;
+  comment.append(commentText);
+  return comment;
+}
+
+/** Creates the comment's footer with date. */
+function createCardFooter(text){
+  let footer = document.createElement('footer');
+  footer.classList.add('w3-container');
+  let footerText = document.createElement('h5');
+  footerText.innerHTML=text;
+  footer.append(footerText);
+  return footer;
+}
+
+
