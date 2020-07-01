@@ -15,6 +15,8 @@
 package com.google.sps.servlets;
 
 import java.io.IOException;
+import com.google.common.collect.ImmutableList; 
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,9 +26,19 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
+  private static final ImmutableList<String> FUN_FACTS = ImmutableList.of(
+    "I develop Nintendo GameBoy Advance ROMs in my spare time",
+    "I was a YouTube star back in the days <a href='https://youtube.com/thefredo1000'>Check out my channel</a>",
+    "I am a huge Star Wars fan",
+    "I love Weezer, they are my favorite band",
+    "I can play the bass (Still a rookie)",
+    "I have three dogs!");
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    String fact = FUN_FACTS.get((int) (Math.random() * FUN_FACTS.size()));
+
     response.setContentType("text/html;");
-    response.getWriter().println("<h1>Hello world!</h1>");
+    response.getWriter().println(fact);
   }
 }
