@@ -197,7 +197,7 @@ function getServletMessage() {
     const citiesContainer = document.getElementById('js-servlet-container');
     citiesContainer.innerHTML = '';
     
-    for (comment of comments) {
+    for (const comment of comments) {
       // Add each comment as a <li> to the container
       citiesContainer.appendChild(createListElement(comment));
     }

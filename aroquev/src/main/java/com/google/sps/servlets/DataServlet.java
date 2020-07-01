@@ -17,7 +17,6 @@ package com.google.sps.servlets;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -27,14 +26,15 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
-  private ArrayList<String> comments;
+  private static final ArrayList<String> comments = new ArrayList<String>();
+  comments.add("I would like to live in NYC.");
+  comments.add("Berlin looks like a nice place to have fun.");
+  comments.add("I gotta go visit Japan one day!");
 
   @Override
   public void init() {
-    comments = new ArrayList<>();
-    comments.add("I would like to live in NYC.");
-    comments.add("Berlin looks like a nice place to have fun.");
-    comments.add("I gotta go visit Japan one day!");
+    
+    
   }
 
   @Override
@@ -50,7 +50,7 @@ public class DataServlet extends HttpServlet {
   /**
    * Convert to JSON using Gson
    */
-  private String convertToJson(ArrayList comments) {
+  private String convertToJson(ArrayList<String> comments) {
     Gson gson = new Gson();
     String json = gson.toJson(comments);
     return json;
