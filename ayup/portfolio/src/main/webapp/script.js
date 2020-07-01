@@ -38,3 +38,19 @@ function addRandomFact() {
   factContainer.innerHTML = newFact;
 }
 
+/**
+ * Fetch the facts from the server
+ */
+async function getRandomFactUsingAsyncAwait() {
+  const response = await fetch('/data');
+  const fact = await response.text();
+
+  // New fact container to replace the older one
+  const newFactContainer = document.createElement("span");
+  newFactContainer.id = "js-fact-container";
+  newFactContainer.innerHTML = fact;
+
+  // Replacing the current fact container with a new one
+  var a = document.getElementById('js-fact-container');
+  a.parentNode.replaceChild(newFactContainer, a);
+}
