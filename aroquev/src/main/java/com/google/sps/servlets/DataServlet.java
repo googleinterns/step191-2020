@@ -43,8 +43,8 @@ public class DataServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // probaby verify that message is not empty
     String comment = request.getParameter("comments-body-input");
+    comments.add(comment);
     response.sendRedirect("/index.html");
-
   }
 
   /**

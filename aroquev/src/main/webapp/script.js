@@ -194,7 +194,7 @@ function getRandomCar() {
 function getServletMessage() {
   fetch('/data').then(response => response.json()).then((comments)=> {
     // Get the cities container
-    const citiesContainer = document.getElementById('js-servlet-container');
+    const citiesContainer = document.getElementById('js-comments-container');
     citiesContainer.innerHTML = '';
     
     for (const comment of comments) {
