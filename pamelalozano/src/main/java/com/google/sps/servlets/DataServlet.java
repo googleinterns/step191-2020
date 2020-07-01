@@ -26,17 +26,16 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
     
-    ArrayList<String> comments = new ArrayList<String>();  
+  ArrayList<String> comments = new ArrayList<>();  
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json;");
     response.getWriter().println(comments);
   }
-
-    @Override
+  
+  @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
     // Get the input from the form.
     Comment newComment = getComment(request);
 
@@ -57,7 +56,6 @@ public class DataServlet extends HttpServlet {
 
   /** Returns the comment posted or a comment with subject error if something is missing. */
   private Comment getComment(HttpServletRequest request) {
-      
     // Get the input from the form.
     String subject = request.getParameter("subject");
     String msg = request.getParameter("msg");
