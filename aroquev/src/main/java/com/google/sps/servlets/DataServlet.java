@@ -17,6 +17,7 @@ package com.google.sps.servlets;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays; 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -26,17 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
-  private static final ArrayList<String> comments = new ArrayList<String>() {{
-    comments.add("I would like to live in NYC.");
-    comments.add("Berlin looks like a nice place to have fun.");
-    comments.add("I gotta go visit Japan one day!");
-  }};  
-
-  @Override
-  public void init() {
-    
-    
-  }
+  private static final ArrayList<String> comments = new ArrayList<String>( Arrays.asList("I would like to live in NYC.", "Berlin looks like a nice place to have fun.", "I gotta go visit Japan one day!") );  
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -46,6 +37,14 @@ public class DataServlet extends HttpServlet {
     // Send the JSON as response
     response.setContentType("application/json;");
     response.getWriter().println(json);
+  }
+
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    // probaby verify that message is not empty
+    String comment = request.getParameter("comments-body-input");
+    response.sendRedirect("/index.html");
+
   }
 
   /**
@@ -58,5 +57,3 @@ public class DataServlet extends HttpServlet {
   }
 
 }
-
-
