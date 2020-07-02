@@ -29,6 +29,15 @@ public class NewCommentServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Entity commentEntity = createCommentEntity(request);
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    datastore.put(commentEntity);
+
+    response.sendRedirect("/");
+  }
+
+  private Entity createCommentEntity(HttpServletRequest request){
     String title = request.getParameter("title");
     String description = request.getParameter("description");
     String username = request.getParameter("username");
@@ -40,9 +49,6 @@ public class NewCommentServlet extends HttpServlet {
     commentEntity.setProperty("username", username);
     commentEntity.setProperty("timestamp", timestamp);
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    datastore.put(commentEntity);
-
-    response.sendRedirect("/index.html");
+    return commentEntity;
   }
 }

@@ -43,13 +43,7 @@ public class ListCommentsServlet extends HttpServlet {
 
     List<Comment> comments = new ArrayList<>();
     for (Entity entity : results.asIterable()) {
-      long id = entity.getKey().getId();
-      String title = (String) entity.getProperty("title");
-      String description = (String) entity.getProperty("description");
-      String username = (String) entity.getProperty("username");
-      long timestamp = (long) entity.getProperty("timestamp");
-
-      Comment comment = new Comment(id, title, description, username, timestamp);
+      Comment comment = entityToComment(entity);
       comments.add(comment);
     }
 
@@ -57,5 +51,14 @@ public class ListCommentsServlet extends HttpServlet {
 
     response.setContentType("application/json;");
     response.getWriter().println(gson.toJson(comments));
+  }
+
+  private Comment entityToComment(Entity entity){
+    long id = entity.getKey().getId();
+    String title = (String) entity.getProperty("title");
+    String description = (String) entity.getProperty("description");
+    String username = (String) entity.getProperty("username");
+    long timestamp = (long) entity.getProperty("timestamp");
+    return new Comment(id, title, description, username, timestamp);
   }
 }
