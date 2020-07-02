@@ -193,7 +193,7 @@ function getRandomCar() {
  * Fetch message from Java servlet and add it to the DOM
  */
 function getServletMessage() {
-  fetch('/data').then(response => response.json()).then((comments) => {
+  fetch('/data?maxComments=3').then(response => response.json()).then((comments) => {
     // Get the cities container
     const citiesContainer = document.getElementById('js-comments-container');
     citiesContainer.innerHTML = '';
