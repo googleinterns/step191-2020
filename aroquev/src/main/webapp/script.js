@@ -242,7 +242,11 @@ function createListElement(text) {
   return liElement;
 }
 
-
+/**
+ * Deletes all comments in DS and then refreshes comments section
+ */
 function deleteAllComments() {
-  console.log("All comments to be deleted");
+  fetch('/delete-data', {method: 'POST'}).then(() => {
+    getServletComments();
+  });
 }
