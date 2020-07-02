@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body onload="getServletMessage()">
   <div id="content">
     <h1>Armando Roque's Portfolio</h1>
     <p>Hi and welcome to my personal portfolio! I am Armando, and here you will find interesting things about me (thanks
@@ -165,13 +165,6 @@
       <img class="body-img" src="images/stadium.jpg" alt="Chava and Armando at a soccer game">
     </div>
 
-    <p>Wanna know where I want to travel to?</p>
-
-    <button onclick="getServletMessage()">Tell me!</button>
-    <div id="js-servlet-container"></div>
-
-    <br>
-
     <p>Click here to get a random message:</p>
 
     <button onclick="addRandomGreeting()">Hello</button>
@@ -180,6 +173,23 @@
     <p>Click here to get info from a random car:</p>
     <button onclick="getRandomCar()">Get Car!</button>
     <div id="js-car-container"></div>
+
+    <hr>
+    <div id="comments">
+      <h2>Comments!</h2>
+      <form action="/data" method="POST">
+        <p>You are welcome to leave a comment if you found something interesting or just have anything to say!</p>
+        <textarea name="comments-body-input">Write your comment here</textarea>
+        <br>
+        <input type="submit">
+      </form>
+  
+      <h3>Previous comments</h3>
+      <div id="js-comments-container">
+        
+      </div>
+    </div>
+    
 
     <div id="external-links">
       <p><a id="github-link" href="https://github.com/aroquev00" target="_blank">Click here to see my GitHub Profile!

@@ -14,6 +14,9 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,17 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
-  private static final ArrayList<String> comments = new ArrayList<String>() {{
-    comments.add("I would like to live in NYC.");
-    comments.add("Berlin looks like a nice place to have fun.");
-    comments.add("I gotta go visit Japan one day!");
-  }};  
-
-  @Override
-  public void init() {
-    
-    
-  }
+  private final ArrayList<String> comments = new ArrayList<String>();  
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -46,6 +39,23 @@ public class DataServlet extends HttpServlet {
     // Send the JSON as response
     response.setContentType("application/json;");
     response.getWriter().println(json);
+  }
+
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    // probaby verify that message is not empty
+    String comment = request.getParameter("comments-body-input");
+    long timestamp = System.currentTimeMillis();
+
+    Entity commentEntity = new Entity("Comment");
+    commentEntity.setProperty("commentBody", comment);
+    commentEntity.setProperty("timestamp", timestamp);
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    datastore.put(commentEntity);
+
+    comments.add(comment);
+    response.sendRedirect("/");
   }
 
   /**
@@ -58,5 +68,3 @@ public class DataServlet extends HttpServlet {
   }
 
 }
-
-
