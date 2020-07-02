@@ -87,10 +87,12 @@ function createCommentElement(comment) {
 
   const deleteButtonElement = createDeleteButton()
   deleteButtonElement.addEventListener('click', () => {
-    deleteComment(comment.id);
+    deleteComment(comment.id).then(() => {
+      loadComments();
+    })
 
-    // Loads the comments again
-    loadComments()
+    // // Loads the comments again
+    // loadComments()
   });
 
   commentElement.appendChild(titleElement);
@@ -105,10 +107,10 @@ function createCommentElement(comment) {
 }
 
 /** Tells the server to delete the comment. */
-function deleteComment(commentId) {
+async function deleteComment(commentId) {
   const params = new URLSearchParams();
   params.append('id', commentId);
-  fetch('/delete-comment', {method: 'POST', body: params});
+  await fetch('/delete-comment', {method: 'POST', body: params});
 }
 
 function createDeleteButton() {
