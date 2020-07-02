@@ -90,9 +90,6 @@ function createCommentElement(comment) {
     deleteComment(comment.id).then(() => {
       loadComments();
     })
-
-    // // Loads the comments again
-    // loadComments()
   });
 
   commentElement.appendChild(titleElement);
