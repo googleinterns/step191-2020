@@ -35,6 +35,7 @@
 }
 #projects .navbar-dark{
     background-color: #3a5688;
+    color: white;
     cursor: pointer;
     border: solid 1px white;
 }
