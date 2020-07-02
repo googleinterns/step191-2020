@@ -223,11 +223,12 @@ function verifyNumberCommentsInput() {
   let maxComments = 5;
 
   let maxCommentsInput = document.getElementById("maxComments").value;
+  const commentsErrorContainer = document.getElementById('js-comments-input-error-container');
   if (maxCommentsInput.length != 0 && maxCommentsInput < 11 && maxCommentsInput > 0) {
     maxComments = maxCommentsInput;
+    commentsErrorContainer.innerText = "";
   }
   else {
-    const commentsErrorContainer = document.getElementById('js-comments-input-error-container');
     commentsErrorContainer.innerText = "Invalid input for number of comments!";
   }
 
