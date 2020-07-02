@@ -241,3 +241,8 @@ function createListElement(text) {
   liElement.innerText = text;
   return liElement;
 }
+
+
+function deleteAllComments() {
+  console.log("All comments to be deleted");
+}
