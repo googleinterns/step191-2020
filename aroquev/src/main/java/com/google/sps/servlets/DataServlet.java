@@ -41,10 +41,7 @@ public class DataServlet extends HttpServlet {
 
     final ArrayList<String> comments = new ArrayList<String>();
     for (Entity entity : results.asIterable()) {
-      long id = entity.getKey().getId();
       String comment = (String) entity.getProperty("commentBody");
-      // Timestamp is not used at the moment, but will help in next feature
-      long timestamp = (long) entity.getProperty("timestamp");
 
       comments.add(comment);
     }
@@ -59,7 +56,7 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // probaby verify that message is not empty
+    // TODO: verify that message is not empty
     String comment = request.getParameter("comments-body-input");
     long timestamp = System.currentTimeMillis();
 
