@@ -59,6 +59,11 @@ async function getRandomFactUsingAsyncAwait() {
 function loadComments() {
   fetch('/list-comments').then(response => response.json()).then((comments) => {
     const commentListElement = document.getElementById('comment-list');
+
+    // Deletes all of the current commentss
+    while (commentListElement.firstChild) {
+      commentListElement.removeChild(commentListElement.lastChild);
+    }
     comments.forEach((comment) => {
       commentListElement.appendChild(createCommentElement(comment));
     })
@@ -84,8 +89,8 @@ function createCommentElement(comment) {
   deleteButtonElement.addEventListener('click', () => {
     deleteComment(comment.id);
 
-    // Remove the comment from the DOM.
-    commentElement.remove();
+    // Loads the comments again
+    loadComments()
   });
 
   commentElement.appendChild(titleElement);
