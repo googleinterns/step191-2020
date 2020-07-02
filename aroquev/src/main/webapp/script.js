@@ -192,8 +192,20 @@ function getRandomCar() {
 /**
  * Fetch message from Java servlet and add it to the DOM
  */
-function getServletMessage() {
-  fetch('/data?maxComments=3').then(response => response.json()).then((comments) => {
+function getServletComments() {
+  let maxComments = 5;
+  let maxCommentsInput = document.getElementById("maxComments").value;
+  console.log("Value is " + maxCommentsInput);
+  console.log(typeof maxComments);
+  if (maxCommentsInput.length != 0 && maxCommentsInput < 11 && maxCommentsInput > 0) {
+    maxComments = maxCommentsInput;
+  }
+  else {
+    const commentsErrorContainer = document.getElementById('js-comments-input-error-container');
+    commentsErrorContainer.innerText = "Invalid input for number of comments!";
+  }
+
+  fetch('/data?maxComments=' + maxComments).then(response => response.json()).then((comments) => {
     // Get the cities container
     const citiesContainer = document.getElementById('js-comments-container');
     citiesContainer.innerHTML = '';
