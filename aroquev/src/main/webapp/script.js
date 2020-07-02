@@ -193,17 +193,7 @@ function getRandomCar() {
  * Fetch message from Java servlet and add it to the DOM
  */
 function getServletComments() {
-  let maxComments = 5;
-  let maxCommentsInput = document.getElementById("maxComments").value;
-  console.log("Value is " + maxCommentsInput);
-  console.log(typeof maxComments);
-  if (maxCommentsInput.length != 0 && maxCommentsInput < 11 && maxCommentsInput > 0) {
-    maxComments = maxCommentsInput;
-  }
-  else {
-    const commentsErrorContainer = document.getElementById('js-comments-input-error-container');
-    commentsErrorContainer.innerText = "Invalid input for number of comments!";
-  }
+  let maxComments = verifyNumberCommentsInput();
 
   fetch('/data?maxComments=' + maxComments).then(response => response.json()).then((comments) => {
     // Get the cities container
@@ -222,6 +212,26 @@ function getServletComments() {
       }
     }
   });
+}
+
+/**
+ * Verify the input number from selection of number of comments to display
+ * Minimum number is 1 comment, and maximum is 10 comments
+ */
+function verifyNumberCommentsInput() {
+  // Default value
+  let maxComments = 5;
+
+  let maxCommentsInput = document.getElementById("maxComments").value;
+  if (maxCommentsInput.length != 0 && maxCommentsInput < 11 && maxCommentsInput > 0) {
+    maxComments = maxCommentsInput;
+  }
+  else {
+    const commentsErrorContainer = document.getElementById('js-comments-input-error-container');
+    commentsErrorContainer.innerText = "Invalid input for number of comments!";
+  }
+
+  return maxComments;
 }
 
 /** Creates an <li> element containing text. */
