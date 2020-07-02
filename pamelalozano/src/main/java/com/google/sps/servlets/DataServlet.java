@@ -14,6 +14,9 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
 import java.util.ArrayList; 
 import java.util.Date; 
 import java.io.IOException;
@@ -45,6 +48,16 @@ public class DataServlet extends HttpServlet {
       return;
     }
 
+    //Storing in database
+    Entity commentEntity = new Entity("Comment");
+        commentEntity.setProperty("subject", newComment.getSubject());
+        commentEntity.setProperty("msg", newComment.getMessage());
+        commentEntity.setProperty("date", newComment.getDate());
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    datastore.put(commentEntity);
+
+    //Storing local for testing and visual purposes
     String commentJson = newComment.toJson();
     comments.add(0, commentJson);
 

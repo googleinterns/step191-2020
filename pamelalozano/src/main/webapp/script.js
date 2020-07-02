@@ -14,10 +14,8 @@
 
 /** Toggles the project's section */
 document.getElementById("projects").addEventListener("click", function (event) {
-    if(event.target.classList[0]=="navbar"){
-    event.target.closest('.project').classList.toggle("open");
-    location.href = "#c-"+event.target.closest('.project').id;
-    }
+        location.href="#projects";
+        event.target.closest('.project').classList.toggle("open");
 });
 
 /** Loads existing Comments */
