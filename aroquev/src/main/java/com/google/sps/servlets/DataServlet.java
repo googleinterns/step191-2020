@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns some example content. TODO: modify this file to handle comments data */
+/** Servlet that returns some example content.*/
 @WebServlet("/data")
 public class DataServlet extends HttpServlet { 
 
@@ -42,7 +42,6 @@ public class DataServlet extends HttpServlet {
     final ArrayList<String> comments = new ArrayList<String>();
     for (Entity entity : results.asIterable()) {
       String comment = (String) entity.getProperty("commentBody");
-
       comments.add(comment);
     }
 
