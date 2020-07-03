@@ -196,19 +196,19 @@ function getServletComments() {
   let maxComments = verifyNumberCommentsInput();
 
   fetch('/data?maxComments=' + maxComments).then(response => response.json()).then((comments) => {
-    // Get the cities container
-    const citiesContainer = document.getElementById('js-comments-container');
-    citiesContainer.innerHTML = '';
+    // Get the comments container
+    const commentsContainer = document.getElementById('js-comments-container');
+    commentsContainer.innerHTML = '';
     
     // Check if the array of comments is empty
     if (!Array.isArray(comments) || !comments.length) {
       const pElement = document.createElement('p');
       pElement.innerText = "Looks like there are no comments yet. Be the first one to comment!"
-      citiesContainer.appendChild(pElement);
+      commentsContainer.appendChild(pElement);
     } else {
       for (const comment of comments) {
-        // Add each comment as a <li> to the container
-        citiesContainer.appendChild(createListElement(comment));
+        
+        commentsContainer.appendChild(buildCommentView(comment));
       }
     }
   });
@@ -233,6 +233,30 @@ function verifyNumberCommentsInput() {
   }
 
   return maxComments;
+}
+
+function buildCommentView(comment) {
+  const commentView = document.createElement('div');
+
+  const username = document.createElement('div');
+  username.innerText = `Posted by: ${comment.username}`;
+  username.classList.add('comment-username');
+
+  const timestamp = document.createElement('div');
+  timestamp.innerText = `On: ${comment.timestamp}`;
+  timestamp.classList.add('comment-timestamp');
+
+  const body = document.createElement('div');
+  body.innerText = comment.body;
+  body.classList.add('comment-body');
+
+  commentView.appendChild(username);
+  commentView.appendChild(timestamp);
+  commentView.appendChild(body);
+
+  commentView.appendChild(document.createElement('br'));
+
+  return commentView
 }
 
 /** Creates an <li> element containing text. */

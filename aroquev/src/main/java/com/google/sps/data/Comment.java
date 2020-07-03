@@ -23,12 +23,12 @@ public final class Comment {
   private final int upvotes;
   private final int downvotes;
 
-  public Comment(long id, String body, String username long timestamp) {
+  public Comment(long id, String body, String username, long timestamp, int upvotes, int downvotes) {
     this.id = id;
     this.body = body;
     this.username = username;
     this.timestamp = timestamp;
-    this.upvotes = 0;
-    this.downvotes = 0;
+    this.upvotes = upvotes;
+    this.downvotes = downvotes;
   }
 }
