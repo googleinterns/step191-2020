@@ -14,6 +14,7 @@
 
 package com.google.sps.servlets;
 
+import java.util.Enumeration;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.FetchOptions;
@@ -43,23 +44,62 @@ public class DataServlet extends HttpServlet {
     
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-    ArrayList<String> comments = new ArrayList<>();  
+    FetchOptions fetchOptions = FetchOptions.Builder.withLimit(3);
 
-    Query query = new Query("Comment").addSort("date", SortDirection.DESCENDING);
-    PreparedQuery resultsQuery = datastore.prepare(query);
-    List<Entity> results = resultsQuery.asList(FetchOptions.Builder.withLimit(3));
+     String startCursor = request.getParameter("cursor");
+     String next = request.getParameter("next"); //if back this is null
+     String back = request.getParameter("back"); //if next this is null
+
+    //If the request is for a change of page
+    if (startCursor != null && next != null) {
+        
+        //Next 3 comments
+      fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor));
+    
+    } else if (startCursor != null && back != null) {
+        
+        //Back to the first 3 comments 
+        //I couldn't figure out how to get the getStartCursor()
+      fetchOptions.endCursor(Cursor.fromWebSafeString(startCursor));
+    
+    }
+
+    Query q = new Query("Comment").addSort("date", SortDirection.DESCENDING);
+        
+        PreparedQuery pq = datastore.prepare(q);
+        QueryResultList<Entity> results;
+
+        try {
+            //Fetches the query from the start cursor passed
+            results = pq.asQueryResultList(fetchOptions);
+        } 
+        catch (IllegalArgumentException e) {
+            System.out.println(e);
+            response.sendRedirect("/#comments");
+            return;
+        }
+   
+    //Stores the cursor of the last element in this request
+    String cursorString = results.getCursor().toWebSafeString();
+    
+    ArrayList<Comment> comments = new ArrayList<>();  
 
     //Query of entities to JSON
     for (Entity entity : results) {
         
         //Returns comment converted to json (method in Comment object)
-        String comment = entityToString(entity);
+        Comment comment = entityToComment(entity);
 
         comments.add(comment);
     }
 
+    //CommentsPage is the object with the comments and the cursor to keep track
+    //Of comments location
+    CommentsPage commentsPage = new CommentsPage(comments, cursorString);
+    String res = commentsPage.toJson();
+
     response.setContentType("application/json;");
-    response.getWriter().println(comments);
+    response.getWriter().println(res);
   }
   
   @Override
@@ -89,8 +129,8 @@ public class DataServlet extends HttpServlet {
     response.sendRedirect("/#comments");
   }
 
-  /** Returns the entity as a String*/
-  private String entityToString(Entity entity) {
+  /** Returns the entity as a Comment*/
+  private Comment entityToComment(Entity entity) {
       
     // Gets the properties to convert to json
     String subject = (String) entity.getProperty("subject");
@@ -98,9 +138,8 @@ public class DataServlet extends HttpServlet {
     Date date = (Date) entity.getProperty("date");
 
     Comment newComment = new Comment(subject, msg, date);
-    String commentJson = newComment.toJson();
 
-    return commentJson;
+    return newComment;
   }
 
   /** Returns the comment posted or a comment with subject error if something is missing. */

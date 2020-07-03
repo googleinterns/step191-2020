@@ -112,6 +112,10 @@
   min-height: 700px;
 }
 
+#comments-list{
+    display:inline;
+}
+
 #comments form{
     float:left;
 }
