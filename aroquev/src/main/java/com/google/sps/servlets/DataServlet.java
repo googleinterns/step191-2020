@@ -49,8 +49,8 @@ public class DataServlet extends HttpServlet {
       String username = (String) entity.getProperty("commentUsername");
       String body = (String) entity.getProperty("commentBody");
       long timestamp = (long) entity.getProperty("timestamp");
-      int upvotes = 0;
-      int downvotes = 0;
+      int upvotes = ((Long) entity.getProperty("upvotes")).intValue();
+      int downvotes = ((Long) entity.getProperty("downvotes")).intValue();
 
       final Comment comment = new Comment(id, body, username, timestamp, upvotes, downvotes);
       
