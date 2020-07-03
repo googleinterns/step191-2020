@@ -207,7 +207,6 @@ function getServletComments() {
       commentsContainer.appendChild(pElement);
     } else {
       for (const comment of comments) {
-        
         commentsContainer.appendChild(buildCommentView(comment));
       }
     }
@@ -250,13 +249,49 @@ function buildCommentView(comment) {
   body.innerText = comment.body;
   body.classList.add('comment-body');
 
+  const upvote = document.createElement('button');
+  upvote.innerText = "Upvote";
+  upvote.setAttribute('onclick', 'voteComment(' + comment.id + ' , true)');
+
+  const downvote = document.createElement('button');
+  downvote.innerText = "Upvote";
+  downvote.setAttribute('onclick', 'voteComment(' + comment.id + ' , false)');
+
   commentView.appendChild(username);
   commentView.appendChild(timestamp);
   commentView.appendChild(body);
+  commentView.appendChild(upvote);
+  commentView.appendChild(downvote);
 
+  commentView.appendChild(document.createElement('br'));
   commentView.appendChild(document.createElement('br'));
 
   return commentView
+}
+
+/**
+ * 
+ * @param {*} id 
+ * @param {*} choice true for upvote, false for downvote
+ */
+function voteComment(id, choice) {
+  console.log(JSON.stringify({commentId: id, commentChoice: choice}));
+  if (choice) {
+    console.log('comment upvoted');
+  } else {
+    console.log('comment downvoted');
+  }
+  fetch('/vote-comment', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({commentId: id, commentChoice: choice})
+  }).then(() => {
+    console.log('works')
+    //getServletComments();
+  });
 }
 
 /** Creates an <li> element containing text. */

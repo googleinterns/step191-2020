@@ -45,7 +45,7 @@ public class DataServlet extends HttpServlet {
 
     final ArrayList<Comment> comments = new ArrayList<Comment>();
     for (Entity entity : results.asIterable(FetchOptions.Builder.withLimit(maxComments))) {
-      int id = 2;
+      long id = entity.getKey().getId();
       String username = (String) entity.getProperty("commentUsername");
       String body = (String) entity.getProperty("commentBody");
       long timestamp = (long) entity.getProperty("timestamp");
