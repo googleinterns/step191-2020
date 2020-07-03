@@ -14,6 +14,9 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.Cursor;
+import com.google.appengine.api.datastore.QueryResultList;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
@@ -21,6 +24,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import java.util.ArrayList; 
+import java.util.List; 
 import java.util.Date; 
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
@@ -42,10 +46,11 @@ public class DataServlet extends HttpServlet {
     ArrayList<String> comments = new ArrayList<>();  
 
     Query query = new Query("Comment").addSort("date", SortDirection.DESCENDING);
-    PreparedQuery results = datastore.prepare(query);
+    PreparedQuery resultsQuery = datastore.prepare(query);
+    List<Entity> results = resultsQuery.asList(FetchOptions.Builder.withLimit(3));
 
     //Query of entities to JSON
-    for (Entity entity : results.asIterable()) {
+    for (Entity entity : results) {
         
         //Returns comment converted to json (method in Comment object)
         String comment = entityToString(entity);
