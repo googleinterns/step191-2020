@@ -14,6 +14,7 @@
 
 package com.google.sps.servlets;
 
+import java.util.Enumeration;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.FetchOptions;
@@ -43,23 +44,59 @@ public class DataServlet extends HttpServlet {
     
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-    ArrayList<String> comments = new ArrayList<>();  
+    FetchOptions fetchOptions = FetchOptions.Builder.withLimit(3);
 
-    Query query = new Query("Comment").addSort("date", SortDirection.DESCENDING);
-    PreparedQuery resultsQuery = datastore.prepare(query);
-    List<Entity> results = resultsQuery.asList(FetchOptions.Builder.withLimit(3));
+    // If this servlet is passed a cursor parameter, let's use it.
+     String startCursor = request.getParameter("cursor");
+     String next = request.getParameter("next");
+     String back = request.getParameter("back");
+     String cursorString = "";
+
+    if (startCursor != null && next != null) {
+      fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor));
+    } else if (startCursor != null && back != null) {
+      fetchOptions.endCursor(Cursor.fromWebSafeString(startCursor));
+    }
+
+    Query q = new Query("Comment").addSort("date", SortDirection.DESCENDING);
+    PreparedQuery pq = datastore.prepare(q);
+
+    QueryResultList<Entity> results;
+    try {
+      results = pq.asQueryResultList(fetchOptions);
+    } catch (IllegalArgumentException e) {
+      // IllegalArgumentException happens when an invalid cursor is used.
+      // A user could have manually entered a bad cursor in the URL or there
+      // may have been an internal implementation detail change in App Engine.
+      // Redirect to the page without the cursor parameter to show something
+      // rather than an error.
+      System.out.println(e);
+      response.sendRedirect("/#comments");
+      return;
+    }
+   
+    if (next != null) {
+      cursorString = results.getCursor().toWebSafeString();
+    } else if (back != null) {
+      cursorString = results.getCursor().toWebSafeString();
+    }
+
+    ArrayList<Comment> comments = new ArrayList<>();  
 
     //Query of entities to JSON
     for (Entity entity : results) {
         
         //Returns comment converted to json (method in Comment object)
-        String comment = entityToString(entity);
+        Comment comment = entityToComment(entity);
 
         comments.add(comment);
     }
 
+    CommentsPage commentsPage = new CommentsPage(comments, cursorString);
+    String res = commentsPage.toJson();
+
     response.setContentType("application/json;");
-    response.getWriter().println(comments);
+    response.getWriter().println(res);
   }
   
   @Override
@@ -90,7 +127,7 @@ public class DataServlet extends HttpServlet {
   }
 
   /** Returns the entity as a String*/
-  private String entityToString(Entity entity) {
+  private Comment entityToComment(Entity entity) {
       
     // Gets the properties to convert to json
     String subject = (String) entity.getProperty("subject");
@@ -98,9 +135,9 @@ public class DataServlet extends HttpServlet {
     Date date = (Date) entity.getProperty("date");
 
     Comment newComment = new Comment(subject, msg, date);
-    String commentJson = newComment.toJson();
+//    String commentJson = newComment.toJson();
 
-    return commentJson;
+    return newComment;
   }
 
   /** Returns the comment posted or a comment with subject error if something is missing. */
