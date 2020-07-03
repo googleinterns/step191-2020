@@ -81,7 +81,7 @@ public class DataServlet extends HttpServlet {
    
     //Stores the cursor of the last element in this request
     String cursorString = results.getCursor().toWebSafeString();
-    
+
     ArrayList<Comment> comments = new ArrayList<>();  
 
     //Query of entities to JSON
@@ -128,6 +128,7 @@ public class DataServlet extends HttpServlet {
     //ToDo: Successful comment post alert
     response.sendRedirect("/#comments");
   }
+
 
   /** Returns the entity as a Comment*/
   private Comment entityToComment(Entity entity) {

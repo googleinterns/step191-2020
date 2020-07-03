@@ -93,7 +93,6 @@ async function backPage(){
         document.getElementById("pageNumber").innerText= pageNum;
     }
 
-    console.log(comments.length);
     //The newest comments at the top
     comments.forEach(comment => {
         console.log(comment);
