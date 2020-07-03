@@ -217,12 +217,18 @@
     
     <form action="/data" method="POST">
       <p>Comment:</p>
-      <input type="text" name="subject" placeholder="Subject">*<br /><br />
-      <textarea type="text" name="msg" placeholder="Comment"></textarea>*
-      <br/><br/>
+      <input type="text" name="subject" placeholder="Subject">
+      <textarea type="text" name="msg" placeholder="Comment"></textarea>
     <input type="submit" />
+    </form>
 
-    <div id="comments-section"></div>
+    <div id="comments-section">
+      <p style="text-align: center;">
+        <i class="fa fa-chevron-circle-left fa-2x" aria-hidden="true" style="float: left;"></i>
+        <span id="pageNumber">1</span>
+        <i class="fa fa-chevron-circle-right fa-2x" aria-hidden="true" style="float: right;"></i>
+      </p>
+    </div>
 
 </div>    
 
