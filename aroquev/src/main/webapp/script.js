@@ -207,7 +207,7 @@ function getServletComments() {
       commentsContainer.appendChild(pElement);
     } else {
       for (const comment of comments) {
-        commentsContainer.appendChild(buildCommentView(comment));
+        commentsContainer.appendChild(createCommentElement(comment));
       }
     }
   });
@@ -234,7 +234,7 @@ function verifyNumberCommentsInput() {
   return maxComments;
 }
 
-function buildCommentView(comment) {
+function createCommentElement(comment) {
   const commentView = document.createElement('div');
 
   const username = document.createElement('div');
@@ -251,11 +251,21 @@ function buildCommentView(comment) {
 
   const upvote = document.createElement('button');
   upvote.innerText = "Upvote";
-  upvote.setAttribute('onclick', 'voteComment(' + comment.id + ' , true)');
+  upvote.addEventListener('click', () => {
+    voteComment(comment, true);
+
+    // Remove the task from the DOM.
+    //taskElement.remove();
+  });
 
   const downvote = document.createElement('button');
-  downvote.innerText = "Upvote";
-  downvote.setAttribute('onclick', 'voteComment(' + comment.id + ' , false)');
+  downvote.innerText = "Downvote";
+  downvote.addEventListener('click', () => {
+    voteComment(comment, false);
+
+    // Remove the task from the DOM.
+    //taskElement.remove();
+  });
 
   commentView.appendChild(username);
   commentView.appendChild(timestamp);
@@ -274,8 +284,8 @@ function buildCommentView(comment) {
  * @param {*} id 
  * @param {*} choice true for upvote, false for downvote
  */
-function voteComment(id, choice) {
-  console.log(JSON.stringify({commentId: id, commentChoice: choice}));
+function voteComment(comment, choice) {
+  console.log(JSON.stringify({commentId: comment.id, commentChoice: choice}));
   if (choice) {
     console.log('comment upvoted');
   } else {
@@ -287,10 +297,10 @@ function voteComment(id, choice) {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({commentId: id, commentChoice: choice})
+    body: JSON.stringify({commentId: comment.id, commentChoice: choice})
   }).then(() => {
     console.log('works')
-    //getServletComments();
+    getServletComments();
   });
 }
 

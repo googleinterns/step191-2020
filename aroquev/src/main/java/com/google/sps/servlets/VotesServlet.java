@@ -17,54 +17,64 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.gson.Gson;
-import java.io.Reader;
-import java.io.Writer;
+import com.google.gson.JsonObject;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONString;
 
-/** Servlet that returns some example content.*/
+/** Servlet that updates upvotes or downvotes of a comment*/
 @WebServlet("/vote-comment")
 public class VotesServlet extends HttpServlet { 
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    String jsonString = deserializeJson(request);
+    JsonObject jsonObj = new Gson().fromJson(jsonString, JsonObject.class);
+
+    long id = (Long) jsonObj.get("commentId").getAsLong();
+    boolean choice = jsonObj.get("commentChoice").getAsBoolean();
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Key commentEntityKey = KeyFactory.createKey("Comment", id);
+
+    Entity comment = null;
+    try {
+      comment = datastore.get(commentEntityKey);
+    } catch (Exception e) {
+      //TODO: handle exception
+    }
+    
+    if (choice) {
+      int upvotes = Math.toIntExact((long) comment.getProperty("upvotes"));
+      upvotes++;
+      comment.setProperty("upvotes", upvotes);
+    } else {
+      int downvotes = Math.toIntExact((long) comment.getProperty("downvotes"));
+      downvotes++;
+      comment.setProperty("downvotes", downvotes);
+    }
+    
+    datastore.put(comment);
+  }
+
+  private String deserializeJson(HttpServletRequest request) {
     StringBuilder jsonBuff = new StringBuilder();
     String line = null;
     try {
         BufferedReader reader = request.getReader();
         while ((line = reader.readLine()) != null)
             jsonBuff.append(line);
-    } catch (Exception e) { /*error*/ }
-    String jsonString = jsonBuff.toString();
-    System.out.println("Request JSON string :" + jsonBuff.toString());
+    } catch (Exception e) { 
+      /*error*/ 
+    }
 
-    Gson gson = new Gson();
-    JsonObject convertedObject = new Gson().fromJson(jsonString, JsonObject.class);
-    // Query query = new Query("Comment");
-
-    // DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    // PreparedQuery results = datastore.prepare(query);
-    
-    // Key commentKey;
-    // for (Entity entity : results.asIterable()) {
-    //   commentKey = entity.getKey();
-    //   datastore.delete(commentKey);
-    // }
+    return jsonBuff.toString();
   }
 
 }
