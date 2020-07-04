@@ -246,7 +246,15 @@ function createCommentElement(comment) {
   username.classList.add('comment-username');
 
   const timestamp = document.createElement('div');
-  timestamp.innerText = `On: ${comment.timestamp}`;
+  const date = new Date(comment.timestamp);
+  const options = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric'
+  };
+  timestamp.innerText = `On: ${new Intl.DateTimeFormat('en', options).format(date)}`;
   timestamp.classList.add('comment-timestamp');
 
   const popularity = document.createElement('div');
