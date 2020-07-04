@@ -234,6 +234,10 @@ function verifyNumberCommentsInput() {
   return maxComments;
 }
 
+/**
+ * Takes the comment object and builds the element in the DOM
+ * @param {*} comment the comment object to be displayed
+ */
 function createCommentElement(comment) {
   const commentView = document.createElement('div');
 
@@ -245,6 +249,9 @@ function createCommentElement(comment) {
   timestamp.innerText = `On: ${comment.timestamp}`;
   timestamp.classList.add('comment-timestamp');
 
+  const popularity = document.createElement('div');
+  popularity.innerText = `Popularity: ${comment.upvotes - comment.downvotes}`;
+
   const body = document.createElement('div');
   body.innerText = comment.body;
   body.classList.add('comment-body');
@@ -253,22 +260,17 @@ function createCommentElement(comment) {
   upvote.innerText = "Upvote";
   upvote.addEventListener('click', () => {
     voteComment(comment, true);
-
-    // Remove the task from the DOM.
-    //taskElement.remove();
   });
 
   const downvote = document.createElement('button');
   downvote.innerText = "Downvote";
   downvote.addEventListener('click', () => {
     voteComment(comment, false);
-
-    // Remove the task from the DOM.
-    //taskElement.remove();
   });
 
   commentView.appendChild(username);
   commentView.appendChild(timestamp);
+  commentView.appendChild(popularity);
   commentView.appendChild(body);
   commentView.appendChild(upvote);
   commentView.appendChild(downvote);
@@ -280,17 +282,12 @@ function createCommentElement(comment) {
 }
 
 /**
- * 
- * @param {*} id 
+ * Function that handles when the user has voted a comment, then refreshes 
+ * the comments section
+ * @param {*} comment the comment which is being voted 
  * @param {*} choice true for upvote, false for downvote
  */
 function voteComment(comment, choice) {
-  console.log(JSON.stringify({commentId: comment.id, commentChoice: choice}));
-  if (choice) {
-    console.log('comment upvoted');
-  } else {
-    console.log('comment downvoted');
-  }
   fetch('/vote-comment', {
     method: 'POST',
     headers: {
@@ -299,7 +296,6 @@ function voteComment(comment, choice) {
     },
     body: JSON.stringify({commentId: comment.id, commentChoice: choice})
   }).then(() => {
-    console.log('works')
     getServletComments();
   });
 }
