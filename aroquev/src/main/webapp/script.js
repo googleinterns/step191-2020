@@ -276,12 +276,21 @@ function createCommentElement(comment) {
     voteComment(comment, false);
   });
 
+  const deleteCommentButton = document.createElement('button');
+  deleteCommentButton.innerText = "Delete comment";
+  deleteCommentButton.addEventListener('click', () => {
+    deleteComment(comment);
+  });
+
+  
+
   commentView.appendChild(username);
   commentView.appendChild(timestamp);
   commentView.appendChild(popularity);
   commentView.appendChild(body);
   commentView.appendChild(upvote);
   commentView.appendChild(downvote);
+  commentView.appendChild(deleteCommentButton);
 
   commentView.appendChild(document.createElement('br'));
   commentView.appendChild(document.createElement('br'));
@@ -303,6 +312,19 @@ function voteComment(comment, choice) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({commentId: comment.id, commentChoice: choice})
+  }).then(() => {
+    getServletComments();
+  });
+}
+
+function deleteComment(comment) {
+  fetch('/delete-comment', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({commentId: comment.id})
   }).then(() => {
     getServletComments();
   });
