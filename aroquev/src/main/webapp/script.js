@@ -243,7 +243,7 @@ function createCommentElement(comment) {
 
   const username = document.createElement('div');
   username.innerText = `Posted by: ${comment.username}`;
-  username.classList.add('comment-username');
+  username.classList.add('metadata');
 
   const timestamp = document.createElement('div');
   const date = new Date(comment.timestamp);
@@ -255,9 +255,10 @@ function createCommentElement(comment) {
     minute: 'numeric'
   };
   timestamp.innerText = `On: ${new Intl.DateTimeFormat('en', options).format(date)}`;
-  timestamp.classList.add('comment-timestamp');
+  timestamp.classList.add('metadata');
 
   const popularity = document.createElement('div');
+  popularity.classList.add('metadata');
   popularity.innerText = `Popularity: ${comment.upvotes - comment.downvotes}`;
 
   const body = document.createElement('div');
@@ -280,6 +281,8 @@ function createCommentElement(comment) {
 
   const deleteCommentButton = document.createElement('button');
   deleteCommentButton.innerText = "Delete comment";
+  deleteCommentButton.classList.add('delete-btn');
+  deleteCommentButton.classList.add('btn');
   deleteCommentButton.addEventListener('click', () => {
     deleteComment(comment);
   });
@@ -292,6 +295,7 @@ function createCommentElement(comment) {
   commentView.appendChild(body);
   commentView.appendChild(upvote);
   commentView.appendChild(downvote);
+  commentView.appendChild(document.createElement('br'));
   commentView.appendChild(deleteCommentButton);
 
   commentView.appendChild(document.createElement('br'));

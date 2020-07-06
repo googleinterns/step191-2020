@@ -188,4 +188,27 @@ footer {
 
 .vote {
   width: 25px;
+  cursor: pointer;
+}
+
+.btn {
+  cursor: pointer;
+  border-radius: 4px;
+  border: none;
+  font-size: 16px;
+}
+
+.delete-btn {
+  background-color: #e27d09;
+  color: white;
+}
+
+.delete-all-btn {
+  background-color: #e21009;
+  color: white;
+}
+
+.metadata {
+  font-size: 12px;
+  color: #717171;
 }
