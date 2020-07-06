@@ -221,15 +221,11 @@ function getServletComments() {
 function verifyNumberCommentsInput() {
   // Default value
   let maxComments = 5;
-
-  let maxCommentsInput = document.getElementById("maxComments").value;
-  const commentsErrorContainer = document.getElementById('js-comments-input-error-container');
+  let maxCommentsContainer = document.getElementById("comment-number-input");
+  maxCommentsContainer.reportValidity();
+  let maxCommentsInput = document.getElementById("comment-number-input").value;
   if (maxCommentsInput.length != 0 && maxCommentsInput < 11 && maxCommentsInput > 0) {
     maxComments = maxCommentsInput;
-    commentsErrorContainer.innerText = "";
-  }
-  else {
-    commentsErrorContainer.innerText = "Invalid input for number of comments!";
   }
 
   return maxComments;
