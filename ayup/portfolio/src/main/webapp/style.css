@@ -66,3 +66,28 @@
 .links-icons {
   height: 32px;
 }
+
+.new-comment-input {
+  margin: 0px 10px 10px 10px;
+  width: 50%;
+}
+
+.new-comment-textarea {
+  margin: 0px 10px 5px 10px;
+  width: 50%;
+}
+
+#js-comment-list {
+  overflow: scroll;
+  max-height: 300px;
+  list-style-type: none;
+  padding: 0;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 20px;
+}
+
