@@ -152,3 +152,12 @@
   from {opacity: .4}
   to {opacity: 1}
 }
+
+/* Footer styling */
+footer {
+  text-align: center;
+  padding: 3px;
+  background-color: #4397ac;
+  color: white;
+  display: block;
+}
