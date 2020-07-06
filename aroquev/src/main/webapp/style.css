@@ -41,6 +41,10 @@
     width: 600px;
 }
 
+img {
+  border-radius: 20px;
+}
+
 /* Rules for the GitHub and LinkedIn icons */
 #github-link {
     color: rgb(132, 0, 255);
