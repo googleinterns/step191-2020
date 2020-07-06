@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body onload="getServletMessage()">
+<body onload="getServletComments()">
   <div id="content">
     <h1>Armando Roque's Portfolio</h1>
     <p>Hi and welcome to my personal portfolio! I am Armando, and here you will find interesting things about me (thanks
@@ -185,6 +185,14 @@
       </form>
   
       <h3>Previous comments</h3>
+
+      <label for="maxComments">Change number of comments displayed (between 1 and 10):</label>
+      <input type="number" id="maxComments" name="quantity" min="1" max="10" value="5" onchange="getServletComments()">
+      <br><br>
+
+      <div id="js-comments-input-error-container"></div>
+      <br>
+
       <div id="js-comments-container">
         
       </div>
