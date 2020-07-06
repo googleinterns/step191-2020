@@ -61,7 +61,7 @@ function loadComments() {
     var commentListElement = document.getElementById('js-comment-list');
     // Deletes all of the current comments
     while (commentListElement.lastChild) {
-      commentListElement.removeChild(commentListElement.firstChild);
+      commentListElement.removeChild(commentListElement.firstChild); 
     }
 
     comments.forEach((comment) => {
