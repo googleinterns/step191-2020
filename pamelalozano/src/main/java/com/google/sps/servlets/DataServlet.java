@@ -14,7 +14,6 @@
 
 package com.google.sps.servlets;
 
-import java.util.Enumeration;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.FetchOptions;
@@ -90,6 +89,7 @@ public class DataServlet extends HttpServlet {
         //Returns comment converted to json (method in Comment object)
         Comment comment = entityToComment(entity);
 
+
         comments.add(comment);
     }
 
@@ -139,8 +139,8 @@ public class DataServlet extends HttpServlet {
     Date date = (Date) entity.getProperty("date");
 
     Comment newComment = new Comment(subject, msg, date);
-
     return newComment;
+
   }
 
   /** Returns the comment posted or a comment with subject error if something is missing. */
