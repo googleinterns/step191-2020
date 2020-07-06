@@ -54,3 +54,68 @@ async function getRandomFactUsingAsyncAwait() {
   var a = document.getElementById('js-fact-container');
   a.parentNode.replaceChild(newFactContainer, a);
 }
+
+/** Fetches comments from the server and adds them to the DOM. */
+function loadComments() {
+  fetch('/list-comments').then(response => response.json()).then((comments) => {
+    const commentListElement = document.getElementById('comment-list');
+
+    // Deletes all of the current commentss
+    while (commentListElement.firstChild) {
+      commentListElement.removeChild(commentListElement.lastChild);
+    }
+    comments.forEach((comment) => {
+      commentListElement.appendChild(createCommentElement(comment));
+    })
+  });
+}
+
+/** Creates an element that represents a title, a description, a username and its delete button. */
+function createCommentElement(comment) {
+  const commentElement = document.createElement('li');
+  commentElement.className = 'comment';
+
+  const titleElement = document.createElement('span');
+  titleElement.innerText = comment.title;
+  titleElement.className = "font-weight-bold";
+
+  const descriptionElement = document.createElement('span');
+  descriptionElement.innerText = comment.description;
+
+  const usernameElement = document.createElement('span');
+  usernameElement.innerText = "By: " + comment.username;
+
+  const deleteButtonElement = createDeleteButton()
+  deleteButtonElement.addEventListener('click', () => {
+    deleteComment(comment.id).then(() => {
+      loadComments();
+    })
+
+    // // Loads the comments again
+    // loadComments()
+  });
+
+  commentElement.appendChild(titleElement);
+  commentElement.appendChild(document.createElement("br"));
+  commentElement.appendChild(descriptionElement);
+  commentElement.appendChild(document.createElement("br"));
+  commentElement.appendChild(usernameElement);
+  commentElement.appendChild(document.createElement("br"));
+  commentElement.appendChild(deleteButtonElement);
+  commentElement.appendChild(document.createElement("hr"));
+  return commentElement;
+}
+
+/** Tells the server to delete the comment. */
+async function deleteComment(commentId) {
+  const params = new URLSearchParams();
+  params.append('id', commentId);
+  await fetch('/delete-comment', {method: 'POST', body: params});
+}
+
+function createDeleteButton() {
+  const deleteButtonElement = document.createElement('button');
+  deleteButtonElement.innerText = 'Delete';
+  deleteButtonElement.className = "btn btn-danger";
+  return deleteButtonElement;
+}
