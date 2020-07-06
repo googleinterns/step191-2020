@@ -264,14 +264,16 @@ function createCommentElement(comment) {
   body.innerText = comment.body;
   body.classList.add('comment-body');
 
-  const upvote = document.createElement('button');
-  upvote.innerText = "Upvote";
+  const upvote = document.createElement('img');
+  upvote.src = 'images/upvote.png'
+  upvote.classList.add('vote');
   upvote.addEventListener('click', () => {
     voteComment(comment, true);
   });
 
-  const downvote = document.createElement('button');
-  downvote.innerText = "Downvote";
+  const downvote = document.createElement('img');
+  downvote.src = 'images/downvote.png'
+  downvote.classList.add('vote');
   downvote.addEventListener('click', () => {
     voteComment(comment, false);
   });

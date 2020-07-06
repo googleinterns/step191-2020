@@ -185,3 +185,7 @@ footer {
 #comments h2 {
   color: #0f7007;
 }
+
+.vote {
+  width: 25px;
+}
