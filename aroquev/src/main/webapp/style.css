@@ -1,3 +1,7 @@
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
 /* For the header */
 /* Add a black background color to the top navigation */
 .topnav {
@@ -164,4 +168,20 @@ footer {
   background-color: #4397ac;
   color: white;
   display: block;
+}
+
+#about-me h2 {
+  color: #0759c5;
+}
+
+#projects h2 {
+  color: #c51d07;
+}
+
+#hobbies h2 {
+  color: #db9005;
+}
+
+#comments h2 {
+  color: #0f7007;
 }
