@@ -43,65 +43,44 @@ async function loadComments() {
   };
 }
 
-async function nextPage(){
-
-  let response = await fetch('/data?cursor='+cursor+'&next=true');
-  let responseJson = await response.json();
-  let comments = responseJson.comments;
-  cursor = responseJson.cursor;
-
-  if(comments.length != 0) {
-    
-    let commentSection = document.getElementById("comments-list");
-    //Empty section
-    document.getElementById("comments-list").innerText='';
-
-    //Change page num
-    let pageNum = document.getElementById("pageNumber").innerText;
-    pageNum++;
-    document.getElementById("pageNumber").innerText= pageNum;
-
-    console.log(comments.length);
-    //The newest comments at the top
-    comments.forEach(comment => {
-        console.log(comment);
-        let newCard = createCard(comment);
-        commentSection.append(newCard);
-    });
-
-  };
-
-}
-
-async function backPage(){
-
-  let response = await fetch('/data?cursor='+cursor+'&back=true');
-  let responseJson = await response.json();
-  let comments = responseJson.comments;
-  cursor = responseJson.cursor;
-
-  if(comments.length != 0) {
-    
-    let commentSection = document.getElementById("comments-list");
-    //Empty section
-    document.getElementById("comments-list").innerText='';
-
-    //Change page num
-    let pageNum = document.getElementById("pageNumber").innerText;
-    if (1 < pageNum ) {
-        pageNum=1;
-        document.getElementById("pageNumber").innerText= pageNum;
+/** Changes comment page */
+async function changePage(type){
+    let reponse;
+    if(type == 'back') {
+        response = await fetch('/data?cursor='+cursor+'&back=true');
+    }
+    else if (type == 'next') {
+        response = await fetch('/data?cursor='+cursor+'&next=true');
     }
 
-    //The newest comments at the top
-    comments.forEach(comment => {
+    let responseJson = await response.json();
+    let comments = responseJson.comments;
+    cursor = responseJson.cursor;
+    
+    if(comments.length != 0) {     
+        let commentSection = document.getElementById("comments-list");
+        //Empty section
+        document.getElementById("comments-list").innerText='';
+
+        //Change page num
+        let pageNum = document.getElementById("pageNumber").innerText;
+        if(type == 'back') {
+            if (1 < pageNum ) {
+                pageNum=1;
+            }
+        } 
+        else if (type == 'next') {
+            pageNum++;
+        }
+        document.getElementById("pageNumber").innerText= pageNum;
+
+        //The newest comments at the top
+        comments.forEach(comment => {
         console.log(comment);
         let newCard = createCard(comment);
         commentSection.append(newCard);
-    });
-
-  };
-
+        });
+    };
 }
 
 /** Creates a card element containing the comment. */
