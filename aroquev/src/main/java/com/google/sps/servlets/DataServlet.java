@@ -22,6 +22,7 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.gson.Gson;
+import com.google.sps.data.Comment;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.servlet.annotation.WebServlet;
@@ -42,9 +43,10 @@ public class DataServlet extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
-    final ArrayList<String> comments = new ArrayList<String>();
+    final ArrayList<Comment> comments = new ArrayList<Comment>();
     for (Entity entity : results.asIterable(FetchOptions.Builder.withLimit(maxComments))) {
-      String comment = (String) entity.getProperty("commentBody");
+      final Comment comment = new Comment(entity);
+      
       comments.add(comment);
     }
 
@@ -58,14 +60,16 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // TODO: verify that message is not empty
+    int id = 0;
+    String username = request.getParameter("comments-username-input");
     String comment = request.getParameter("comments-body-input");
     long timestamp = System.currentTimeMillis();
+    int upvotes = 0;
+    int downvotes = 0;
 
-    Entity commentEntity = new Entity("Comment");
-    commentEntity.setProperty("commentBody", comment);
-    commentEntity.setProperty("timestamp", timestamp);
-
+    Comment newComment = new Comment(id, username, comment, timestamp, upvotes, downvotes);
+    Entity commentEntity = newComment.toEntity();
+    
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(commentEntity);
 
@@ -75,7 +79,7 @@ public class DataServlet extends HttpServlet {
   /**
    * Convert to JSON using Gson
    */
-  private String convertToJson(ArrayList<String> comments) {
+  private String convertToJson(ArrayList<Comment> comments) {
     Gson gson = new Gson();
     String json = gson.toJson(comments);
     return json;

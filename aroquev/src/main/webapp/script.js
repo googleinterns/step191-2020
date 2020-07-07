@@ -197,18 +197,18 @@ function getServletComments() {
   if (maxComments != null) {
     fetch('/data?maxComments=' + maxComments).then(response => response.json()).then((comments) => {
       // Get the cities container
-      const citiesContainer = document.getElementById('js-comments-container');
-      citiesContainer.innerHTML = '';
+      const commentsContainer = document.getElementById('js-comments-container');
+      commentsContainer.innerHTML = '';
       
       // Check if the array of comments is empty
       if (!Array.isArray(comments) || !comments.length) {
         const pElement = document.createElement('p');
         pElement.innerText = "Looks like there are no comments yet. Be the first one to comment!"
-        citiesContainer.appendChild(pElement);
+        commentsContainer.appendChild(pElement);
       } else {
         for (const comment of comments) {
-          // Add each comment as a <li> to the container
-          citiesContainer.appendChild(createListElement(comment));
+          // Add each comment to the commentsContainer
+          commentsContainer.appendChild(createCommentElement(comment));
         }
       }
     });
@@ -229,6 +229,80 @@ function verifyNumberCommentsInput() {
     maxComments = maxCommentsInput;
   }
   return maxComments;
+}
+
+/**
+ * Takes the comment object and builds the element in the DOM
+ * @param {*} comment the comment object to be displayed
+ */
+function createCommentElement(comment) {
+  const commentView = document.createElement('div');
+
+  const username = document.createElement('div');
+  username.innerText = `Posted by: ${comment.username}`;
+  username.classList.add('comment-username');
+
+  const timestamp = document.createElement('div');
+  const date = new Date(comment.timestamp);
+  const options = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric'
+  };
+  timestamp.innerText = `On: ${new Intl.DateTimeFormat('en', options).format(date)}`;
+  timestamp.classList.add('comment-timestamp');
+
+  const popularity = document.createElement('div');
+  popularity.innerText = `Popularity: ${comment.upvotes - comment.downvotes}`;
+
+  const body = document.createElement('div');
+  body.innerText = comment.body;
+  body.classList.add('comment-body');
+
+  const upvote = document.createElement('button');
+  upvote.innerText = "Upvote";
+  upvote.addEventListener('click', () => {
+    voteComment(comment, true);
+  });
+
+  const downvote = document.createElement('button');
+  downvote.innerText = "Downvote";
+  downvote.addEventListener('click', () => {
+    voteComment(comment, false);
+  });
+
+  commentView.appendChild(username);
+  commentView.appendChild(timestamp);
+  commentView.appendChild(popularity);
+  commentView.appendChild(body);
+  commentView.appendChild(upvote);
+  commentView.appendChild(downvote);
+
+  commentView.appendChild(document.createElement('br'));
+  commentView.appendChild(document.createElement('br'));
+
+  return commentView
+}
+
+/**
+ * Function that handles when the user has voted a comment, then refreshes 
+ * the comments section
+ * @param {*} comment the comment which is being voted 
+ * @param {*} choice true for upvote, false for downvote
+ */
+function voteComment(comment, choice) {
+  fetch('/vote-comment', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({commentId: comment.id, commentChoice: choice})
+  }).then(() => {
+    getServletComments();
+  });
 }
 
 /** Creates an <li> element containing text. */
