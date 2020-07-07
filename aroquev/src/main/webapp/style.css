@@ -123,3 +123,11 @@
   from {opacity: .4}
   to {opacity: 1}
 }
+
+#comment-number-input {
+  margin: 10px;
+}
+
+#comment-number-input:invalid {
+  border: 2px solid red;
+}
