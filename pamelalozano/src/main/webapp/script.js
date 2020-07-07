@@ -45,12 +45,12 @@ async function loadComments() {
 
 /** Changes comment page */
 async function changePage(type){
-    let reponse;
+    let response;
     if(type == 'back') {
-        response = await fetch('/data?cursor='+cursor+'&back=true');
+        response = await fetch('/data?cursor='+cursor+'&pageDirection=back');
     }
     else if (type == 'next') {
-        response = await fetch('/data?cursor='+cursor+'&next=true');
+        response = await fetch('/data?cursor='+cursor+'&pageDirection=next');
     }
 
     let responseJson = await response.json();
@@ -76,7 +76,6 @@ async function changePage(type){
 
         //The newest comments at the top
         comments.forEach(comment => {
-        console.log(comment);
         let newCard = createCard(comment);
         commentSection.append(newCard);
         });

@@ -46,17 +46,14 @@ public class DataServlet extends HttpServlet {
     FetchOptions fetchOptions = FetchOptions.Builder.withLimit(3);
 
      String startCursor = request.getParameter("cursor");
-     String next = request.getParameter("next"); //if back this is null
-     String back = request.getParameter("back"); //if next this is null
+     String pageDirection = request.getParameter("pageDirection");
 
     //If the request is for a change of page
-    if (startCursor != null && next != null) {
-        
+    if (startCursor != null && "next".equals(pageDirection)) {
         //Next 3 comments
       fetchOptions.startCursor(Cursor.fromWebSafeString(startCursor));
     
-    } else if (startCursor != null && back != null) {
-        
+    } else if (startCursor != null && "back".equals(pageDirection)) {
         //Back to the first 3 comments 
         //I couldn't figure out how to get the getStartCursor()
       fetchOptions.endCursor(Cursor.fromWebSafeString(startCursor));
