@@ -14,6 +14,8 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.FetchOptions;
@@ -103,7 +105,8 @@ public class DataServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
      
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
- 
+    UserService userService = UserServiceFactory.getUserService();
+
     // Get the input from the form.
     Comment newComment = getComment(request);
 
@@ -118,6 +121,9 @@ public class DataServlet extends HttpServlet {
         commentEntity.setProperty("subject", newComment.getSubject());
         commentEntity.setProperty("msg", newComment.getMessage());
         commentEntity.setProperty("date", newComment.getDate());
+        if (userService.isUserLoggedIn()) {
+            commentEntity.setProperty("author", newComment.getAuthor());
+        }
 
     datastore.put(commentEntity);
 
@@ -133,20 +139,31 @@ public class DataServlet extends HttpServlet {
     // Gets the properties to convert to json
     String subject = (String) entity.getProperty("subject");
     String msg = (String) entity.getProperty("msg");
+    String author;
+    if(entity.getProperty("author")!=null){
+        author = (String) entity.getProperty("author");
+    } else{
+        author="Anonymous";
+    }
     Date date = (Date) entity.getProperty("date");
 
-    Comment newComment = new Comment(subject, msg, date);
+    Comment newComment = new Comment(subject, msg, author, date);
     return newComment;
 
   }
 
   /** Returns the comment posted or a comment with subject error if something is missing. */
   private Comment getComment(HttpServletRequest request) {
+    UserService userService = UserServiceFactory.getUserService();
     // Get the input from the form.
     String subject = request.getParameter("subject");
     String msg = request.getParameter("msg");
+    String author=null;
+    if (userService.isUserLoggedIn()) {
+        author = userService.getCurrentUser().getEmail();
+    }
 
-    Comment newComment = new Comment(subject, msg, new Date(System.currentTimeMillis()));
+    Comment newComment = new Comment(subject, msg, author, new Date(System.currentTimeMillis()));
 
     return newComment;
   }
