@@ -351,3 +351,73 @@ function deleteAllComments() {
     getServletComments();
   });
 }
+
+function onDOMLoad() {
+  buildWriteCommentsBox();
+  getServletComments();
+}
+
+function checkLoggedIn() {
+  fetch('/login-status').then(response => response.json()).then((loginStatus) => {
+    console.log(loginStatus);
+    console.log(typeof loginStatus);
+    if (loginStatus == true) {
+      console.log("User is logged in");
+    } else {
+      console.log("User is NOT logged in or error");
+    }
+    return loginStatus;
+  });
+}
+
+function buildWriteCommentsBox() {
+  const writeCommentsBox = document.getElementById('js-write-comment-box');
+
+  if (checkLoggedIn) {  
+    const commentForm = document.createElement('form');
+    commentForm.action = 'javascript:;';
+    commentForm.addEventListener('submit', () => {
+      submitComment(commentForm);
+    });
+
+    // Build elements inside form
+    const pElement = document.createElement('p');
+    pElement.innerText = "You are welcome to leave a comment if you found something interesting or just have anything to say!";
+    
+    const bodyTextArea = document.createElement('textarea');
+    bodyTextArea.id = 'comments-body-input';
+    bodyTextArea.name = 'comments-body-input';
+    bodyTextArea.required = 'required';
+    bodyTextArea.placeholder = 'Write your comment here';
+
+    const usernameTextArea = document.createElement('textarea');
+    usernameTextArea.name = 'comments-username-input';
+    usernameTextArea.name = 'comments-username-input';
+    usernameTextArea.required = 'required';
+    usernameTextArea.placeholder = 'Username (can be your name)';
+
+    const submitButton = document.createElement('input');
+    submitButton.type = 'submit';
+
+    commentForm.appendChild(pElement);
+    commentForm.appendChild(bodyTextArea);
+    commentForm.appendChild(document.createElement('br'));
+    commentForm.appendChild(usernameTextArea);
+    commentForm.appendChild(document.createElement('br'));
+    commentForm.appendChild(submitButton);
+
+    writeCommentsBox.appendChild(commentForm);
+  } else {
+    const pElement = document.createElement('p');
+    pElement.innerText = "You should log in";
+    writeCommentsBox.appendChild(pElement);
+  }
+}
+
+function submitComment(commentForm) {
+  console.log(commentForm);
+  console.log("Submit called");
+  commentBody = commentForm.elements['comments-body-input'].value;
+  console.log(commentBody);
+  commentForm.reset();
+}

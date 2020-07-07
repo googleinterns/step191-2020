@@ -11,7 +11,7 @@
       href="images/noogler-hat.png">
 </head>
 
-<body onload="getServletComments()">
+<body onload="onDOMLoad()">
   <div class="topnav">
     <a class="active" href="#">Home</a>
     <a href="#about-me">About Me</a>
@@ -189,7 +189,8 @@
     <hr>
     <div id="comments">
       <h2>Comments!</h2>
-      <form action="/data" method="POST">
+      <div id="js-write-comment-box"></div>
+      <form action="javascript:;" onsubmit="myFunction(this)">
         <p>You are welcome to leave a comment if you found something interesting or just have anything to say!</p>
         <textarea name="comments-body-input" required="required" placeholder="Write your comment here"></textarea>
         <br>
