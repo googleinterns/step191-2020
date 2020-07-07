@@ -194,40 +194,40 @@ function getRandomCar() {
  */
 function getServletComments() {
   let maxComments = verifyNumberCommentsInput();
-
-  fetch('/data?maxComments=' + maxComments).then(response => response.json()).then((comments) => {
-    // Get the cities container
-    const citiesContainer = document.getElementById('js-comments-container');
-    citiesContainer.innerHTML = '';
-    
-    // Check if the array of comments is empty
-    if (!Array.isArray(comments) || !comments.length) {
-      const pElement = document.createElement('p');
-      pElement.innerText = "Looks like there are no comments yet. Be the first one to comment!"
-      citiesContainer.appendChild(pElement);
-    } else {
-      for (const comment of comments) {
-        // Add each comment as a <li> to the container
-        citiesContainer.appendChild(createListElement(comment));
+  if (maxComments != null) {
+    fetch('/data?maxComments=' + maxComments).then(response => response.json()).then((comments) => {
+      // Get the cities container
+      const citiesContainer = document.getElementById('js-comments-container');
+      citiesContainer.innerHTML = '';
+      
+      // Check if the array of comments is empty
+      if (!Array.isArray(comments) || !comments.length) {
+        const pElement = document.createElement('p');
+        pElement.innerText = "Looks like there are no comments yet. Be the first one to comment!"
+        citiesContainer.appendChild(pElement);
+      } else {
+        for (const comment of comments) {
+          // Add each comment as a <li> to the container
+          citiesContainer.appendChild(createListElement(comment));
+        }
       }
-    }
-  });
+    });
+  }
 }
 
 /**
  * Verify the input number from selection of number of comments to display
  * Minimum number is 1 comment, and maximum is 10 comments
+ * If number is not valid it returns null
  */
 function verifyNumberCommentsInput() {
-  // Default value
-  let maxComments = 5;
+  let maxComments = null;
   let maxCommentsContainer = document.getElementById("comment-number-input");
   maxCommentsContainer.reportValidity();
-  let maxCommentsInput = document.getElementById("comment-number-input").value;
+  let maxCommentsInput = maxCommentsContainer.value;
   if (maxCommentsInput.length != 0 && maxCommentsInput < 11 && maxCommentsInput > 0) {
     maxComments = maxCommentsInput;
   }
-
   return maxComments;
 }
 
@@ -236,4 +236,13 @@ function createListElement(text) {
   const liElement = document.createElement('li');
   liElement.innerText = text;
   return liElement;
+}
+
+/**
+ * Deletes all comments in DS and then refreshes comments section
+ */
+function deleteAllComments() {
+  fetch('/delete-data', {method: 'POST'}).then(() => {
+    getServletComments();
+  });
 }
