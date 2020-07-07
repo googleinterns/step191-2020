@@ -419,5 +419,16 @@ function submitComment(commentForm) {
   console.log("Submit called");
   commentBody = commentForm.elements['comments-body-input'].value;
   console.log(commentBody);
-  commentForm.reset();
+  
+  fetch('/delete-comment', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({commentId: comment.id})
+  }).then(() => {
+    getServletComments();
+    commentForm.reset();
+  });
 }
