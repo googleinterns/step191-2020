@@ -207,8 +207,8 @@ function getServletComments() {
         commentsContainer.appendChild(pElement);
       } else {
         for (const comment of comments) {
-          // Add each comment as a <li> to the container
-          commentsContainer.appendChild(createListElement(comment));
+          // Add each comment to the commentsContainer
+          commentsContainer.appendChild(createCommentElement(comment));
         }
       }
     });
@@ -228,22 +228,6 @@ function verifyNumberCommentsInput() {
   if (maxCommentsInput.length != 0 && maxCommentsInput < 11 && maxCommentsInput > 0) {
     maxComments = maxCommentsInput;
   }
-  return maxComments;
-}
-
-/**
- * Verify the input number from selection of number of comments to display
- * Minimum number is 1 comment, and maximum is 10 comments
- */
-function verifyNumberCommentsInput() {
-  let maxComments = null;
-  const maxCommentsContainer = document.getElementById("maxComments");
-  maxCommentsContainer.reportValidity();
-  const maxCommentsInput = maxCommentsContainer.value;
-  if (maxCommentsInput.length != 0 && maxCommentsInput < 11 && maxCommentsInput > 0) {
-    maxComments = maxCommentsInput;
-  }
-
   return maxComments;
 }
 
