@@ -28,21 +28,21 @@ public class UserServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("text/html");
-
     UserService userService = UserServiceFactory.getUserService();
+    Auth.Builder auth;
+
     if (userService.isUserLoggedIn()) {
       String userEmail = userService.getCurrentUser().getEmail();
       String urlToRedirectToAfterUserLogsOut = "/";
       String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
-
-      response.getWriter().println("<p>Hello " + userEmail + "!</p>");
-      response.getWriter().println("<p>Logout <a href=\"" + logoutUrl + "\">here</a>.</p>");
+    auth = new Auth.Builder().setIsLoggedIn(true).setLogoutUrl(logoutUrl).setActiveUser(userEmail);
     } else {
       String urlToRedirectToAfterUserLogsIn = "/";
       String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
-
-      response.getWriter().println("<p>Hello stranger.</p>");
-      response.getWriter().println("<p>Login <a href=\"" + loginUrl + "\">here</a>.</p>");
+    auth = new Auth.Builder().setLoginUrl(loginUrl);
     }
+
+    String authJson = auth.build().toJson();  
+    response.getWriter().println(authJson);
   }
 }
