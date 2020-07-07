@@ -34,8 +34,7 @@ public class VotesServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String jsonString = deserializeJson(request);
-    JsonObject jsonObj = new Gson().fromJson(jsonString, JsonObject.class);
+    JsonObject jsonObj = new Gson().fromJson(request.getReader(), JsonObject.class);
 
     long id = (Long) jsonObj.get("commentId").getAsLong();
     boolean choice = jsonObj.get("commentChoice").getAsBoolean();
