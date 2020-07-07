@@ -45,15 +45,7 @@ public class DataServlet extends HttpServlet {
 
     final ArrayList<Comment> comments = new ArrayList<Comment>();
     for (Entity entity : results.asIterable(FetchOptions.Builder.withLimit(maxComments))) {
-      long id = entity.getKey().getId();
-      String username = (String) entity.getProperty("commentUsername");
-      String body = (String) entity.getProperty("commentBody");
-      long timestamp = (long) entity.getProperty("timestamp");
-      int upvotes = ((Long) entity.getProperty("upvotes")).intValue();
-      int downvotes = ((Long) entity.getProperty("downvotes")).intValue();
-
-      final Comment comment = new Comment(id, body, username, timestamp, upvotes, downvotes);
-      
+      final Comment comment = new Comment(entity);
       comments.add(comment);
     }
 
@@ -67,17 +59,16 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    int id = 0;
     String username = request.getParameter("comments-username-input");
     String comment = request.getParameter("comments-body-input");
     long timestamp = System.currentTimeMillis();
+    int upvotes = 0;
+    int downvotes = 0;
 
-    Entity commentEntity = new Entity("Comment");
-    commentEntity.setProperty("commentUsername", username);
-    commentEntity.setProperty("commentBody", comment);
-    commentEntity.setProperty("timestamp", timestamp);
-    commentEntity.setProperty("upvotes", 0);
-    commentEntity.setProperty("downvotes", 0);
-
+    Comment newComment = new Comment(id, username, comment, timestamp, upvotes, downvotes);
+    Entity commentEntity = newComment.toEntity();
+    
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(commentEntity);
 

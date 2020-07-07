@@ -20,8 +20,8 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
-import com.google.appengine.api.datastore.Key;
 import com.google.gson.Gson;
+import com.google.sps.data.Comment;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,23 +30,35 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns some example content.*/
-@WebServlet("/delete-data")
-public class DeleteServlet extends HttpServlet { 
+/** Servlet responsible for listing comments. */
+@WebServlet("/list-comments")
+public class ListCommentsServlet extends HttpServlet {
 
   @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Query query = new Query("Comment");
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
-    
-    final List<Key> commentKeys = new ArrayList<Key>();
+
+    List<Comment> comments = new ArrayList<>();
     for (Entity entity : results.asIterable()) {
-      commentKeys.add(entity.getKey());
+      Comment comment = entityToComment(entity);
+      comments.add(comment);
     }
 
-    datastore.delete(commentKeys);
+    Gson gson = new Gson();
+
+    response.setContentType("application/json;");
+    response.getWriter().println(gson.toJson(comments));
   }
 
+  private Comment entityToComment(Entity entity){
+    long id = entity.getKey().getId();
+    String title = (String) entity.getProperty("title");
+    String description = (String) entity.getProperty("description");
+    String username = (String) entity.getProperty("username");
+    long timestamp = (long) entity.getProperty("timestamp");
+    return new Comment(id, title, description, username, timestamp);
+  }
 }

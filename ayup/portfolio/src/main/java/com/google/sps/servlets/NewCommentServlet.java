@@ -17,36 +17,38 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.SortDirection;
-import com.google.appengine.api.datastore.Key;
-import com.google.gson.Gson;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns some example content.*/
-@WebServlet("/delete-data")
-public class DeleteServlet extends HttpServlet { 
+/** Servlet responsible for creating new comments. */
+@WebServlet("/new-comment")
+public class NewCommentServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Query query = new Query("Comment");
+    Entity commentEntity = createCommentEntity(request);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    PreparedQuery results = datastore.prepare(query);
-    
-    final List<Key> commentKeys = new ArrayList<Key>();
-    for (Entity entity : results.asIterable()) {
-      commentKeys.add(entity.getKey());
-    }
+    datastore.put(commentEntity);
 
-    datastore.delete(commentKeys);
+    response.sendRedirect("/");
   }
 
+  private Entity createCommentEntity(HttpServletRequest request){
+    String title = request.getParameter("title");
+    String description = request.getParameter("description");
+    String username = request.getParameter("username");
+    long timestamp = System.currentTimeMillis();
+
+    Entity commentEntity = new Entity("Comment");
+    commentEntity.setProperty("title", title);
+    commentEntity.setProperty("description", description);
+    commentEntity.setProperty("username", username);
+    commentEntity.setProperty("timestamp", timestamp);
+
+    return commentEntity;
+  }
 }
