@@ -24,6 +24,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -40,11 +41,12 @@ public class DeleteServlet extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
     
-    Key commentKey;
+    final List<Key> commentKeys = new ArrayList<Key>();
     for (Entity entity : results.asIterable()) {
-      commentKey = entity.getKey();
-      datastore.delete(commentKey);
+      commentKeys.add(entity.getKey());
     }
+
+    datastore.delete(commentKeys);
   }
 
 }

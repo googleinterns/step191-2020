@@ -14,6 +14,8 @@
 
 package com.google.sps.data;
 
+import com.google.appengine.api.datastore.Entity;
+
 public final class Comment {
 
   private final long id;
@@ -32,6 +34,21 @@ public final class Comment {
     this.downvotes = downvotes;
   }
 
+  public Comment(Entity entity) {
+    long id = entity.getKey().getId();
+    String username = (String) entity.getProperty("commentUsername");
+    String body = (String) entity.getProperty("commentBody");
+    long timestamp = (long) entity.getProperty("timestamp");
+    int upvotes = ((Long) entity.getProperty("upvotes")).intValue();
+    int downvotes = ((Long) entity.getProperty("downvotes")).intValue();
+    this.id = id;
+    this.body = body;
+    this.username = username;
+    this.timestamp = timestamp;
+    this.upvotes = upvotes;
+    this.downvotes = downvotes;
+  }
+
   public Entity toEntity() {
     Entity commentEntity = new Entity("Comment");
     commentEntity.setProperty("commentUsername", username);
@@ -39,6 +56,8 @@ public final class Comment {
     commentEntity.setProperty("timestamp", timestamp);
     commentEntity.setProperty("upvotes", upvotes);
     commentEntity.setProperty("downvotes", downvotes);
+
+    return commentEntity;
   }
 
 }
