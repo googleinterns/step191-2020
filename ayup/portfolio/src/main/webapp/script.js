@@ -58,12 +58,12 @@ async function getRandomFactUsingAsyncAwait() {
 /** Fetches comments from the server and adds them to the DOM. */
 function loadComments() {
   fetch('/list-comments').then(response => response.json()).then((comments) => {
-    const commentListElement = document.getElementById('comment-list');
-
-    // Deletes all of the current commentss
-    while (commentListElement.firstChild) {
-      commentListElement.removeChild(commentListElement.lastChild);
+    var commentListElement = document.getElementById('js-comment-list');
+    // Deletes all of the current comments
+    while (commentListElement.lastChild) {
+      commentListElement.removeChild(commentListElement.firstChild); 
     }
+
     comments.forEach((comment) => {
       commentListElement.appendChild(createCommentElement(comment));
     })
@@ -75,9 +75,9 @@ function createCommentElement(comment) {
   const commentElement = document.createElement('li');
   commentElement.className = 'comment';
 
-  const titleElement = document.createElement('span');
+  const titleElement = document.createElement('div');
   titleElement.innerText = comment.title;
-  titleElement.className = "font-weight-bold";
+  titleElement.className = "font-weight-bold comment-header";
 
   const descriptionElement = document.createElement('span');
   descriptionElement.innerText = comment.description;
@@ -90,18 +90,15 @@ function createCommentElement(comment) {
     deleteComment(comment.id).then(() => {
       loadComments();
     })
-
-    // // Loads the comments again
-    // loadComments()
   });
 
+  titleElement.appendChild(deleteButtonElement)
+
   commentElement.appendChild(titleElement);
-  commentElement.appendChild(document.createElement("br"));
   commentElement.appendChild(descriptionElement);
   commentElement.appendChild(document.createElement("br"));
   commentElement.appendChild(usernameElement);
   commentElement.appendChild(document.createElement("br"));
-  commentElement.appendChild(deleteButtonElement);
   commentElement.appendChild(document.createElement("hr"));
   return commentElement;
 }
@@ -115,7 +112,11 @@ async function deleteComment(commentId) {
 
 function createDeleteButton() {
   const deleteButtonElement = document.createElement('button');
-  deleteButtonElement.innerText = 'Delete';
-  deleteButtonElement.className = "btn btn-danger";
+  deleteButtonElement.className = "btn bg-transparent delete-button";
+
+  const trashImgElement = document.createElement("img");
+  trashImgElement.src = "images/recycle.png";
+
+  deleteButtonElement.appendChild(trashImgElement);
   return deleteButtonElement;
 }

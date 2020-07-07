@@ -165,23 +165,26 @@
                 </div>
                 <br>
                 <div class="row">
-                    <div class="col-md-12" id="js-fact-parent">
+                    <div class="col-md-6">
                         <h1><span class="about-title">Leave a comment!</span></h1>
-                        <h3><span class="about-subtitle">Recieving feedback it's always good!</span></h3>
+                        <h3><span class="about-subtitle">Recieving feedback it's always good!</span> </h3>
                         <br>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
                         <form method="POST" action="/new-comment">
-                            <h5 class="font-weight-bold">Title</h5>
-                            <input type="text" name="title" />
+                            <input class="new-comment-input" type="text" name="title" placeholder="Title"/>
                             <br>
-                            <h5 class="font-weight-bold">Description</h5><input type="text" name="description" />
+                            <textarea class="new-comment-textarea" type="text" name="description" placeholder="Description"></textarea>
                             <br>
-                            <h5 class="font-weight-bold">Username</h5>
-                            <input type="text" name="username" />
+                            <input class="new-comment-input"type="text" name="username" placeholder="Username" />
                             <br>
-                            <button class="btn btn-danger" id="about-button">Submit</button>
+                            <button  class="btn btn-danger" id="about-button">Submit</button>
                         </form>
-                        <br>
-                        <ul id="comment-list"></ul>
+                    </div>
+                    <div class="col-md-6 comments-container rounded border">
+                        <ul id="js-comment-list"><br></ul>
                     </div>
                 </div>
                 <br>
@@ -198,11 +201,7 @@
             <img src="images/roddy.png" id="toasty">
         </div>
         <div class="footer">
-            <div class="row">
-                <div class="col-md-12">
-                    Made with love by Rodrigo :)
-                </div>
-            </div>
+            Made with love by Rodrigo :)
         </div>
   </body>
 </html>
