@@ -112,6 +112,10 @@
   min-height: 700px;
 }
 
+#comments-list{
+    display:inline;
+}
+
 #comments form{
     float:left;
 }
@@ -181,6 +185,7 @@
   display:block;
   margin-top:10px;
   margin-bottom:10px;
+  cursor: pointer;
 }
 
 #comments input[type="submit"]:hover{

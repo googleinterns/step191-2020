@@ -18,23 +18,68 @@ document.getElementById("projects").addEventListener("click", function (event) {
         event.target.closest('.project').classList.toggle("open");
 });
 
+let cursor = "";
+
 /** Loads existing Comments */
 async function loadComments() {
   let response = await fetch('/data');
-  let comments = await response.json();
+  let responseJson = await response.json();
+  let comments = responseJson.comments;
+  cursor = responseJson.cursor;
+
   if(comments.length == 0) {
-      document.getElementById("comments-section").innerHTML="No comments";
+      document.getElementById("comments-list").innerHTML="No comments";
   } 
   else {
-    let commentSection = document.getElementById("comments-section");
+    let commentSection = document.getElementById("comments-list");
     
     //The newest comments at the top
     comments.forEach(comment => {
+        console.log(comment);
         let newCard = createCard(comment);
         commentSection.append(newCard);
     });
 
   };
+}
+
+/** Changes comment page */
+async function changePage(type){
+    let response;
+    if(type == 'back') {
+        response = await fetch('/data?cursor='+cursor+'&pageDirection=back');
+    }
+    else if (type == 'next') {
+        response = await fetch('/data?cursor='+cursor+'&pageDirection=next');
+    }
+
+    let responseJson = await response.json();
+    let comments = responseJson.comments;
+    cursor = responseJson.cursor;
+    
+    if(comments.length != 0) {     
+        let commentSection = document.getElementById("comments-list");
+        //Empty section
+        document.getElementById("comments-list").innerText='';
+
+        //Change page num
+        let pageNum = document.getElementById("pageNumber").innerText;
+        if(type == 'back') {
+            if (1 < pageNum ) {
+                pageNum=1;
+            }
+        } 
+        else if (type == 'next') {
+            pageNum++;
+        }
+        document.getElementById("pageNumber").innerText= pageNum;
+
+        //The newest comments at the top
+        comments.forEach(comment => {
+        let newCard = createCard(comment);
+        commentSection.append(newCard);
+        });
+    };
 }
 
 /** Creates a card element containing the comment. */
