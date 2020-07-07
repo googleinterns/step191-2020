@@ -194,23 +194,41 @@ function getRandomCar() {
  */
 function getServletComments() {
   let maxComments = verifyNumberCommentsInput();
-
-  fetch('/data?maxComments=' + maxComments).then(response => response.json()).then((comments) => {
-    // Get the comments container
-    const commentsContainer = document.getElementById('js-comments-container');
-    commentsContainer.innerHTML = '';
-    
-    // Check if the array of comments is empty
-    if (!Array.isArray(comments) || !comments.length) {
-      const pElement = document.createElement('p');
-      pElement.innerText = "Looks like there are no comments yet. Be the first one to comment!"
-      commentsContainer.appendChild(pElement);
-    } else {
-      for (const comment of comments) {
-        commentsContainer.appendChild(createCommentElement(comment));
+  if (maxComments != null) {
+    fetch('/data?maxComments=' + maxComments).then(response => response.json()).then((comments) => {
+      // Get the cities container
+      const commentsContainer = document.getElementById('js-comments-container');
+      commentsContainer.innerHTML = '';
+      
+      // Check if the array of comments is empty
+      if (!Array.isArray(comments) || !comments.length) {
+        const pElement = document.createElement('p');
+        pElement.innerText = "Looks like there are no comments yet. Be the first one to comment!"
+        commentsContainer.appendChild(pElement);
+      } else {
+        for (const comment of comments) {
+          // Add each comment as a <li> to the container
+          commentsContainer.appendChild(createListElement(comment));
+        }
       }
-    }
-  });
+    });
+  }
+}
+
+/**
+ * Verify the input number from selection of number of comments to display
+ * Minimum number is 1 comment, and maximum is 10 comments
+ * If number is not valid it returns null
+ */
+function verifyNumberCommentsInput() {
+  let maxComments = null;
+  let maxCommentsContainer = document.getElementById("comment-number-input");
+  maxCommentsContainer.reportValidity();
+  let maxCommentsInput = maxCommentsContainer.value;
+  if (maxCommentsInput.length != 0 && maxCommentsInput < 11 && maxCommentsInput > 0) {
+    maxComments = maxCommentsInput;
+  }
+  return maxComments;
 }
 
 /**
@@ -218,17 +236,12 @@ function getServletComments() {
  * Minimum number is 1 comment, and maximum is 10 comments
  */
 function verifyNumberCommentsInput() {
-  // Default value
-  let maxComments = 5;
-
-  let maxCommentsInput = document.getElementById("maxComments").value;
-  const commentsErrorContainer = document.getElementById('js-comments-input-error-container');
+  let maxComments = null;
+  const maxCommentsContainer = document.getElementById("maxComments");
+  maxCommentsContainer.reportValidity();
+  const maxCommentsInput = maxCommentsContainer.value;
   if (maxCommentsInput.length != 0 && maxCommentsInput < 11 && maxCommentsInput > 0) {
     maxComments = maxCommentsInput;
-    commentsErrorContainer.innerText = "";
-  }
-  else {
-    commentsErrorContainer.innerText = "Invalid input for number of comments!";
   }
 
   return maxComments;

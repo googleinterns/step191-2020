@@ -14,10 +14,17 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.Cursor;
+import com.google.appengine.api.datastore.QueryResultList;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import java.util.ArrayList; 
+import java.util.List; 
 import java.util.Date; 
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
@@ -25,20 +32,41 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+//ToDo: Separate doPost and doGet in different files
+
 /** Servlet that returns some example content.*/
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
-    
-  ArrayList<String> comments = new ArrayList<>();  
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    ArrayList<String> comments = new ArrayList<>();  
+
+    Query query = new Query("Comment").addSort("date", SortDirection.DESCENDING);
+    PreparedQuery resultsQuery = datastore.prepare(query);
+    List<Entity> results = resultsQuery.asList(FetchOptions.Builder.withLimit(3));
+
+    //Query of entities to JSON
+    for (Entity entity : results) {
+        
+        //Returns comment converted to json (method in Comment object)
+        String comment = entityToString(entity);
+
+        comments.add(comment);
+    }
+
     response.setContentType("application/json;");
     response.getWriter().println(comments);
   }
   
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+     
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+ 
     // Get the input from the form.
     Comment newComment = getComment(request);
 
@@ -54,16 +82,25 @@ public class DataServlet extends HttpServlet {
         commentEntity.setProperty("msg", newComment.getMessage());
         commentEntity.setProperty("date", newComment.getDate());
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(commentEntity);
-
-    //Storing local for testing and visual purposes
-    String commentJson = newComment.toJson();
-    comments.add(0, commentJson);
 
     // Redirect back to the page in the comments section.
     //ToDo: Successful comment post alert
     response.sendRedirect("/#comments");
+  }
+
+  /** Returns the entity as a String*/
+  private String entityToString(Entity entity) {
+      
+    // Gets the properties to convert to json
+    String subject = (String) entity.getProperty("subject");
+    String msg = (String) entity.getProperty("msg");
+    Date date = (Date) entity.getProperty("date");
+
+    Comment newComment = new Comment(subject, msg, date);
+    String commentJson = newComment.toJson();
+
+    return commentJson;
   }
 
   /** Returns the comment posted or a comment with subject error if something is missing. */
