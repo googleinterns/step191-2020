@@ -29,22 +29,20 @@ public class UserServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("text/html");
     UserService userService = UserServiceFactory.getUserService();
-    Auth auth = new Auth(userService.isUserLoggedIn());
+    Auth.Builder auth;
+
     if (userService.isUserLoggedIn()) {
       String userEmail = userService.getCurrentUser().getEmail();
-      auth.setActiveUser(userEmail);
       String urlToRedirectToAfterUserLogsOut = "/";
       String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
-      auth.setLogoutUrl(logoutUrl);
-
+    auth = new Auth.Builder().setIsLoggedIn(true).setLogoutUrl(logoutUrl).setActiveUser(userEmail);
     } else {
       String urlToRedirectToAfterUserLogsIn = "/";
       String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
-      auth.setLoginUrl(loginUrl);
-
+    auth = new Auth.Builder().setLoginUrl(loginUrl);
     }
 
-    String authJson = auth.toJson();  
+    String authJson = auth.build().toJson();  
     response.getWriter().println(authJson);
   }
 }

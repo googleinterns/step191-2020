@@ -7,39 +7,12 @@ import com.google.gson.Gson;
 import java.io.IOException;
 
 public class Auth {
-  
-  private boolean isLoggedIn;
-  private boolean isAdmin;
-  private String logoutUrl;
-  private String loginUrl;
-  private String activeUser;
-
-  public Auth(boolean isLoggedIn) {
-    this.isLoggedIn = isLoggedIn;
-    this.isAdmin = false;
-    this.logoutUrl = null;
-    this.loginUrl = null;
-    this.activeUser = null;
-  }
-  
-  public void setLoginUrl(String loginUrl) {
-      this.loginUrl = loginUrl;
-      this.logoutUrl = null;
-      this.activeUser = null;
-  }
-  public void setLogoutUrl(String logoutUrl) {
-      this.logoutUrl = logoutUrl;
-      this.loginUrl = null;
-  }
-  public void setAdmin(boolean isAdmin) {
-      this.isAdmin = isAdmin;
-  }
-  public void setIsLoggedIn(boolean isLoggedIn) {
-      this.isLoggedIn = isLoggedIn;
-  }
-  public void setActiveUser(String activeUser) {
-      this.activeUser = activeUser;
-  }
+  private final boolean isLoggedIn;
+  private final boolean isAdmin;
+  private final String logoutUrl;
+  private final String loginUrl;
+  private final String activeUser;
+ 
   public String getLoginUrl() {
       return this.loginUrl;
   }
@@ -55,9 +28,49 @@ public class Auth {
   public Boolean isAdministrator() {
       return this.isAdmin;
   }
+
+  private Auth(Builder builder) {
+    isLoggedIn = builder.isLoggedIn;
+    isAdmin = builder.isAdmin;
+    activeUser = builder.activeUser;
+    loginUrl = builder.loginUrl;
+    logoutUrl = builder.logoutUrl;
+  }
+
+  public static class Builder {
+    private boolean isLoggedIn=false;
+    private boolean isAdmin=false;
+    private String logoutUrl=null;
+    private String loginUrl=null;
+    private String activeUser=null;
+
+    public Builder setLoginUrl(String loginUrl) {
+      this.loginUrl = loginUrl;
+      return this;
+    }
+    public Builder setLogoutUrl(String logoutUrl) {
+      this.logoutUrl = logoutUrl;
+      return this;
+    }
+    public Builder setAdmin(boolean isAdmin) {
+      this.isAdmin = isAdmin;
+      return this;
+    }
+    public Builder setIsLoggedIn(boolean isLoggedIn) {
+      this.isLoggedIn = isLoggedIn;
+      return this;
+    }
+    public Builder setActiveUser(String activeUser) {
+      this.activeUser = activeUser;
+      return this;
+    }
+    public Auth build() {
+      return new Auth(this);
+    }
+  }
   public String toJson() {
     Gson gson = new Gson();
     String json = gson.toJson(this);
     return json;
   }
-};
+}
