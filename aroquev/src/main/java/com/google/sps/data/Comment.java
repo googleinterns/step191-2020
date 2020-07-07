@@ -31,4 +31,14 @@ public final class Comment {
     this.upvotes = upvotes;
     this.downvotes = downvotes;
   }
+
+  public Entity toEntity() {
+    Entity commentEntity = new Entity("Comment");
+    commentEntity.setProperty("commentUsername", username);
+    commentEntity.setProperty("commentBody", body);
+    commentEntity.setProperty("timestamp", timestamp);
+    commentEntity.setProperty("upvotes", upvotes);
+    commentEntity.setProperty("downvotes", downvotes);
+  }
+
 }
