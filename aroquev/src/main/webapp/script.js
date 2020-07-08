@@ -196,7 +196,7 @@ function getServletComments() {
   let maxComments = verifyNumberCommentsInput();
   if (maxComments != null) {
     fetch('/data?maxComments=' + maxComments).then(response => response.json()).then((comments) => {
-      // Get the cities container
+      // Get the comments container
       const commentsContainer = document.getElementById('js-comments-container');
       commentsContainer.innerHTML = '';
       
@@ -300,6 +300,19 @@ function voteComment(comment, choice) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({commentId: comment.id, commentChoice: choice})
+  }).then(() => {
+    getServletComments();
+  });
+}
+
+function deleteComment(comment) {
+  fetch('/delete-comment', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({commentId: comment.id})
   }).then(() => {
     getServletComments();
   });
