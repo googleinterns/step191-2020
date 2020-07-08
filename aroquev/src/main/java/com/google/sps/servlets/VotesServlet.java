@@ -34,8 +34,7 @@ public class VotesServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String jsonString = deserializeJson(request);
-    JsonObject jsonObj = new Gson().fromJson(jsonString, JsonObject.class);
+    JsonObject jsonObj = new Gson().fromJson(request.getReader(), JsonObject.class);
 
     long id = (Long) jsonObj.get("commentId").getAsLong();
     boolean choice = jsonObj.get("commentChoice").getAsBoolean();
@@ -62,19 +61,5 @@ public class VotesServlet extends HttpServlet {
     
     datastore.put(comment);
   }
-
-  private String deserializeJson(HttpServletRequest request) {
-    StringBuilder jsonBuff = new StringBuilder();
-    String line = null;
-    try {
-        BufferedReader reader = request.getReader();
-        while ((line = reader.readLine()) != null)
-            jsonBuff.append(line);
-    } catch (Exception e) { 
-      /*error*/ 
-    }
-
-    return jsonBuff.toString();
-  }
-
+  
 }

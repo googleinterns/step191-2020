@@ -212,3 +212,11 @@ footer {
   font-size: 12px;
   color: #717171;
 }
+
+#comment-number-input {
+  margin: 10px;
+}
+
+#comment-number-input:invalid {
+  border: 2px solid red;
+}

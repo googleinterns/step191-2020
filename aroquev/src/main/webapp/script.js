@@ -194,44 +194,73 @@ function getRandomCar() {
  */
 function getServletComments() {
   let maxComments = verifyNumberCommentsInput();
-
-  fetch('/data?maxComments=' + maxComments).then(response => response.json()).then((comments) => {
-    // Get the comments container
-    const commentsContainer = document.getElementById('js-comments-container');
-    commentsContainer.innerHTML = '';
-    
-    // Check if the array of comments is empty
-    if (!Array.isArray(comments) || !comments.length) {
-      const pElement = document.createElement('p');
-      pElement.innerText = "Looks like there are no comments yet. Be the first one to comment!"
-      commentsContainer.appendChild(pElement);
-    } else {
-      for (const comment of comments) {
-        commentsContainer.appendChild(createCommentElement(comment));
+  if (maxComments != null) {
+    fetch('/data?maxComments=' + maxComments).then(response => response.json()).then((comments) => {
+      // Get the comments container
+      const commentsContainer = document.getElementById('js-comments-container');
+      commentsContainer.innerHTML = '';
+      
+      // Check if the array of comments is empty
+      if (!Array.isArray(comments) || !comments.length) {
+        const pElement = document.createElement('p');
+        pElement.innerText = "Looks like there are no comments yet. Be the first one to comment!"
+        commentsContainer.appendChild(pElement);
+      } else {
+        for (const comment of comments) {
+          // Add each comment to the commentsContainer
+          commentsContainer.appendChild(createCommentElement(comment));
+        }
       }
-    }
-  });
+    });
+  }
 }
 
 /**
  * Verify the input number from selection of number of comments to display
  * Minimum number is 1 comment, and maximum is 10 comments
+ * If number is not valid it returns null
  */
 function verifyNumberCommentsInput() {
-  // Default value
-  let maxComments = 5;
-
-  let maxCommentsInput = document.getElementById("maxComments").value;
-  const commentsErrorContainer = document.getElementById('js-comments-input-error-container');
+  let maxComments = null;
+  let maxCommentsContainer = document.getElementById("comment-number-input");
+  maxCommentsContainer.reportValidity();
+  let maxCommentsInput = maxCommentsContainer.value;
   if (maxCommentsInput.length != 0 && maxCommentsInput < 11 && maxCommentsInput > 0) {
     maxComments = maxCommentsInput;
-    commentsErrorContainer.innerText = "";
   }
-  else {
-    commentsErrorContainer.innerText = "Invalid input for number of comments!";
-  }
-
   return maxComments;
+}
+
+/**
+ * Function that handles when the user has voted a comment, then refreshes 
+ * the comments section
+ * @param {*} comment the comment which is being voted 
+ * @param {*} choice true for upvote, false for downvote
+ */
+function voteComment(comment, choice) {
+  fetch('/vote-comment', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({commentId: comment.id, commentChoice: choice})
+  }).then(() => {
+    getServletComments();
+  });
+}
+
+function deleteComment(comment) {
+  fetch('/delete-comment', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({commentId: comment.id})
+  }).then(() => {
+    getServletComments();
+  });
 }
 
 /**
@@ -302,38 +331,6 @@ function createCommentElement(comment) {
   commentView.appendChild(document.createElement('br'));
 
   return commentView
-}
-
-/**
- * Function that handles when the user has voted a comment, then refreshes 
- * the comments section
- * @param {*} comment the comment which is being voted 
- * @param {*} choice true for upvote, false for downvote
- */
-function voteComment(comment, choice) {
-  fetch('/vote-comment', {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({commentId: comment.id, commentChoice: choice})
-  }).then(() => {
-    getServletComments();
-  });
-}
-
-function deleteComment(comment) {
-  fetch('/delete-comment', {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({commentId: comment.id})
-  }).then(() => {
-    getServletComments();
-  });
 }
 
 /** Creates an <li> element containing text. */

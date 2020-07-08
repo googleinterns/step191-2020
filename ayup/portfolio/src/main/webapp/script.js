@@ -54,3 +54,69 @@ async function getRandomFactUsingAsyncAwait() {
   var a = document.getElementById('js-fact-container');
   a.parentNode.replaceChild(newFactContainer, a);
 }
+
+/** Fetches comments from the server and adds them to the DOM. */
+function loadComments() {
+  fetch('/list-comments').then(response => response.json()).then((comments) => {
+    var commentListElement = document.getElementById('js-comment-list');
+    // Deletes all of the current comments
+    while (commentListElement.lastChild) {
+      commentListElement.removeChild(commentListElement.firstChild); 
+    }
+
+    comments.forEach((comment) => {
+      commentListElement.appendChild(createCommentElement(comment));
+    })
+  });
+}
+
+/** Creates an element that represents a title, a description, a username and its delete button. */
+function createCommentElement(comment) {
+  const commentElement = document.createElement('li');
+  commentElement.className = 'comment';
+
+  const titleElement = document.createElement('div');
+  titleElement.innerText = comment.title;
+  titleElement.className = "font-weight-bold comment-header";
+
+  const descriptionElement = document.createElement('span');
+  descriptionElement.innerText = comment.description;
+
+  const usernameElement = document.createElement('span');
+  usernameElement.innerText = "By: " + comment.username;
+
+  const deleteButtonElement = createDeleteButton()
+  deleteButtonElement.addEventListener('click', () => {
+    deleteComment(comment.id).then(() => {
+      loadComments();
+    })
+  });
+
+  titleElement.appendChild(deleteButtonElement)
+
+  commentElement.appendChild(titleElement);
+  commentElement.appendChild(descriptionElement);
+  commentElement.appendChild(document.createElement("br"));
+  commentElement.appendChild(usernameElement);
+  commentElement.appendChild(document.createElement("br"));
+  commentElement.appendChild(document.createElement("hr"));
+  return commentElement;
+}
+
+/** Tells the server to delete the comment. */
+async function deleteComment(commentId) {
+  const params = new URLSearchParams();
+  params.append('id', commentId);
+  await fetch('/delete-comment', {method: 'POST', body: params});
+}
+
+function createDeleteButton() {
+  const deleteButtonElement = document.createElement('button');
+  deleteButtonElement.className = "btn bg-transparent delete-button";
+
+  const trashImgElement = document.createElement("img");
+  trashImgElement.src = "images/recycle.png";
+
+  deleteButtonElement.appendChild(trashImgElement);
+  return deleteButtonElement;
+}
