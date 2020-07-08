@@ -161,7 +161,7 @@ public class DataServlet extends HttpServlet {
     String msg = request.getParameter("msg");
     String author=null;
     if (userService.isUserLoggedIn()) {
-        author = userService.getCurrentUser().getEmail();
+        author = getUserNickname(userService.getCurrentUser().getUserId());
     }
 
     Comment newComment = new Comment(subject, msg, author, new Date(System.currentTimeMillis()));
@@ -180,5 +180,19 @@ public class DataServlet extends HttpServlet {
     }
 
     return true;
+  }
+
+  private String getUserNickname(String id) {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query =
+        new Query("UserInfo")
+            .setFilter(new Query.FilterPredicate("id", Query.FilterOperator.EQUAL, id));
+    PreparedQuery results = datastore.prepare(query);
+    Entity entity = results.asSingleEntity();
+    if (entity == null) {
+      return null;
+    }
+    String nickname = (String) entity.getProperty("nickname");
+    return nickname;
   }
 }

@@ -12,6 +12,7 @@ public class Auth {
   private final String logoutUrl;
   private final String loginUrl;
   private final String activeUser;
+  private final String nickname;
  
   public String getLoginUrl() {
       return this.loginUrl;
@@ -28,6 +29,9 @@ public class Auth {
   public Boolean isAdministrator() {
       return this.isAdmin;
   }
+  public String getNickname() {
+      return this.nickname;
+  }
 
   private Auth(Builder builder) {
     isLoggedIn = builder.isLoggedIn;
@@ -35,6 +39,7 @@ public class Auth {
     activeUser = builder.activeUser;
     loginUrl = builder.loginUrl;
     logoutUrl = builder.logoutUrl;
+    nickname = builder.nickname;
   }
 
   public static class Builder {
@@ -43,6 +48,7 @@ public class Auth {
     private String logoutUrl=null;
     private String loginUrl=null;
     private String activeUser=null;
+    private String nickname=null;
 
     public Builder setLoginUrl(String loginUrl) {
       this.loginUrl = loginUrl;
@@ -62,6 +68,10 @@ public class Auth {
     }
     public Builder setActiveUser(String activeUser) {
       this.activeUser = activeUser;
+      return this;
+    }
+    public Builder setNickname(String nickname) {
+      this.nickname = nickname;
       return this;
     }
     public Auth build() {
