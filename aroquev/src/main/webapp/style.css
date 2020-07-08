@@ -7,11 +7,12 @@ body {
 .topnav {
   background-color: #333;
   overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 /* Style the links inside the navigation bar */
 .topnav a {
-  float: left;
   color: #f2f2f2;
   text-align: center;
   padding: 14px 16px;
@@ -167,7 +168,6 @@ footer {
   padding: 3px;
   background-color: #4397ac;
   color: white;
-  display: block;
 }
 
 #about-me h2 {
@@ -219,4 +219,13 @@ footer {
 
 #comment-number-input:invalid {
   border: 2px solid red;
+}
+
+#js-comments-container {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.commentElement {
+  margin-bottom: 10px;
 }

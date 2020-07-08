@@ -269,6 +269,7 @@ function deleteComment(comment) {
  */
 function createCommentElement(comment) {
   const commentView = document.createElement('div');
+  commentView.classList.add('commentElement');
 
   const username = document.createElement('div');
   username.innerText = `Posted by: ${comment.username}`;
@@ -326,9 +327,6 @@ function createCommentElement(comment) {
   commentView.appendChild(downvote);
   commentView.appendChild(document.createElement('br'));
   commentView.appendChild(deleteCommentButton);
-
-  commentView.appendChild(document.createElement('br'));
-  commentView.appendChild(document.createElement('br'));
 
   return commentView
 }
