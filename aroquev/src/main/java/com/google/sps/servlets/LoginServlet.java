@@ -44,9 +44,7 @@ public class LoginServlet extends HttpServlet {
     jsonObj.addProperty("isLoggedIn", isLoggedIn);
     jsonObj.addProperty("url", url);
     
-    Gson gson = new Gson();
-    String json = gson.toJson(jsonObj);
-
+    String json = new Gson().toJson(jsonObj);
     response.getWriter().println(json);
   }
 

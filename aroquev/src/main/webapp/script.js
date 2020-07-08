@@ -420,10 +420,7 @@ async function buildWriteCommentsBox() {
 }
 
 function submitComment(commentForm) {
-  console.log(commentForm);
-  console.log("Submit called");
   commentBody = commentForm.elements['comments-body-input'].value;
-  console.log(commentBody);
   
   fetch('/data', {
     method: 'POST',
