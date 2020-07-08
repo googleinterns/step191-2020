@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns some example content.*/
+/** Servlet that returns the Comments stored in DS, and adds new Comments to DS.*/
 @WebServlet("/data")
 public class DataServlet extends HttpServlet { 
 
@@ -48,15 +48,7 @@ public class DataServlet extends HttpServlet {
 
     final ArrayList<Comment> comments = new ArrayList<Comment>();
     for (Entity entity : results.asIterable(FetchOptions.Builder.withLimit(maxComments))) {
-      long id = entity.getKey().getId();
-      String username = (String) entity.getProperty("commentUsername");
-      String body = (String) entity.getProperty("commentBody");
-      long timestamp = (long) entity.getProperty("timestamp");
-      int upvotes = ((Long) entity.getProperty("upvotes")).intValue();
-      int downvotes = ((Long) entity.getProperty("downvotes")).intValue();
-
-      final Comment comment = new Comment(id, body, username, timestamp, upvotes, downvotes);
-      
+      final Comment comment = new Comment(entity);
       comments.add(comment);
     }
 
@@ -74,17 +66,16 @@ public class DataServlet extends HttpServlet {
     String comment = jsonObj.get("commentBody").getAsString();
 
     UserService userService = UserServiceFactory.getUserService();
-
     String username = userService.getCurrentUser().getEmail();
+
+    int id = 0;
     long timestamp = System.currentTimeMillis();
+    int upvotes = 0;
+    int downvotes = 0;
 
-    Entity commentEntity = new Entity("Comment");
-    commentEntity.setProperty("commentUsername", username);
-    commentEntity.setProperty("commentBody", comment);
-    commentEntity.setProperty("timestamp", timestamp);
-    commentEntity.setProperty("upvotes", 0);
-    commentEntity.setProperty("downvotes", 0);
-
+    Comment newComment = new Comment(id, username, comment, timestamp, upvotes, downvotes);
+    Entity commentEntity = newComment.toEntity();
+    
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(commentEntity);
   }
