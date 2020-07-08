@@ -73,7 +73,7 @@ public class DataServlet extends HttpServlet {
     int upvotes = 0;
     int downvotes = 0;
 
-    Comment newComment = new Comment(id, username, comment, timestamp, upvotes, downvotes);
+    Comment newComment = new Comment(id, comment, username, timestamp, upvotes, downvotes);
     Entity commentEntity = newComment.toEntity();
     
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
