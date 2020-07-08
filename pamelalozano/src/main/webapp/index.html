@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   </head>
-  <body onload="loadComments()">
+  <body onload="initialLoads()">
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="collapse navbar-collapse" id="navbarNav">
@@ -214,8 +214,16 @@
 </div>
 </div>
 <div class="myContainer" id="comments">
-    
-    <form action="/data" method="POST">
+
+    <div id="login" class="check-login">
+        <p style="display:inline" id="login-txt">Set nickname to post a comment:</p>
+        <button class="w3-button w3-light-grey w3-hover-black w3-round" id="login-btn">Set Nickname</button>
+    </div>
+    <div id="logout" class="check-login">
+        <button class="w3-button w3-light-grey w3-hover-black w3-round" id="logout-btn">Log Out</button>
+    </div>
+
+    <form action="/data" method="POST" id="comments-form" class="check-login">
       <p>Comment:</p>
       <input type="text" name="subject" placeholder="Subject" required>
       <textarea type="text" name="msg" placeholder="Comment" required></textarea>

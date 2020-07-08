@@ -109,7 +109,7 @@
 #comments{
   color: white;
   background-color: #3a5688;
-  min-height: 700px;
+  min-height: 900px;
 }
 
 #comments-list{
@@ -221,4 +221,20 @@
 #comments-section footer{
   color:white;
   background-color:#8e435c;
+}
+.comment-date{
+  float:left;
+}
+.comment-author{
+  float:right;
+}
+.check-login{
+  margin-bottom:20px;
+  display: none;
+}
+.open{
+    display:block;
+}
+.hide{
+    display:none;
 }
