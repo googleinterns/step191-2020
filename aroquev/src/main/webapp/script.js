@@ -363,7 +363,6 @@ async function buildWriteCommentsBox() {
   const loginInfo = await checkLoggedIn();
   if (loginInfo.isLoggedIn) {  
     const commentForm = document.createElement('form');
-    commentForm.action = 'javascript:;';
     commentForm.addEventListener('submit', () => {
       submitComment(commentForm);
     });
