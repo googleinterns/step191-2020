@@ -10,7 +10,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
     <script src="script.js"></script>
   </head>
-  <body onload="loadComments(); logIn()">      
+  <body onload="loadComments(); logIn();">      
         <div class="jumbotron jumbotron-fluid playfair-font" id="jumbotron-intro">
             <div class="container">
                 <div class="row">
@@ -189,9 +189,9 @@
                     </div>
                 </div>
                 <br>
-                <div class="row" onload="getLogInStatus()">
-                    <div class="col-md-10">
-                        
+                <div class="row">
+                    <div class="col-md-10" id="js-img-form">
+                        <button onclick="loadImgForm()">cibo</button>
                     </div>
                 </div>
                 <br>

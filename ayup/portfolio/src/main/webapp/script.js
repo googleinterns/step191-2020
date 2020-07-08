@@ -122,7 +122,6 @@ function createDeleteButton() {
 }
 
 async function logIn() {
-  console.log("Works");
   const response = await fetch('/login-status');
   const text = await response.text();
 
@@ -137,5 +136,10 @@ async function logIn() {
   a.parentNode.replaceChild(newFactContainer, a);
 }
 
-async function getLogInStatus(){
+async function loadImgForm() {
+  const imageFormContainer = document.getElementById("js-img-form");
+
+  const response = await fetch('/image-form');
+  const fact = await response.text();
+  imageFormContainer.innerHTML = fact;
 }
