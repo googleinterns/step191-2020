@@ -357,23 +357,16 @@ function onDOMLoad() {
   getServletComments();
 }
 
-function checkLoggedIn() {
-  fetch('/login-status').then(response => response.json()).then((loginStatus) => {
-    console.log(loginStatus);
-    console.log(typeof loginStatus);
-    if (loginStatus == true) {
-      console.log("User is logged in");
-    } else {
-      console.log("User is NOT logged in or error");
-    }
-    return loginStatus;
-  });
+async function checkLoggedIn() {
+  const response = await fetch('/login-status');
+  const loginInfo = await response.json();
+  return loginInfo;
 }
 
-function buildWriteCommentsBox() {
+async function buildWriteCommentsBox() {
   const writeCommentsBox = document.getElementById('js-write-comment-box');
-
-  if (checkLoggedIn) {  
+  const loginInfo = await checkLoggedIn();
+  if (loginInfo.isLoggedIn) {  
     const commentForm = document.createElement('form');
     commentForm.action = 'javascript:;';
     commentForm.addEventListener('submit', () => {
@@ -399,18 +392,30 @@ function buildWriteCommentsBox() {
     const submitButton = document.createElement('input');
     submitButton.type = 'submit';
 
+    const logoutPElement = document.createElement('a');
+    logoutPElement.href = loginInfo.url;
+    logoutPElement.innerText = "Log out by clicking here";
+
     commentForm.appendChild(pElement);
     commentForm.appendChild(bodyTextArea);
     commentForm.appendChild(document.createElement('br'));
     commentForm.appendChild(usernameTextArea);
     commentForm.appendChild(document.createElement('br'));
     commentForm.appendChild(submitButton);
+    commentForm.appendChild(document.createElement('br'));
+    commentForm.appendChild(logoutPElement);
 
     writeCommentsBox.appendChild(commentForm);
   } else {
     const pElement = document.createElement('p');
     pElement.innerText = "You should log in";
+
+    const loginPElement = document.createElement('a');
+    loginPElement.href = loginInfo.url;
+    loginPElement.innerText = "Log in by clicking here";
+
     writeCommentsBox.appendChild(pElement);
+    writeCommentsBox.appendChild(loginPElement);
   }
 }
 
