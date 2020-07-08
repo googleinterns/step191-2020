@@ -127,12 +127,13 @@ async function logIn() {
   const text = await response.text();
 
   // New fact container to replace the older one
-  const newFactContainer = document.createElement("span");
-  newFactContainer.id = "js-login-status";
+  const newFactContainer = document.createElement("div");
+  newFactContainer.className = "col-md-6";
+  newFactContainer.id = "js-comment-form";
   newFactContainer.innerHTML = text;
 
   // Replacing the current fact container with a new one
-  var a = document.getElementById("js-login-status");
+  var a = document.getElementById("js-comment-form");
   a.parentNode.replaceChild(newFactContainer, a);
 }
 

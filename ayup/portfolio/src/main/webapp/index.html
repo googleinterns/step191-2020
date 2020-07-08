@@ -172,16 +172,8 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
-                        <form method="POST" action="/new-comment">
-                            <input class="new-comment-input" type="text" name="title" placeholder="Title"/>
-                            <br>
-                            <textarea class="new-comment-textarea" type="text" name="description" placeholder="Description"></textarea>
-                            <br>
-                            <input class="new-comment-input"type="text" name="username" placeholder="Username" />
-                            <br>
-                            <button  class="btn btn-danger" id="about-button">Submit</button>
-                        </form>
+                    <div class="col-md-6" id="js-comment-form">
+                        
                     </div>
                     <div class="col-md-6 comments-container rounded border">
                         <ul id="js-comment-list"><br></ul>
@@ -199,8 +191,7 @@
                 <br>
                 <div class="row" onload="getLogInStatus()">
                     <div class="col-md-10">
-                        <button type="button" class="btn btn-danger" id="login-button" onclick="">Log In!</button>
-                        <div id="js-login-status"></div>
+                        
                     </div>
                 </div>
                 <br>

@@ -35,14 +35,20 @@ public class LoginStatusServlet extends HttpServlet {
       String urlToRedirectToAfterUserLogsOut = "/";
       String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
 
-      response.getWriter().println("<p>Hello " + userEmail + "!</p>");
-      response.getWriter().println("<p>Logout <a href=\"" + logoutUrl + "\">here</a>.</p>");
+      response.getWriter().println("<p>Hello " + userEmail + "! Post a comment</p>");
+      response.getWriter().println("<form method=\"POST\" action=\"/new-comment\">");
+      response.getWriter().println("<input class=\"new-comment-input\" type=\"text\" name=\"title\" placeholder=\"Title\"/><br>");
+      response.getWriter().println("<textarea class=\"new-comment-textarea\" type=\"text\" name=\"description\" placeholder=\"Description\"></textarea><br>");
+      response.getWriter().println("<input class=\"new-comment-input\"type=\"text\" name=\"username\" placeholder=\"Username\" /><br>");
+      response.getWriter().println("<button  class=\"btn btn-danger\" id=\"about-button\">Submit</button>");
+      response.getWriter().println("</form>");
+      response.getWriter().println("<a class=\"btn btn-primary\" id=\"about-button\" role=\"button\" href=\"" + logoutUrl + "\">Log Out</a>");
     } else {
       String urlToRedirectToAfterUserLogsIn = "/";
       String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
 
-      response.getWriter().println("<p>Hello stranger.</p>");
-      response.getWriter().println("<p>Login <a href=\"" + loginUrl + "\">here</a>.</p>");
+      response.getWriter().println("<p>You need to log in to comment.</p>");
+      response.getWriter().println("<a class=\"btn btn-primary\" id=\"about-button\" role=\"button\" href=\"" + loginUrl + "\">Log In</a>");
     }
   }
 }
