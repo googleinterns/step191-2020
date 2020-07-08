@@ -232,61 +232,6 @@ function verifyNumberCommentsInput() {
 }
 
 /**
- * Takes the comment object and builds the element in the DOM
- * @param {*} comment the comment object to be displayed
- */
-function createCommentElement(comment) {
-  const commentView = document.createElement('div');
-
-  const username = document.createElement('div');
-  username.innerText = `Posted by: ${comment.username}`;
-  username.classList.add('comment-username');
-
-  const timestamp = document.createElement('div');
-  const date = new Date(comment.timestamp);
-  const options = {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric'
-  };
-  timestamp.innerText = `On: ${new Intl.DateTimeFormat('en', options).format(date)}`;
-  timestamp.classList.add('comment-timestamp');
-
-  const popularity = document.createElement('div');
-  popularity.innerText = `Popularity: ${comment.upvotes - comment.downvotes}`;
-
-  const body = document.createElement('div');
-  body.innerText = comment.body;
-  body.classList.add('comment-body');
-
-  const upvote = document.createElement('button');
-  upvote.innerText = "Upvote";
-  upvote.addEventListener('click', () => {
-    voteComment(comment, true);
-  });
-
-  const downvote = document.createElement('button');
-  downvote.innerText = "Downvote";
-  downvote.addEventListener('click', () => {
-    voteComment(comment, false);
-  });
-
-  commentView.appendChild(username);
-  commentView.appendChild(timestamp);
-  commentView.appendChild(popularity);
-  commentView.appendChild(body);
-  commentView.appendChild(upvote);
-  commentView.appendChild(downvote);
-
-  commentView.appendChild(document.createElement('br'));
-  commentView.appendChild(document.createElement('br'));
-
-  return commentView
-}
-
-/**
  * Function that handles when the user has voted a comment, then refreshes 
  * the comments section
  * @param {*} comment the comment which is being voted 
@@ -316,6 +261,74 @@ function deleteComment(comment) {
   }).then(() => {
     getServletComments();
   });
+}
+
+/**
+ * Takes the comment object and builds the element in the DOM
+ * @param {*} comment the comment object to be displayed
+ */
+function createCommentElement(comment) {
+  const commentView = document.createElement('div');
+  commentView.classList.add('commentElement');
+
+  const username = document.createElement('div');
+  username.innerText = `Posted by: ${comment.username}`;
+  username.classList.add('metadata');
+
+  const timestamp = document.createElement('div');
+  const date = new Date(comment.timestamp);
+  const options = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric'
+  };
+  timestamp.innerText = `On: ${new Intl.DateTimeFormat('en', options).format(date)}`;
+  timestamp.classList.add('metadata');
+
+  const popularity = document.createElement('div');
+  popularity.classList.add('metadata');
+  popularity.innerText = `Popularity: ${comment.upvotes - comment.downvotes}`;
+
+  const body = document.createElement('div');
+  body.innerText = comment.body;
+  body.classList.add('comment-body');
+
+  const upvote = document.createElement('img');
+  upvote.src = 'images/upvote.png'
+  upvote.classList.add('vote');
+  upvote.addEventListener('click', () => {
+    voteComment(comment, true);
+  });
+
+  const downvote = document.createElement('img');
+  downvote.src = 'images/downvote.png'
+  downvote.classList.add('vote');
+  downvote.addEventListener('click', () => {
+    voteComment(comment, false);
+  });
+
+  const deleteCommentButton = document.createElement('button');
+  deleteCommentButton.innerText = "Delete comment";
+  deleteCommentButton.classList.add('delete-btn');
+  deleteCommentButton.classList.add('btn');
+  deleteCommentButton.addEventListener('click', () => {
+    deleteComment(comment);
+  });
+
+  
+
+  commentView.appendChild(username);
+  commentView.appendChild(timestamp);
+  commentView.appendChild(popularity);
+  commentView.appendChild(body);
+  commentView.appendChild(upvote);
+  commentView.appendChild(downvote);
+  commentView.appendChild(document.createElement('br'));
+  commentView.appendChild(deleteCommentButton);
+
+  return commentView
 }
 
 /** Creates an <li> element containing text. */
