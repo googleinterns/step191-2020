@@ -10,7 +10,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
     <script src="script.js"></script>
   </head>
-  <body onload="loadComments()">      
+  <body onload="loadComments(); logIn()">      
         <div class="jumbotron jumbotron-fluid playfair-font" id="jumbotron-intro">
             <div class="container">
                 <div class="row">
@@ -194,6 +194,13 @@
                         <p class="card-text">You can reach out to me on my email or to my social media.</p>
                         <a href="https://github.com/thefredo1000"><img src="images/github.png" class="links-icons"></a>
                         <a href="https://mx.linkedin.com/in/rodrigo-casale-37929716a"><img src="images/linkedin.png" class="links-icons"></a>
+                    </div>
+                </div>
+                <br>
+                <div class="row" onload="getLogInStatus()">
+                    <div class="col-md-10">
+                        <button type="button" class="btn btn-danger" id="login-button" onclick="">Log In!</button>
+                        <div id="js-login-status"></div>
                     </div>
                 </div>
                 <br>

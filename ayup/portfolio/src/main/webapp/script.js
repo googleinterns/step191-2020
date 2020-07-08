@@ -120,3 +120,21 @@ function createDeleteButton() {
   deleteButtonElement.appendChild(trashImgElement);
   return deleteButtonElement;
 }
+
+async function logIn() {
+  console.log("Works");
+  const response = await fetch('/login-status');
+  const text = await response.text();
+
+  // New fact container to replace the older one
+  const newFactContainer = document.createElement("span");
+  newFactContainer.id = "js-login-status";
+  newFactContainer.innerHTML = text;
+
+  // Replacing the current fact container with a new one
+  var a = document.getElementById("js-login-status");
+  a.parentNode.replaceChild(newFactContainer, a);
+}
+
+async function getLogInStatus(){
+}
