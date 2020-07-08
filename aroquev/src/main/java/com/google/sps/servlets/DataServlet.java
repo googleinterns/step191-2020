@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns some example content.*/
+/** Servlet that returns the Comments stored in DS, and adds new Comments to DS.*/
 @WebServlet("/data")
 public class DataServlet extends HttpServlet { 
 

@@ -28,34 +28,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that updates upvotes or downvotes of a comment*/
+/** Servlet that deletes a Comment from the DS.*/
 @WebServlet("/delete-comment")
 public class DeleteCommentServlet extends HttpServlet { 
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String jsonString = deserializeJson(request);
-    JsonObject jsonObj = new Gson().fromJson(jsonString, JsonObject.class);
+    JsonObject jsonObj = new Gson().fromJson(request.getReader(), JsonObject.class);
 
     long id = (Long) jsonObj.get("commentId").getAsLong();
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Key commentEntityKey = KeyFactory.createKey("Comment", id);
     datastore.delete(commentEntityKey);
-  }
-
-  private String deserializeJson(HttpServletRequest request) {
-    StringBuilder jsonBuff = new StringBuilder();
-    String line = null;
-    try {
-        BufferedReader reader = request.getReader();
-        while ((line = reader.readLine()) != null)
-            jsonBuff.append(line);
-    } catch (Exception e) { 
-      /*error*/ 
-    }
-
-    return jsonBuff.toString();
   }
 
 }
