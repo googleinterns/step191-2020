@@ -420,13 +420,13 @@ function submitComment(commentForm) {
   commentBody = commentForm.elements['comments-body-input'].value;
   console.log(commentBody);
   
-  fetch('/delete-comment', {
+  fetch('/data', {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({commentId: comment.id})
+    body: JSON.stringify({commentBody: commentBody})
   }).then(() => {
     getServletComments();
     commentForm.reset();
