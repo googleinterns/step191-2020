@@ -46,13 +46,13 @@ async function getRandomFactUsingAsyncAwait() {
   const fact = await response.text();
 
   // New fact container to replace the older one
-  const logInFormContainer = document.createElement("span");
-  logInFormContainer.id = "js-fact-container";
-  logInFormContainer.innerHTML = fact;
+  const newFactContainer = document.createElement("span");
+  newFactContainer.id = "js-fact-container";
+  newFactContainer.innerHTML = fact;
 
   // Replacing the current fact container with a new one
   var a = document.getElementById('js-fact-container');
-  a.parentNode.replaceChild(logInFormContainer, a);
+  a.parentNode.replaceChild(newFactContainer, a);
 }
 
 /** Fetches comments from the server and adds them to the DOM. */
