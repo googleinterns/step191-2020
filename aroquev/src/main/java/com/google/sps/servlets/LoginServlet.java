@@ -43,6 +43,10 @@ public class LoginServlet extends HttpServlet {
     if (isLoggedIn) {
       url = userService.createLogoutURL("/");
       nickname = getUserNickname(userService.getCurrentUser().getUserId());
+      if (nickname == "") {
+        setNickname(userService.getCurrentUser().getUserId(), userService.getCurrentUser().getEmail());
+        nickname = userService.getCurrentUser().getEmail();
+      }
     } else {
       url = userService.createLoginURL("/#comments");
     }
@@ -68,12 +72,7 @@ public class LoginServlet extends HttpServlet {
     String nickname = jsonObj.get("nickname").getAsString();
     String id = userService.getCurrentUser().getUserId();
     
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity entity = new Entity("UserInfo", id);
-    entity.setProperty("id", id);
-    entity.setProperty("nickname", nickname);
-    // The put() function automatically inserts new data or updates existing data based on ID
-    datastore.put(entity);
+    setNickname(id, nickname);
   }
 
   /**
@@ -91,6 +90,18 @@ public class LoginServlet extends HttpServlet {
     }
     String nickname = (String) entity.getProperty("nickname");
     return nickname;
+  }
+
+  /**
+   * Function that sets the User's nickname in DS
+   */
+  private void setNickname(String id, String nickname) {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Entity entity = new Entity("UserInfo", id);
+    entity.setProperty("id", id);
+    entity.setProperty("nickname", nickname);
+    // The put() function automatically inserts new data or updates existing data based on ID
+    datastore.put(entity);
   }
 
 }

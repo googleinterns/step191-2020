@@ -404,16 +404,15 @@ function buildNicknameInputBox(loginInfo, nicknameForm) {
 
   nicknameForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    updateNickname(nicknameForm, nicknamePElement, loginInfo);
+    updateNickname(nicknameForm, nicknamePElement);
   });
 }
 
 /**
  * Function that handles when the user wants to change his nickname
  * @param {*} nicknameForm The nickname form that contains the data the user wants to submit
- * @param {*} loginInfo The login info that will be updated with the new nickname
  */
-function updateNickname(nicknameForm, loginInfo) {
+function updateNickname(nicknameForm) {
   const nickname = nicknameForm.elements['comments-nickname-input'].value;
   const nicknamePElement = nicknameForm.querySelector('p');
   if (nickname != "") {
@@ -426,27 +425,11 @@ function updateNickname(nicknameForm, loginInfo) {
       body: JSON.stringify({nickname: nickname})
     }).then(() => {
       nicknamePElement.innerText = `You are posting as: ${nickname}`;
-      loginInfo.nickname = nickname;
-      updateLoginInfoNickname(loginInfo);
+      nicknameForm.reset();
     });
   } 
 }
 
-/**
- * 
- * @param {*} loginInfo 
- */
-function updateLoginInfoNickname(loginInfo) {
-  const commentForm = document.getElementById('commentForm');
-  commentForm.removeEventListener('submit', (event) => {
-    event.preventDefault();
-    submitComment(commentForm, loginInfo);
-  });
-  commentForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    submitComment(commentForm, loginInfo);
-  });
-}
 
 /**
  * Function that builds the comments box telling the user to log in
@@ -474,21 +457,16 @@ function buildWriteCommentBoxLoggedOut(loginInfo) {
  * @param {*} loginInfo The login info of the user
  */
 function submitComment(commentForm, loginInfo) {
-  if (loginInfo.nickname != "") {
-    commentBody = commentForm.elements['comments-body-input'].value;
-    fetch('/data', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({commentBody: commentBody})
-    }).then(() => {
-      getServletComments();
-      commentForm.reset();
-    });
-  } else {
-    alert("A nickname has not been set for this account. Please set one to comment.")
-  }
-  
+  commentBody = commentForm.elements['comments-body-input'].value;
+  fetch('/data', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({commentBody: commentBody})
+  }).then(() => {
+    getServletComments();
+    commentForm.reset();
+  });
 }
