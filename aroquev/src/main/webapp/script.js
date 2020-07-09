@@ -368,9 +368,11 @@ function buildWriteCommentBoxLoggedIn(loginInfo) {
   const commentFormTemplateClone = document.querySelector('#commentInputBox').content.cloneNode(true);
 
   const commentForm = commentFormTemplateClone.querySelectorAll('form')[0];
+  commentForm.id = "commentForm";
   buildWriteCommentInputBox(loginInfo, commentForm); 
 
   const nicknameForm = commentFormTemplateClone.querySelectorAll('form')[1];
+  nicknameForm.id = 'nicknameForm';
   buildNicknameInputBox(loginInfo, nicknameForm);
 
   return commentFormTemplateClone;
@@ -425,8 +427,25 @@ function updateNickname(nicknameForm, loginInfo) {
     }).then(() => {
       nicknamePElement.innerText = `You are posting as: ${nickname}`;
       loginInfo.nickname = nickname;
+      updateLoginInfoNickname(loginInfo);
     });
   } 
+}
+
+/**
+ * 
+ * @param {*} loginInfo 
+ */
+function updateLoginInfoNickname(loginInfo) {
+  const commentForm = document.getElementById('commentForm');
+  commentForm.removeEventListener('submit', (event) => {
+    event.preventDefault();
+    submitComment(commentForm, loginInfo);
+  });
+  commentForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    submitComment(commentForm, loginInfo);
+  });
 }
 
 /**
