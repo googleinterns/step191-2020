@@ -35,7 +35,7 @@ body {
 #content {
   margin-left: auto;
   margin-right: auto;
-  width: 650px;
+  width: 800px;
 }
 
 #greeting-container {
@@ -228,4 +228,12 @@ footer {
 
 .commentElement {
   margin-bottom: 10px;
+}
+
+#map {
+  border: thin solid black;
+  height: 550px;
+  max-width: 1000px;
+  position: relative;
+  margin: auto;
 }
