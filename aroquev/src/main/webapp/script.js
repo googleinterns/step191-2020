@@ -400,7 +400,23 @@ function submitComment(commentForm) {
 
 /** Creates a map and adds it to the page. */
 function createMap() {
+  const MEXICO_BOUNDS = {
+    north: 33.990,
+    south: 13.652,
+    west: -119.495,
+    east: -85.515
+  };
+
+  const mapOpt = {
+    center: {lat: 23.167, lng: -101.842}, 
+    zoom: 5,
+    mapTypeId: 'hybrid',
+    restriction: {
+      latLngBounds: MEXICO_BOUNDS,
+      strictBounds: false
+    }
+  };
+
   const map = new google.maps.Map(
-      document.getElementById('map'),
-      {center: {lat: 23.167, lng: -101.842}, zoom: 5});
+      document.getElementById('map'), mapOpt);
 }
