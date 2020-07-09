@@ -122,7 +122,7 @@ function createDeleteButton() {
   return deleteButtonElement;
 }
 
-// Creates the log in form
+/** Creates the log in form */
 async function logIn() {
   const response = await fetch('/login-status');
   const text = await response.text();
