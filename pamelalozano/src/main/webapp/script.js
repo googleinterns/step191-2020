@@ -20,9 +20,9 @@ document.getElementById("projects").addEventListener("click", function (event) {
 
 let cursor = "";
 
-async function initialLoads(){
-    await loadComments();
-    await checkLogin();
+function initialLoads(){
+    loadComments();
+    checkLogin();
 }
 
 /*This function displays log in button if there is no user, a set nickname button if there is a user but the
