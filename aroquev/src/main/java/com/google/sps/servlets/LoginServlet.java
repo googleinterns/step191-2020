@@ -16,33 +16,36 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/user")
-public class UserServlet extends HttpServlet {
+@WebServlet("/login-status")
+public class LoginServlet extends HttpServlet { 
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.setContentType("text/html");
     UserService userService = UserServiceFactory.getUserService();
-    Auth.Builder auth;
+    
+    boolean isLoggedIn = userService.isUserLoggedIn();
+    String url;
 
-    if (userService.isUserLoggedIn()) {
-      String userEmail = userService.getCurrentUser().getEmail();
-      String urlToRedirectToAfterUserLogsOut = "/";
-      String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
-    auth = new Auth.Builder().setIsLoggedIn(true).setLogoutUrl(logoutUrl).setActiveUser(userEmail);
+    if (isLoggedIn) {
+      url = userService.createLogoutURL("/");
     } else {
-      String urlToRedirectToAfterUserLogsIn = "/";
-      String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
-    auth = new Auth.Builder().setLoginUrl(loginUrl);
+      url = userService.createLoginURL("/");
     }
 
-    String authJson = auth.build().toJson();  
-    response.getWriter().println(authJson);
+    JsonObject jsonObj = new JsonObject();
+    jsonObj.addProperty("isLoggedIn", isLoggedIn);
+    jsonObj.addProperty("url", url);
+    
+    String json = new Gson().toJson(jsonObj);
+    response.getWriter().println(json);
   }
+
 }

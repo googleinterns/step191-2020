@@ -17,36 +17,30 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that deletes all Comments from DS*/
-@WebServlet("/delete-data")
-public class DeleteServlet extends HttpServlet { 
+/** Servlet that deletes a Comment from the DS.*/
+@WebServlet("/delete-comment")
+public class DeleteCommentServlet extends HttpServlet { 
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Query query = new Query("Comment");
+    JsonObject jsonObj = new Gson().fromJson(request.getReader(), JsonObject.class);
+
+    long id = (Long) jsonObj.get("commentId").getAsLong();
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    PreparedQuery results = datastore.prepare(query);
-    
-    final List<Key> commentKeys = new ArrayList<Key>();
-    for (Entity entity : results.asIterable()) {
-      commentKeys.add(entity.getKey());
-    }
-
-    datastore.delete(commentKeys);
+    Key commentEntityKey = KeyFactory.createKey("Comment", id);
+    datastore.delete(commentEntityKey);
   }
 
 }

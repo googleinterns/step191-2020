@@ -196,19 +196,19 @@ function getServletComments() {
   let maxComments = verifyNumberCommentsInput();
   if (maxComments != null) {
     fetch('/data?maxComments=' + maxComments).then(response => response.json()).then((comments) => {
-      // Get the cities container
-      const citiesContainer = document.getElementById('js-comments-container');
-      citiesContainer.innerHTML = '';
+      // Get the comments container
+      const commentsContainer = document.getElementById('js-comments-container');
+      commentsContainer.innerHTML = '';
       
       // Check if the array of comments is empty
       if (!Array.isArray(comments) || !comments.length) {
         const pElement = document.createElement('p');
         pElement.innerText = "Looks like there are no comments yet. Be the first one to comment!"
-        citiesContainer.appendChild(pElement);
+        commentsContainer.appendChild(pElement);
       } else {
         for (const comment of comments) {
-          // Add each comment as a <li> to the container
-          citiesContainer.appendChild(createListElement(comment));
+          // Add each comment to the commentsContainer
+          commentsContainer.appendChild(createCommentElement(comment));
         }
       }
     });
@@ -231,6 +231,88 @@ function verifyNumberCommentsInput() {
   return maxComments;
 }
 
+/**
+ * Function that handles when the user has voted a comment, then refreshes 
+ * the comments section
+ * @param {*} comment the comment which is being voted 
+ * @param {*} choice true for upvote, false for downvote
+ */
+function voteComment(comment, choice) {
+  fetch('/vote-comment', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({commentId: comment.id, commentChoice: choice})
+  }).then(() => {
+    getServletComments();
+  });
+}
+
+function deleteComment(comment) {
+  fetch('/delete-comment', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({commentId: comment.id})
+  }).then(() => {
+    getServletComments();
+  });
+}
+
+/**
+ * Takes the comment object and builds the element in the DOM
+ * @param {*} comment the comment object to be displayed
+ */
+function createCommentElement(comment) {
+  const commentElementTemplateClone = document.querySelector('#commentElementTemplate').content.cloneNode(true);
+
+  const commentView = commentElementTemplateClone.querySelector('div');
+  const commentDivs = commentView.querySelectorAll('div');
+  
+  const username = commentDivs[0];
+  username.innerText = `Posted by: ${comment.username}`;
+
+  const timestamp = commentDivs[1];
+  const date = new Date(comment.timestamp);
+  const options = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric'
+  };
+  timestamp.innerText = `On: ${new Intl.DateTimeFormat('en', options).format(date)}`;
+
+  const popularity = commentDivs[2];
+  popularity.innerText = `Popularity: ${comment.upvotes - comment.downvotes}`;
+
+  const body = commentDivs[3];
+  body.innerText = comment.body;
+
+  const commentVotes = commentView.querySelectorAll('img');
+
+  const upvote = commentVotes[0];
+  upvote.addEventListener('click', () => {
+    voteComment(comment, true);
+  });
+
+  const downvote = commentVotes[1];
+  downvote.addEventListener('click', () => {
+    voteComment(comment, false);
+  });
+
+  const deleteCommentButton = commentView.querySelector('button');
+  deleteCommentButton.addEventListener('click', () => {
+    deleteComment(comment);
+  });
+
+  return commentElementTemplateClone;
+}
+
 /** Creates an <li> element containing text. */
 function createListElement(text) {
   const liElement = document.createElement('li');
@@ -244,5 +326,73 @@ function createListElement(text) {
 function deleteAllComments() {
   fetch('/delete-data', {method: 'POST'}).then(() => {
     getServletComments();
+  });
+}
+
+function onDOMLoad() {
+  buildWriteCommentsBox();
+  getServletComments();
+}
+
+async function checkLoggedIn() {
+  const response = await fetch('/login-status');
+  const loginInfo = await response.json();
+  return loginInfo;
+}
+
+async function buildWriteCommentsBox() {
+  const writeCommentsBox = document.getElementById('js-write-comment-box');
+  const loginInfo = await checkLoggedIn();
+  if (loginInfo.isLoggedIn) { 
+    writeCommentsBox.appendChild(buildWriteCommentBoxLoggedIn(loginInfo));
+  } else {
+    writeCommentsBox.appendChild(buildWriteCommentBoxLoggedOut(loginInfo));
+  }
+}
+
+function buildWriteCommentBoxLoggedIn(loginInfo) {
+  const commentFormTemplateClone = document.querySelector('#commentInputBox').content.cloneNode(true);
+
+  commentForm = commentFormTemplateClone.querySelector('form');
+  commentForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    submitComment(commentForm);
+  });
+
+  const logoutAElement = commentForm.querySelector('a');
+  logoutAElement.href = loginInfo.url;
+
+  return commentFormTemplateClone;
+}
+
+function buildWriteCommentBoxLoggedOut(loginInfo) {
+  const divElement = document.createElement('div');
+  
+  const pElement = document.createElement('p');
+  pElement.innerText = "You should log in";
+
+  const loginAElement = document.createElement('a');
+  loginAElement.href = loginInfo.url;
+  loginAElement.innerText = "Log in by clicking here";
+
+  divElement.appendChild(pElement);
+  divElement.appendChild(loginAElement);
+
+  return divElement;
+}
+
+function submitComment(commentForm) {
+  commentBody = commentForm.elements['comments-body-input'].value;
+  console.log(commentBody);
+  fetch('/data', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({commentBody: commentBody})
+  }).then(() => {
+    getServletComments();
+    commentForm.reset();
   });
 }
