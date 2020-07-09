@@ -14,6 +14,9 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.QueryResultList;
 import com.google.appengine.api.datastore.PreparedQuery;
@@ -64,14 +67,19 @@ public class UserServlet extends HttpServlet {
   /** Returns the nickname of the user with id, or null if the user has not set a nickname. */
   private String getUserNickname(String id) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Query query =
-        new Query("UserInfo")
-            .setFilter(new Query.FilterPredicate("id", Query.FilterOperator.EQUAL, id));
-    PreparedQuery results = datastore.prepare(query);
-    Entity entity = results.asSingleEntity();
+    Entity entity = null;
+
+    try {
+        Key userInfoKey = KeyFactory.createKey("UserInfo", id);
+        entity = datastore.get(userInfoKey);
+    } catch(Exception e) {
+        System.out.println(e);
+    }
+
     if (entity == null) {
       return null;
     }
+
     String nickname = (String) entity.getProperty("nickname");
     return nickname;
   }

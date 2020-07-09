@@ -45,10 +45,10 @@ public class Auth {
   public static class Builder {
     private boolean isLoggedIn=false;
     private boolean isAdmin=false;
-    private String logoutUrl=null;
-    private String loginUrl=null;
-    private String activeUser=null;
-    private String nickname=null;
+    private String logoutUrl;
+    private String loginUrl;
+    private String activeUser;
+    private String nickname;
 
     public Builder setLoginUrl(String loginUrl) {
       this.loginUrl = loginUrl;
