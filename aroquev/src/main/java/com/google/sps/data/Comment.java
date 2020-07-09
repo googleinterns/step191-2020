@@ -14,7 +14,13 @@
 
 package com.google.sps.data;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 
 public final class Comment {
 
@@ -24,6 +30,7 @@ public final class Comment {
   private final long timestamp;
   private final int upvotes;
   private final int downvotes;
+  private final String nickname;
 
   public Comment(long id, String body, String username, long timestamp, int upvotes, int downvotes) {
     this.id = id;
@@ -32,6 +39,7 @@ public final class Comment {
     this.timestamp = timestamp;
     this.upvotes = upvotes;
     this.downvotes = downvotes;
+    this.nickname = getUserNickname(username);
   }
 
   public Comment(Entity entity) {
@@ -47,6 +55,7 @@ public final class Comment {
     this.timestamp = timestamp;
     this.upvotes = upvotes;
     this.downvotes = downvotes;
+    this.nickname = getUserNickname(username);
   }
 
   public Entity toEntity() {
@@ -58,6 +67,23 @@ public final class Comment {
     commentEntity.setProperty("downvotes", downvotes);
 
     return commentEntity;
+  }
+
+  /**
+   * Returns the nickname of the user with id, or empty String if the user has not set a nickname.
+   */
+  private String getUserNickname(String id) {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Query query =
+        new Query("UserInfo")
+            .setFilter(new Query.FilterPredicate("id", Query.FilterOperator.EQUAL, id));
+    PreparedQuery results = datastore.prepare(query);
+    Entity entity = results.asSingleEntity();
+    if (entity == null) {
+      return "";
+    }
+    String nickname = (String) entity.getProperty("nickname");
+    return nickname;
   }
 
 }
