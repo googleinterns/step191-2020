@@ -135,3 +135,19 @@ async function logIn() {
   var a = document.getElementById("js-comment-form");
   a.parentNode.replaceChild(newFactContainer, a);
 }
+
+(function(exports) {
+  "use strict";
+
+  function initMap() {
+    exports.map = new google.maps.Map(document.getElementById("map"), {
+      center: {
+        lat: 25.5487519,
+        lng: -103.4719567
+      },
+      zoom: 8
+    });
+  }
+
+  exports.initMap = initMap;
+})((this.window = this.window || {}));
