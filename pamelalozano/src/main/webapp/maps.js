@@ -25,7 +25,7 @@ async function createMapChart(){
       google.charts.setOnLoadCallback(drawRegionsMap);
 
       async function drawRegionsMap() {
-        var data = google.visualization.arrayToDataTable(await fetchInfo());
+        var data = google.visualization.arrayToDataTable(await fetchInfo('SL.IND.EMPL.FE.ZS'));
 
         var options = {};
 
@@ -35,12 +35,12 @@ async function createMapChart(){
       }
 }
 
-async function fetchInfo(){
+async function fetchInfo(indicatorCode){
 
     var output = [];
     output.push(['Country', 'Female employees in industry %']);
 
-    let response = await fetch('https://api.worldbank.org/V2/country/all/indicator/SL.IND.EMPL.FE.ZS?format=json&date=2019&page=1&per_page=264');
+    let response = await fetch('https://api.worldbank.org/V2/country/all/indicator/'+indicatorCode+'?format=json&date=2019&page=1&per_page=264');
     let json = await response.json();
     let info = json[1];
 
