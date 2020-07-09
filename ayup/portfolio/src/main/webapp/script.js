@@ -135,11 +135,3 @@ async function logIn() {
   var a = document.getElementById("js-comment-form");
   a.parentNode.replaceChild(newFactContainer, a);
 }
-
-async function loadImgForm() {
-  const imageFormContainer = document.getElementById("js-img-form");
-
-  const response = await fetch('/image-form');
-  const fact = await response.text();
-  imageFormContainer.innerHTML = fact;
-}
