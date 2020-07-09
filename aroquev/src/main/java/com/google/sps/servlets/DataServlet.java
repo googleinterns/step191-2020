@@ -21,7 +21,10 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.sps.data.Comment;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,20 +62,22 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    JsonObject jsonObj = new Gson().fromJson(request.getReader(), JsonObject.class);
+    String comment = jsonObj.get("commentBody").getAsString();
+
+    UserService userService = UserServiceFactory.getUserService();
+    String username = userService.getCurrentUser().getEmail();
+
     int id = 0;
-    String username = request.getParameter("comments-username-input");
-    String comment = request.getParameter("comments-body-input");
     long timestamp = System.currentTimeMillis();
     int upvotes = 0;
     int downvotes = 0;
 
-    Comment newComment = new Comment(id, username, comment, timestamp, upvotes, downvotes);
+    Comment newComment = new Comment(id, comment, username, timestamp, upvotes, downvotes);
     Entity commentEntity = newComment.toEntity();
     
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(commentEntity);
-
-    response.sendRedirect("/");
   }
 
   /**

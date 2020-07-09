@@ -11,7 +11,7 @@
       href="images/noogler-hat.png">
 </head>
 
-<body onload="getServletComments()">
+<body onload="onDOMLoad()">
   <div class="topnav">
     <a class="active" href="#">Home</a>
     <a href="#about-me">About Me</a>
@@ -188,14 +188,18 @@
     <hr>
     <div id="comments">
       <h2>Comments!</h2>
-      <form action="/data" method="POST">
-        <p>You are welcome to leave a comment if you found something interesting or just have anything to say!</p>
-        <textarea name="comments-body-input" required="required" placeholder="Write your comment here"></textarea>
-        <br>
-        <textarea name="comments-username-input" required="required" placeholder="Username (can be your name)"></textarea>
-        <br>
-        <input type="submit">
-      </form>
+      <div id="js-write-comment-box"></div>
+
+      <template id="commentInputBox">
+        <form>
+          <p>You are welcome to leave a comment if you found something interesting or just have anything to say!</p>
+          <textarea id="comments-body-input" name="comments-body-input" required="required" placeholder="Write your comment here"></textarea>
+          <br>
+          <input type="submit">
+          <br>
+          <a>Log out by clicking here</a>
+        </form>
+      </template>
   
       <h3>Previous comments</h3>
 
@@ -203,6 +207,19 @@
       <input type="number" id="comment-number-input" name="quantity" min="1" max="10" value="5" onchange="getServletComments()">
 
       <div id="js-comments-container"></div>
+
+      <template id="commentElementTemplate">
+        <div class="commentElement">
+          <div class="metadata"></div>
+          <div class="metadata"></div>
+          <div class="metadata"></div>
+          <div class="comment-body"></div>
+          <img src="images/upvote.png" class="vote">
+          <img src="images/downvote.png" class="vote">
+          <br>
+          <button class="delete-btn btn">Delete comment</button>
+        </div>
+      </template>
 
       <button onclick="deleteAllComments()" class="btn delete-all-btn">Delete all comments</button>
     </div>

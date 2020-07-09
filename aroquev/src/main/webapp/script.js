@@ -268,14 +268,15 @@ function deleteComment(comment) {
  * @param {*} comment the comment object to be displayed
  */
 function createCommentElement(comment) {
-  const commentView = document.createElement('div');
-  commentView.classList.add('commentElement');
+  const commentElementTemplateClone = document.querySelector('#commentElementTemplate').content.cloneNode(true);
 
-  const username = document.createElement('div');
+  const commentView = commentElementTemplateClone.querySelector('div');
+  const commentDivs = commentView.querySelectorAll('div');
+  
+  const username = commentDivs[0];
   username.innerText = `Posted by: ${comment.username}`;
-  username.classList.add('metadata');
 
-  const timestamp = document.createElement('div');
+  const timestamp = commentDivs[1];
   const date = new Date(comment.timestamp);
   const options = {
     year: 'numeric',
@@ -285,50 +286,31 @@ function createCommentElement(comment) {
     minute: 'numeric'
   };
   timestamp.innerText = `On: ${new Intl.DateTimeFormat('en', options).format(date)}`;
-  timestamp.classList.add('metadata');
 
-  const popularity = document.createElement('div');
-  popularity.classList.add('metadata');
+  const popularity = commentDivs[2];
   popularity.innerText = `Popularity: ${comment.upvotes - comment.downvotes}`;
 
-  const body = document.createElement('div');
+  const body = commentDivs[3];
   body.innerText = comment.body;
-  body.classList.add('comment-body');
 
-  const upvote = document.createElement('img');
-  upvote.src = 'images/upvote.png'
-  upvote.classList.add('vote');
+  const commentVotes = commentView.querySelectorAll('img');
+
+  const upvote = commentVotes[0];
   upvote.addEventListener('click', () => {
     voteComment(comment, true);
   });
 
-  const downvote = document.createElement('img');
-  downvote.src = 'images/downvote.png'
-  downvote.classList.add('vote');
+  const downvote = commentVotes[1];
   downvote.addEventListener('click', () => {
     voteComment(comment, false);
   });
 
-  const deleteCommentButton = document.createElement('button');
-  deleteCommentButton.innerText = "Delete comment";
-  deleteCommentButton.classList.add('delete-btn');
-  deleteCommentButton.classList.add('btn');
+  const deleteCommentButton = commentView.querySelector('button');
   deleteCommentButton.addEventListener('click', () => {
     deleteComment(comment);
   });
 
-  
-
-  commentView.appendChild(username);
-  commentView.appendChild(timestamp);
-  commentView.appendChild(popularity);
-  commentView.appendChild(body);
-  commentView.appendChild(upvote);
-  commentView.appendChild(downvote);
-  commentView.appendChild(document.createElement('br'));
-  commentView.appendChild(deleteCommentButton);
-
-  return commentView
+  return commentElementTemplateClone;
 }
 
 /** Creates an <li> element containing text. */
@@ -344,5 +326,73 @@ function createListElement(text) {
 function deleteAllComments() {
   fetch('/delete-data', {method: 'POST'}).then(() => {
     getServletComments();
+  });
+}
+
+function onDOMLoad() {
+  buildWriteCommentsBox();
+  getServletComments();
+}
+
+async function checkLoggedIn() {
+  const response = await fetch('/login-status');
+  const loginInfo = await response.json();
+  return loginInfo;
+}
+
+async function buildWriteCommentsBox() {
+  const writeCommentsBox = document.getElementById('js-write-comment-box');
+  const loginInfo = await checkLoggedIn();
+  if (loginInfo.isLoggedIn) { 
+    writeCommentsBox.appendChild(buildWriteCommentBoxLoggedIn(loginInfo));
+  } else {
+    writeCommentsBox.appendChild(buildWriteCommentBoxLoggedOut(loginInfo));
+  }
+}
+
+function buildWriteCommentBoxLoggedIn(loginInfo) {
+  const commentFormTemplateClone = document.querySelector('#commentInputBox').content.cloneNode(true);
+
+  commentForm = commentFormTemplateClone.querySelector('form');
+  commentForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    submitComment(commentForm);
+  });
+
+  const logoutAElement = commentForm.querySelector('a');
+  logoutAElement.href = loginInfo.url;
+
+  return commentFormTemplateClone;
+}
+
+function buildWriteCommentBoxLoggedOut(loginInfo) {
+  const divElement = document.createElement('div');
+  
+  const pElement = document.createElement('p');
+  pElement.innerText = "You should log in";
+
+  const loginAElement = document.createElement('a');
+  loginAElement.href = loginInfo.url;
+  loginAElement.innerText = "Log in by clicking here";
+
+  divElement.appendChild(pElement);
+  divElement.appendChild(loginAElement);
+
+  return divElement;
+}
+
+function submitComment(commentForm) {
+  commentBody = commentForm.elements['comments-body-input'].value;
+  console.log(commentBody);
+  fetch('/data', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({commentBody: commentBody})
+  }).then(() => {
+    getServletComments();
+    commentForm.reset();
   });
 }
