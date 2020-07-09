@@ -307,7 +307,6 @@ function createCommentElement(comment) {
 
   const deleteCommentButton = commentView.querySelector('button');
   deleteCommentButton.addEventListener('click', () => {
-    handleCommentSubmit;
     deleteComment(comment);
   });
 
@@ -355,8 +354,8 @@ function buildWriteCommentBoxLoggedIn(loginInfo) {
   const commentFormTemplateClone = document.querySelector('#commentInputBox').content.cloneNode(true);
 
   commentForm = commentFormTemplateClone.querySelector('form');
-  commentForm.addEventListener('submit', () => {
-    handleCommentSubmit;
+  commentForm.addEventListener('submit', (event) => {
+    event.preventDefault();
     submitComment(commentForm);
   });
 
@@ -364,10 +363,6 @@ function buildWriteCommentBoxLoggedIn(loginInfo) {
   logoutAElement.href = loginInfo.url;
 
   return commentFormTemplateClone;
-}
-
-function handleCommentSubmit(event) {
-  event.preventDefault();
 }
 
 function buildWriteCommentBoxLoggedOut(loginInfo) {
