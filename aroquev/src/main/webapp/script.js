@@ -274,7 +274,7 @@ function createCommentElement(comment) {
   const commentDivs = commentView.querySelectorAll('div');
   
   const username = commentDivs[0];
-  username.innerText = `Posted by: ${comment.username}`;
+  username.innerText = `Posted by: ${comment.nickname}`;
 
   const timestamp = commentDivs[1];
   const date = new Date(comment.timestamp);
@@ -329,19 +329,29 @@ function deleteAllComments() {
   });
 }
 
+/**
+ * Function that loads necessary info onLoad()
+ */
 function onDOMLoad() {
   buildWriteCommentsBox();
   getServletComments();
 }
 
+/**
+ * Function that checks if the s
+ */
 async function checkLoggedIn() {
   const response = await fetch('/login-status');
   const loginInfo = await response.json();
   return loginInfo;
 }
 
+/**
+ * Function that starts the building of a comment box depending on if the user is logged in or not
+ */
 async function buildWriteCommentsBox() {
   const writeCommentsBox = document.getElementById('js-write-comment-box');
+  writeCommentsBox.innerHTML = '';
   const loginInfo = await checkLoggedIn();
   if (loginInfo.isLoggedIn) { 
     writeCommentsBox.appendChild(buildWriteCommentBoxLoggedIn(loginInfo));
@@ -350,21 +360,79 @@ async function buildWriteCommentsBox() {
   }
 }
 
+/**
+ * Function that builds the two forms that are displayed to the user if he is logged in
+ * @param {*} loginInfo the login info about the user
+ */
 function buildWriteCommentBoxLoggedIn(loginInfo) {
   const commentFormTemplateClone = document.querySelector('#commentInputBox').content.cloneNode(true);
 
-  commentForm = commentFormTemplateClone.querySelector('form');
-  commentForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    submitComment(commentForm);
-  });
+  const commentForm = commentFormTemplateClone.querySelectorAll('form')[0];
+  buildWriteCommentInputBox(loginInfo, commentForm); 
 
-  const logoutAElement = commentForm.querySelector('a');
-  logoutAElement.href = loginInfo.url;
+  const nicknameForm = commentFormTemplateClone.querySelectorAll('form')[1];
+  buildNicknameInputBox(loginInfo, nicknameForm);
 
   return commentFormTemplateClone;
 }
 
+/**
+ * Function that builds the section where the user writes his comment
+ * @param {*} loginInfo The login info about the user
+ * @param {*} commentForm The element that conains the elements in which the user will type and submit his comment
+ */
+function buildWriteCommentInputBox(loginInfo, commentForm) {
+  commentForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    submitComment(commentForm, loginInfo);
+  });
+
+  const logoutAElement = commentForm.querySelector('a');
+  logoutAElement.href = loginInfo.url;
+}
+
+/**
+ * Function that builds the section where the user sets his nickname
+ * @param {*} loginInfo The login info about the user
+ * @param {*} nicknameForm The element that conains the elements in which the user will type and submit his nickname
+ */
+function buildNicknameInputBox(loginInfo, nicknameForm) {
+  const nicknamePElement = nicknameForm.querySelector('p');
+  nicknamePElement.innerText = `You are posting as: ${loginInfo.nickname}`;
+
+  nicknameForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    updateNickname(nicknameForm, nicknamePElement, loginInfo);
+  });
+}
+
+/**
+ * Function that handles when the user wants to change his nickname
+ * @param {*} nicknameForm The nickname form that contains the data the user wants to submit
+ * @param {*} loginInfo The login info that will be updated with the new nickname
+ */
+function updateNickname(nicknameForm, loginInfo) {
+  const nickname = nicknameForm.elements['comments-nickname-input'].value;
+  const nicknamePElement = nicknameForm.querySelector('p');
+  if (nickname != "") {
+    fetch('/login-status', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({nickname: nickname})
+    }).then(() => {
+      nicknamePElement.innerText = `You are posting as: ${nickname}`;
+      loginInfo.nickname = nickname;
+    });
+  } 
+}
+
+/**
+ * Function that builds the comments box telling the user to log in
+ * @param {*} loginInfo The login info that carries the link for the user to log in.
+ */
 function buildWriteCommentBoxLoggedOut(loginInfo) {
   const divElement = document.createElement('div');
   
@@ -381,18 +449,27 @@ function buildWriteCommentBoxLoggedOut(loginInfo) {
   return divElement;
 }
 
-function submitComment(commentForm) {
-  commentBody = commentForm.elements['comments-body-input'].value;
-  console.log(commentBody);
-  fetch('/data', {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({commentBody: commentBody})
-  }).then(() => {
-    getServletComments();
-    commentForm.reset();
-  });
+/**
+ * Function that posts the comment only if the user has a nickname
+ * @param {*} commentForm The form that contains the comment body the user just wrote
+ * @param {*} loginInfo The login info of the user
+ */
+function submitComment(commentForm, loginInfo) {
+  if (loginInfo.nickname != "") {
+    commentBody = commentForm.elements['comments-body-input'].value;
+    fetch('/data', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({commentBody: commentBody})
+    }).then(() => {
+      getServletComments();
+      commentForm.reset();
+    });
+  } else {
+    alert("A nickname has not been set for this account. Please set one to comment.")
+  }
+  
 }
