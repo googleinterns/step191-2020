@@ -35,6 +35,7 @@ public class LoginStatusServlet extends HttpServlet {
       String urlToRedirectToAfterUserLogsOut = "/";
       String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
 
+      // TODO: Find a more efficient way to put this on the html
       response.getWriter().println("<p>Hello " + userEmail + "! Post a comment</p>");
       response.getWriter().println("<form method=\"POST\" action=\"/new-comment\">");
       response.getWriter().println("<input class=\"new-comment-input\" type=\"text\" name=\"title\" placeholder=\"Title\"/><br>");

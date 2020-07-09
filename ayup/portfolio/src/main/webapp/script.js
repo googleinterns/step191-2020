@@ -46,13 +46,13 @@ async function getRandomFactUsingAsyncAwait() {
   const fact = await response.text();
 
   // New fact container to replace the older one
-  const newFactContainer = document.createElement("span");
-  newFactContainer.id = "js-fact-container";
-  newFactContainer.innerHTML = fact;
+  const logInFormContainer = document.createElement("span");
+  logInFormContainer.id = "js-fact-container";
+  logInFormContainer.innerHTML = fact;
 
   // Replacing the current fact container with a new one
   var a = document.getElementById('js-fact-container');
-  a.parentNode.replaceChild(newFactContainer, a);
+  a.parentNode.replaceChild(logInFormContainer, a);
 }
 
 /** Fetches comments from the server and adds them to the DOM. */
@@ -110,6 +110,7 @@ async function deleteComment(commentId) {
   await fetch('/delete-comment', {method: 'POST', body: params});
 }
 
+/** Creates the the delete button over the comments */
 function createDeleteButton() {
   const deleteButtonElement = document.createElement('button');
   deleteButtonElement.className = "btn bg-transparent delete-button";
@@ -121,21 +122,23 @@ function createDeleteButton() {
   return deleteButtonElement;
 }
 
+// Creates the log in form
 async function logIn() {
   const response = await fetch('/login-status');
   const text = await response.text();
 
-  // New fact container to replace the older one
-  const newFactContainer = document.createElement("div");
-  newFactContainer.className = "col-md-6";
-  newFactContainer.id = "js-comment-form";
-  newFactContainer.innerHTML = text;
+  // Log in container to replace the older one
+  const logInFormContainer = document.createElement("div");
+  logInFormContainer.className = "col-md-6";
+  logInFormContainer.id = "js-comment-form";
+  logInFormContainer.innerHTML = text;
 
-  // Replacing the current fact container with a new one
+  // Replacing the current log in form with a new one
   var a = document.getElementById("js-comment-form");
-  a.parentNode.replaceChild(newFactContainer, a);
+  a.parentNode.replaceChild(logInFormContainer, a);
 }
 
+/** Creates the google maps div */
 (function(exports) {
   "use strict";
 
