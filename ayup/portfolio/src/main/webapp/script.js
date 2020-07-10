@@ -110,6 +110,7 @@ async function deleteComment(commentId) {
   await fetch('/delete-comment', {method: 'POST', body: params});
 }
 
+/** Creates the the delete button over the comments */
 function createDeleteButton() {
   const deleteButtonElement = document.createElement('button');
   deleteButtonElement.className = "btn bg-transparent delete-button";
@@ -120,3 +121,37 @@ function createDeleteButton() {
   deleteButtonElement.appendChild(trashImgElement);
   return deleteButtonElement;
 }
+
+/** Creates the log in form */
+async function logIn() {
+  const response = await fetch('/login-status');
+  const text = await response.text();
+
+  // Log in container to replace the older one
+  const logInFormContainer = document.createElement("div");
+  logInFormContainer.className = "col-md-6";
+  logInFormContainer.id = "js-comment-form";
+  logInFormContainer.innerHTML = text;
+
+  // Replacing the current log in form with a new one
+  var a = document.getElementById("js-comment-form");
+  a.parentNode.replaceChild(logInFormContainer, a);
+}
+
+/** Creates the google maps div */
+(function(exports) {
+  "use strict";
+
+  function initMap() {
+    const torreonLatLng = {
+      lat: 25.5487519,
+      lng: -103.4719567
+    };
+    exports.map = new google.maps.Map(document.getElementById("map"), {
+      center: torreonLatLng,
+      zoom: 8
+    });
+  }
+
+  exports.initMap = initMap;
+})((this.window = this.window || {}));
