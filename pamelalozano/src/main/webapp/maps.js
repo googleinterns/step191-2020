@@ -12,31 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** Creates a map according to the info of the indicator in the world's bank data */
+/* The year with the last available information of each indicator*/
+const indicatorYear = {
+    'ER.PTD.TOTL.ZS' : 2018,
+    'SH.DTH.COMM.ZS' : 2016,
+    'EN.ATM.CO2E.PC' : 2014,
+    'SL.IND.EMPL.FE.ZS': 2019,
+    'NY.GDP.PCAP.CD' : 2019,
+    'IC.FRM.FEMO.ZS' : 2019   
+}
 
+/*Action of the search indicator button*/
 document.getElementById("searchIndicatorBtn").addEventListener("click",(e) => {
     document.getElementById("map").innerHTML="";
     let  form = document.getElementById("selectIndicator");
     let selected = form.options[form.selectedIndex];
-    let year = checkIndicatorYear(selected.value);
+    let year = indicatorYear[selected.value];
     document.getElementById("indicatorTitle").innerText=selected.text+" - "+year;
     createMapChart(selected.value, selected.text, year);
 })
 
-/* Returns the year with the last available information of each indicator*/
-function checkIndicatorYear(indicator) {
-  switch (indicator) {
-      case 'ER.PTD.TOTL.ZS':
-      return 2018;
-      case 'SH.DTH.COMM.ZS':
-      return 2016;
-      case 'EN.ATM.CO2E.PC':
-      return 2014;
-      default:
-      return 2019;
-  }
-}
 
+/** Creates a map according to the info of the indicator in the world's bank data */
 async function createMapChart(indicatorCode, indicatorName, year){
 
   google.charts.load('current', {
