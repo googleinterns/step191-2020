@@ -143,11 +143,12 @@ async function logIn() {
   "use strict";
 
   function initMap() {
+    const torreonLatLng = {
+      lat: 25.5487519,
+      lng: -103.4719567
+    };
     exports.map = new google.maps.Map(document.getElementById("map"), {
-      center: {
-        lat: 25.5487519,
-        lng: -103.4719567
-      },
+      center: torreonLatLng,
       zoom: 8
     });
   }
