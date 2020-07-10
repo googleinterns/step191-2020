@@ -400,6 +400,11 @@ function submitComment(commentForm) {
 
 /** Creates a map and adds it to the page. */
 function createMap() {
+  const MEXICO_CITY = {
+    lat: 19.433,
+    lng: 99.133
+  }
+
   const MEXICO_BOUNDS = {
     north: 33.990,
     south: 13.652,
@@ -407,8 +412,10 @@ function createMap() {
     east: -85.515
   };
 
+  //{lat: 23.167, lng: -101.842}
+
   const mapOpt = {
-    center: {lat: 23.167, lng: -101.842}, 
+    center: MEXICO_CITY, 
     zoom: 5,
     mapTypeId: 'hybrid',
     restriction: {
