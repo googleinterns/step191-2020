@@ -13,7 +13,31 @@
 // limitations under the License.
 
 /** Creates a map according to the info of the indicator in the world's bank data */
-async function createMapChart(){
+
+document.getElementById("searchIndicatorBtn").addEventListener("click",(e) => {
+    document.getElementById("map").innerHTML="";
+    let  form = document.getElementById("selectIndicator");
+    let selected = form.options[form.selectedIndex];
+    let year = checkIndicatorYear(selected.value);
+    document.getElementById("indicatorTitle").innerText=selected.text+" - "+year;
+    createMapChart(selected.value, selected.text, year);
+})
+
+/* Returns the year with the last available information of each indicator*/
+function checkIndicatorYear(indicator) {
+  switch (indicator) {
+      case 'ER.PTD.TOTL.ZS':
+      return 2018;
+      case 'SH.DTH.COMM.ZS':
+      return 2016;
+      case 'EN.ATM.CO2E.PC':
+      return 2014;
+      default:
+      return 2019;
+  }
+}
+
+async function createMapChart(indicatorCode, indicatorName, year){
 
   google.charts.load('current', {
         'packages':['geochart'],
@@ -27,9 +51,8 @@ async function createMapChart(){
       async function drawRegionsMap() {
 
         //ToDo: The indicator code will be the name of the selected indicator in the input element  
-        let indicatorCode =  'SL.IND.EMPL.FE.ZS';
 
-        var data = google.visualization.arrayToDataTable(await fetchInfo(indicatorCode));
+        var data = google.visualization.arrayToDataTable(await fetchInfo(indicatorCode, indicatorName, year));
 
         var options = {};
 
@@ -40,21 +63,25 @@ async function createMapChart(){
 }
 
 /*Returns the information in a 2d array */
-async function fetchInfo(indicatorCode){
+async function fetchInfo(indicatorCode, indicatorName, year){
 
     var output = [];
-    output.push(['Country', 'Female employees in industry %']);
 
     const url = new URL(`https://api.worldbank.org/V2/country/all/indicator/${indicatorCode}`);
     const params = url.searchParams;
     params.set('format', 'json');
-    params.set('date', 2019);
+    params.set('date', year);
     params.set('page', 1);
     params.set('per_page', 264);
     
     let response = await fetch(url);
     let json = await response.json();
     let info = json[1];
+
+    //From 1 to 46 the results are zone names not country names so they are not useful
+    info.splice(0, 46);
+
+    output.push(['Country', indicatorName]);
 
     for (let data of info) {
         if (data.value != null) {
@@ -64,7 +91,6 @@ async function fetchInfo(indicatorCode){
         }
     }
 
-    //From 1 to 46 the results are zone names not country names so they are not useful
     return output;
 }
 

@@ -23,7 +23,6 @@ let cursor = "";
 function initialLoads(){
     loadComments();
     checkLogin();
-    createMapChart();
 }
 
 /*This function displays log in button if there is no user, a set nickname button if there is a user but the
@@ -79,7 +78,6 @@ async function loadComments() {
     
     //The newest comments at the top
     comments.forEach(comment => {
-        console.log(comment);
         let newCard = createCard(comment);
         commentSection.append(newCard);
     });
