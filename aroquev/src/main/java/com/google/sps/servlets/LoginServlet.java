@@ -24,6 +24,7 @@ import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.io.IOException;
+import java.util.Optional;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -42,10 +43,12 @@ public class LoginServlet extends HttpServlet {
 
     if (isLoggedIn) {
       url = userService.createLogoutURL("/");
-      nickname = getUserNickname(userService.getCurrentUser().getUserId());
-      if (nickname == "") {
+      Optional<String> optNickname = getUserNickname(userService.getCurrentUser().getUserId());
+      if (!optNickname.isPresent()) {
         setNickname(userService.getCurrentUser().getUserId(), userService.getCurrentUser().getEmail());
         nickname = userService.getCurrentUser().getEmail();
+      } else {
+        nickname = optNickname.get();
       }
     } else {
       url = userService.createLoginURL("/#comments");
@@ -76,9 +79,9 @@ public class LoginServlet extends HttpServlet {
   }
 
   /**
-   * Returns the nickname of the user with id, or empty String if the user has not set a nickname.
+   * Returns the nickname of the user with id, or empty Optional if the user has not set a nickname.
    */
-  private String getUserNickname(String id) {
+  private Optional<String> getUserNickname(String id) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Query query =
         new Query("UserInfo")
@@ -86,10 +89,10 @@ public class LoginServlet extends HttpServlet {
     PreparedQuery results = datastore.prepare(query);
     Entity entity = results.asSingleEntity();
     if (entity == null) {
-      return "";
+      return Optional.empty();
     }
     String nickname = (String) entity.getProperty("nickname");
-    return nickname;
+    return Optional.of(nickname);
   }
 
   /**

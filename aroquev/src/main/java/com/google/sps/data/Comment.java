@@ -21,6 +21,7 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import java.util.Optional;
 
 public final class Comment {
 
@@ -39,7 +40,7 @@ public final class Comment {
     this.timestamp = timestamp;
     this.upvotes = upvotes;
     this.downvotes = downvotes;
-    this.nickname = getUserNickname(username);
+    this.nickname = getUserNickname(username).orElse("anonymous");
   }
 
   public Comment(Entity entity) {
@@ -55,7 +56,7 @@ public final class Comment {
     this.timestamp = timestamp;
     this.upvotes = upvotes;
     this.downvotes = downvotes;
-    this.nickname = getUserNickname(username);
+    this.nickname = getUserNickname(username).orElse("anonymous");
   }
 
   public Entity toEntity() {
@@ -70,9 +71,9 @@ public final class Comment {
   }
 
   /**
-   * Returns the nickname of the user with id, or empty String if the user has not set a nickname.
+   * Returns the nickname of the user with id, or empty Optional if the user has not set a nickname.
    */
-  private String getUserNickname(String id) {
+  private Optional<String> getUserNickname(String id) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Query query =
         new Query("UserInfo")
@@ -80,10 +81,10 @@ public final class Comment {
     PreparedQuery results = datastore.prepare(query);
     Entity entity = results.asSingleEntity();
     if (entity == null) {
-      return "";
+      return Optional.empty();
     }
     String nickname = (String) entity.getProperty("nickname");
-    return nickname;
+    return Optional.of(nickname);
   }
 
 }
