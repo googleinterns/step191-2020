@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** Creates a map that shows landmarks around Google. */
+/** Creates a map according to the info of the indicator in the world's bank data */
 async function createMapChart(){
 
   google.charts.load('current', {
@@ -25,7 +25,11 @@ async function createMapChart(){
       google.charts.setOnLoadCallback(drawRegionsMap);
 
       async function drawRegionsMap() {
-        var data = google.visualization.arrayToDataTable(await fetchInfo('SL.IND.EMPL.FE.ZS'));
+
+        //ToDo: The indicator code will be the name of the selected indicator in the input element  
+        let indicatorCode =  'SL.IND.EMPL.FE.ZS';
+
+        var data = google.visualization.arrayToDataTable(await fetchInfo(indicatorCode));
 
         var options = {};
 
@@ -35,29 +39,40 @@ async function createMapChart(){
       }
 }
 
+/*Returns the information in a 2d array */
 async function fetchInfo(indicatorCode){
 
     var output = [];
     output.push(['Country', 'Female employees in industry %']);
 
-    let response = await fetch('https://api.worldbank.org/V2/country/all/indicator/'+indicatorCode+'?format=json&date=2019&page=1&per_page=264');
+    const url = new URL(`https://api.worldbank.org/V2/country/all/indicator/${indicatorCode}`);
+    const params = url.searchParams;
+    params.set('format', 'json');
+    params.set('date', 2019);
+    params.set('page', 1);
+    params.set('per_page', 264);
+    
+    let response = await fetch(url);
     let json = await response.json();
     let info = json[1];
 
-    let j = 1;
-    info.forEach((data)=>{
-        if(data.value != null){    
-             output.push([]);
-            if(data.country.value != "Russian Federation"){
-                output[j].push(data.country.value);
-            } else {
-                output[j].push("Russia");
-            }
-                output[j].push(parseInt(data.value.toFixed(2)));
-                j++;
-            }
-    })
+    for (let data of info) {
+        if (data.value != null) {
+            const country = normalizeCountryName(data.country.value);
+            const value = parseInt(data.value.toFixed(2));
+            output.push([country, value]);
+        }
+    }
 
-    output.splice(1, 46);
+    //From 1 to 46 the results are zone names not country names so they are not useful
     return output;
+}
+
+/* Returns the name of the country that the chart api accepts */
+function normalizeCountryName(name){
+    if(name != "Russian Federation") {
+          return name;
+    } else {
+        return "Russia";
+    };    
 }
