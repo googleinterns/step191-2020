@@ -19,7 +19,7 @@ document.getElementById("searchIndicatorBtn").addEventListener("click",(e) => {
     let  form = document.getElementById("selectIndicator");
     let selected = form.options[form.selectedIndex];
     let year = checkIndicatorYear(selected.value);
-    document.getElementById("indicatorTitle").innerText=selected.text+" "+year;
+    document.getElementById("indicatorTitle").innerText=selected.text+" - "+year;
     createMapChart(selected.value, selected.text, year);
 })
 
@@ -28,6 +28,8 @@ function checkIndicatorYear(indicator) {
   switch (indicator) {
       case 'ER.PTD.TOTL.ZS':
       return 2018;
+      case 'SH.DTH.COMM.ZS':
+      return 2016;
       case 'EN.ATM.CO2E.PC':
       return 2014;
       default:
