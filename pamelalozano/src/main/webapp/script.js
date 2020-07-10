@@ -20,6 +20,50 @@ document.getElementById("projects").addEventListener("click", function (event) {
 
 let cursor = "";
 
+function initialLoads(){
+    loadComments();
+    checkLogin();
+    createMapChart();
+}
+
+/*This function displays log in button if there is no user, a set nickname button if there is a user but the
+nickname is missing, and a logout button and comment box if the user is logged in and has nickname*/
+async function checkLogin() {
+        
+    //If the user is logged in but doesn't have a nickname     
+    document.getElementById("login").classList.toggle("open");
+    document.getElementById("login-btn").addEventListener("click", function (event) {
+    location.href="/user";
+    });
+
+    let userResponse = await fetch('/user');
+    let userJson = await userResponse.json();
+
+    //If the fetch fails (that happens when the user doesn't have a nickname)
+    //the rest of this code doesn't run
+
+    //The text and button are set as if the nickname is missing in case the fetch fails
+    //So if it doesn't fail that means now the /user contains the Auth object
+
+    document.getElementById("login-txt").innerText="Log in to post a comment:";
+    document.getElementById("login-btn").innerText="Log in";
+    document.getElementById("logout-btn").addEventListener("click", function (event) {
+    location.href=userJson.logoutUrl;
+    });
+    document.getElementById("login-btn").addEventListener("click", function (event) {
+    location.href=userJson.loginUrl;
+    });
+    
+    if(userJson.isLoggedIn&&userJson.nickname!=null) {
+        document.getElementById("comments-form").classList.toggle("open");
+        document.getElementById("logout").classList.toggle("open");
+        document.getElementById("login").classList.toggle("hide");
+    } else {
+        document.getElementById("comments-form").classList.toggle("hide");
+        document.getElementById("logout").classList.toggle("hide");
+    }
+}
+
 /** Loads existing Comments */
 async function loadComments() {
   let response = await fetch('/data');
@@ -88,7 +132,7 @@ function createCard(comment) {
   newCard.classList.add('w3-card-4');
   newCard.append(createCardHeader(comment.subject));
   newCard.append(createCardComment(comment.msg));
-  newCard.append(createCardFooter(comment.date));
+  newCard.append(createCardFooter(comment.date, comment.author));
   return newCard;
 }
 
@@ -113,12 +157,17 @@ function createCardComment(text){
 }
 
 /** Creates the comment's footer with date. */
-function createCardFooter(text){
+function createCardFooter(date, author){
   let footer = document.createElement('footer');
   footer.classList.add('w3-container');
-  let footerText = document.createElement('h5');
-  footerText.innerHTML=text;
-  footer.append(footerText);
+  let dateText = document.createElement('h5');
+  dateText.classList.add('comment-date');
+  dateText.innerHTML=date;
+  let authorText = document.createElement('h5');
+  authorText.classList.add('comment-author');
+  authorText.innerHTML=author;
+  footer.append(dateText);
+  footer.append(authorText);
   return footer;
 }
 
