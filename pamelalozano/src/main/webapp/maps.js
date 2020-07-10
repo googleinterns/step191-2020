@@ -45,7 +45,7 @@ async function createMapChart(indicatorCode, indicatorName, year){
   });
     
       google.charts.setOnLoadCallback(drawRegionsMap);
-    console.log(indicatorCode+" "+indicatorName)
+
       async function drawRegionsMap() {
 
         //ToDo: The indicator code will be the name of the selected indicator in the input element  
@@ -78,7 +78,6 @@ async function fetchInfo(indicatorCode, indicatorName, year){
 
     //From 1 to 46 the results are zone names not country names so they are not useful
     info.splice(0, 46);
-    console.log(info);
 
     output.push(['Country', indicatorName]);
 
@@ -90,7 +89,6 @@ async function fetchInfo(indicatorCode, indicatorName, year){
         }
     }
 
-    console.log(output);
     return output;
 }
 
