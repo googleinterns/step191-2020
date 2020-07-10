@@ -54,7 +54,6 @@ public class DataServlet extends HttpServlet {
 
     // Convert the comments to JSON
     String json = convertToJson(comments);
-
     // Send the JSON as response
     response.setContentType("application/json;");
     response.getWriter().println(json);
@@ -62,11 +61,16 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    UserService userService = UserServiceFactory.getUserService();
+    if (!userService.isUserLoggedIn()) {
+      response.sendRedirect("/");
+      return;
+    }
+
     JsonObject jsonObj = new Gson().fromJson(request.getReader(), JsonObject.class);
     String comment = jsonObj.get("commentBody").getAsString();
 
-    UserService userService = UserServiceFactory.getUserService();
-    String username = userService.getCurrentUser().getEmail();
+    String username = userService.getCurrentUser().getUserId();
 
     int id = 0;
     long timestamp = System.currentTimeMillis();
