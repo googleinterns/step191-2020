@@ -333,6 +333,7 @@ function deleteAllComments() {
  * Function that loads necessary info onLoad()
  */
 function onDOMLoad() {
+  initializeStadiumSV();
   createMap();
   buildWriteCommentsBox();
   getServletComments();
@@ -477,4 +478,17 @@ function createMap() {
   const map = new google.maps.Map(
       document.getElementById('map'),
       {center: {lat: 23.167, lng: -101.842}, zoom: 5});
+}
+
+let panorama;
+function initializeStadiumSV() {
+  console.log('here');
+  panorama = new google.maps.StreetViewPanorama(
+    document.getElementById("stadium-streetview"),
+    {
+      position: { lat: 25.653622, lng: -100.285649 },
+      pov: { heading: 0, pitch: 0 },
+      zoom: 1
+    }
+  );
 }
