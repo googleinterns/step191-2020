@@ -476,6 +476,7 @@ function submitComment(commentForm, loginInfo) {
 
 let map;
 let markers = [];
+let infowindow;
 
 const MEXICO_CITY = {
   lat: 19.433,
@@ -694,17 +695,21 @@ function createMap() {
 
   map.mapTypes.set('dark_mode', darkModeMapType);
 
+  infowindow = new google.maps.InfoWindow({
+    content: 'Hi'
+  });
+
   // Add markers
-  addMarker(MONTERREY, "Monterrey", 'images/norteno-hat.png', new google.maps.Size(50, 38));
-  addMarker(MEXICO_CITY, "Mexico City", 'images/angel.png', new google.maps.Size(30, 90));
-  addMarker(PUEBLA, "Puebla", 'images/church.png', new google.maps.Size(40, 40));
-  addMarker(GUANAJUATO, "Guanajuato", 'images/mummy.png', new google.maps.Size(20, 60));
-  addMarker(RIVIERA_MAYA, "Riviera Maya", 'images/pyramid.png', new google.maps.Size(50, 40));
+  addMarker(MONTERREY, "Monterrey", 'images/norteno-hat.png', new google.maps.Size(50, 38), 'My hometown!');
+  addMarker(MEXICO_CITY, "Mexico City", 'images/angel.png', new google.maps.Size(30, 90), 'It\'s not called \"The City of Palaces\" for nothing!');
+  addMarker(PUEBLA, "Puebla", 'images/church.png', new google.maps.Size(40, 40), 'An architectural and historical odyssey awaits you at Puebla\'s churches!');
+  addMarker(GUANAJUATO, "Guanajuato", 'images/mummy.png', new google.maps.Size(20, 60), 'A truly quaint town where you will experience the Mexican folklore at it\'s finest!');
+  addMarker(RIVIERA_MAYA, "Riviera Maya", 'images/pyramid.png', new google.maps.Size(50, 40), 'A paradise on earth,<br> with many Mayan<br> archeological sites<br> to explore!');
   
 }
 
 // Adds a marker to the map and push to the array.
-function addMarker(location, markerTitle, image, size) {
+function addMarker(location, markerTitle, image, size, description) {
   let marker = new google.maps.Marker({
     position: location,
     map: map,
@@ -715,6 +720,11 @@ function addMarker(location, markerTitle, image, size) {
       scaledSize: size,
       url: image 
     }
+  });
+
+  marker.addListener('click', function() {
+    infowindow.setContent(description);
+    infowindow.open(map, marker);
   });
   markers.push(marker);
 }
