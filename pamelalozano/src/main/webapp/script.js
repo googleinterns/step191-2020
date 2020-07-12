@@ -78,7 +78,6 @@ async function loadComments() {
     
     //The newest comments at the top
     comments.forEach(comment => {
-        console.log(comment);
         let newCard = createCard(comment);
         commentSection.append(newCard);
     });
