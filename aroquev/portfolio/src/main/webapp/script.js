@@ -333,6 +333,7 @@ function deleteAllComments() {
  * Function that loads necessary info onLoad()
  */
 function onDOMLoad() {
+  initializeStadiumSV();
   createMap();
   buildWriteCommentsBox();
   getServletComments();
@@ -472,9 +473,268 @@ function submitComment(commentForm, loginInfo) {
   });
 }
 
-/** Creates a map and adds it to the page. */
+
+
+let map;
+let infowindow;
+
+const MEXICO_CITY = {
+  lat: 19.433,
+  lng: -99.133
+};
+
+const MONTERREY = {
+  lat: 25.686,
+  lng: -100.317
+};
+
+const PUEBLA = {
+  lat: 19.043,
+  lng: -98.199
+};
+
+const GUANAJUATO = {
+  lat: 21.019,
+  lng: -101.258
+}
+
+const RIVIERA_MAYA = {
+  lat: 20.581,
+  lng: -87.12
+}
+
+const MEXICO_BOUNDS = {
+  north: 33.990,
+  south: 13.652,
+  west: -119.495,
+  east: -85.515
+};
+
+const mapOpt = {
+  center: MEXICO_CITY, 
+  zoom: 5,
+  mapTypeControlOptions: {
+    mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'dark_mode']
+  },
+  mapTypeId: 'hybrid',
+  restriction: {
+    latLngBounds: MEXICO_BOUNDS,
+    strictBounds: false
+  }
+};
+
 function createMap() {
-  const map = new google.maps.Map(
-      document.getElementById('map'),
-      {center: {lat: 23.167, lng: -101.842}, zoom: 5});
+  /** Creates a map and adds it to the page. */
+  // Dark mode styling
+  const darkModeMapType = new google.maps.StyledMapType(
+    [
+      {
+        "elementType": "geometry",
+        "stylers": [
+          {
+            "color": "#242f3e"
+          }
+        ]
+      },
+      {
+        "elementType": "labels.text.fill",
+        "stylers": [
+          {
+            "color": "#746855"
+          }
+        ]
+      },
+      {
+        "elementType": "labels.text.stroke",
+        "stylers": [
+          {
+            "color": "#242f3e"
+          }
+        ]
+      },
+      {
+        "featureType": "administrative.locality",
+        "elementType": "labels.text.fill",
+        "stylers": [
+          {
+            "color": "#d59563"
+          }
+        ]
+      },
+      {
+        "featureType": "poi",
+        "elementType": "labels.text.fill",
+        "stylers": [
+          {
+            "color": "#d59563"
+          }
+        ]
+      },
+      {
+        "featureType": "poi.park",
+        "elementType": "geometry",
+        "stylers": [
+          {
+            "color": "#263c3f"
+          }
+        ]
+      },
+      {
+        "featureType": "poi.park",
+        "elementType": "labels.text.fill",
+        "stylers": [
+          {
+            "color": "#6b9a76"
+          }
+        ]
+      },
+      {
+        "featureType": "road",
+        "elementType": "geometry",
+        "stylers": [
+          {
+            "color": "#38414e"
+          }
+        ]
+      },
+      {
+        "featureType": "road",
+        "elementType": "geometry.stroke",
+        "stylers": [
+          {
+            "color": "#212a37"
+          }
+        ]
+      },
+      {
+        "featureType": "road",
+        "elementType": "labels.text.fill",
+        "stylers": [
+          {
+            "color": "#9ca5b3"
+          }
+        ]
+      },
+      {
+        "featureType": "road.highway",
+        "elementType": "geometry",
+        "stylers": [
+          {
+            "color": "#746855"
+          }
+        ]
+      },
+      {
+        "featureType": "road.highway",
+        "elementType": "geometry.stroke",
+        "stylers": [
+          {
+            "color": "#1f2835"
+          }
+        ]
+      },
+      {
+        "featureType": "road.highway",
+        "elementType": "labels.text.fill",
+        "stylers": [
+          {
+            "color": "#f3d19c"
+          }
+        ]
+      },
+      {
+        "featureType": "transit",
+        "elementType": "geometry",
+        "stylers": [
+          {
+            "color": "#2f3948"
+          }
+        ]
+      },
+      {
+        "featureType": "transit.station",
+        "elementType": "labels.text.fill",
+        "stylers": [
+          {
+            "color": "#d59563"
+          }
+        ]
+      },
+      {
+        "featureType": "water",
+        "elementType": "geometry",
+        "stylers": [
+          {
+            "color": "#17263c"
+          }
+        ]
+      },
+      {
+        "featureType": "water",
+        "elementType": "labels.text.fill",
+        "stylers": [
+          {
+            "color": "#515c6d"
+          }
+        ]
+      },
+      {
+        "featureType": "water",
+        "elementType": "labels.text.stroke",
+        "stylers": [
+          {
+            "color": "#17263c"
+          }
+        ]
+      }
+    ], {name: 'Dark Mode'}
+  );
+
+
+  map = new google.maps.Map(document.getElementById('map'), mapOpt);
+
+  map.mapTypes.set('dark_mode', darkModeMapType);
+
+  infowindow = new google.maps.InfoWindow({
+    content: ''
+  });
+
+  // Add markers
+  addMarker(MONTERREY, "Monterrey", 'images/norteno-hat.png', new google.maps.Size(50, 38), 'My hometown!');
+  addMarker(MEXICO_CITY, "Mexico City", 'images/angel.png', new google.maps.Size(30, 90), 'It\'s not called \"The City of Palaces\" for nothing!');
+  addMarker(PUEBLA, "Puebla", 'images/church.png', new google.maps.Size(40, 40), 'An architectural and historical odyssey awaits you at Puebla\'s churches!');
+  addMarker(GUANAJUATO, "Guanajuato", 'images/mummy.png', new google.maps.Size(20, 60), 'A truly quaint town where you will experience the Mexican folklore at it\'s finest!');
+  addMarker(RIVIERA_MAYA, "Riviera Maya", 'images/pyramid.png', new google.maps.Size(50, 40), 'A paradise on earth,<br> with many Mayan<br> archeological sites<br> to explore!');
+  
+}
+
+// Adds a marker to the map and push to the array.
+function addMarker(location, markerTitle, image, size, description) {
+  let marker = new google.maps.Marker({
+    position: location,
+    map: map,
+    title: markerTitle,
+    icon: {
+      // (width, height)
+      size: size,
+      scaledSize: size,
+      url: image 
+    }
+  });
+
+  marker.addListener('click', function() {
+    infowindow.setContent(description);
+    infowindow.open(map, marker);
+  });
+}
+
+function initializeStadiumSV() {
+  let panorama = new google.maps.StreetViewPanorama(
+    document.getElementById("stadium-streetview"),
+    {
+      position: { lat: 25.653622, lng: -100.285649 },
+      pov: { heading: 0, pitch: 0 },
+      zoom: 1
+    }
+  );
 }
