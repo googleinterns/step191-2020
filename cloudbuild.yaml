@@ -4,7 +4,7 @@ steps:
     args: ['-f', './pamelalozano', 'package']
   - name: maven
     entrypoint: mvn
-    args: ['-f', './aroquev/project', 'package']
+    args: ['-f', './aroquev/portfolio', 'package']
   - name: maven
     entrypoint: mvn
     args: ['-f', './ayup/portfolio', 'package']
