@@ -237,3 +237,7 @@ footer {
   position: relative;
   margin: auto;
 }
+
+#stadium-streetview {
+  height: 600px;
+}
