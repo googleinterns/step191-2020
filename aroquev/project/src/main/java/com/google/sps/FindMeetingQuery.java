@@ -14,10 +14,56 @@
 
 package com.google.sps;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public final class FindMeetingQuery {
+
+  /**
+  * 
+  */
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    throw new UnsupportedOperationException("TODO: Implement this method.");
+    Collection<TimeRange> options = new ArrayList<TimeRange>();
+    options.add(TimeRange.WHOLE_DAY);
+    // Initially all the day is available
+
+    // for each event check if there are people that need to be in the Meeting
+    for (Event event : events) {
+      for (String attendee : event.getAttendees()) {
+        if (request.getAttendees().contains(attendee)) {
+          // Someone who is requested in the meeting is in this meeting, so remove this time range from options
+          for (TimeRange option : options) {
+            if (option.overlaps(event.getWhen())) {
+              // Remove this TimeRange option 
+              options.remove(option);
+              
+              // The occupied TimeRange by the meeting
+              TimeRange occupied = event.getWhen();
+              
+              // Add the remaining TimeRanges, if there are any
+
+              // Check if there is any time left before the meeting starts
+              if (option.start() < occupied.start()) {
+                options.add(TimeRange.fromStartEnd(option.start(), occupied.start(), false));
+              }
+
+              // Check if there is any time left after the meeting ends
+              if (option.end() > occupied.end()) {
+                options.add(TimeRange.fromStartEnd(occupied.end(), option.end(), false));
+              }
+
+            }
+
+            // If there is at least one attendee that is in this event, there is no need to check for more
+            break;
+          }
+          
+        }
+      }
+    }
+
+
+    // Now all possible TimeRanges are here, remove all that do not have the desired duration
+    return options;
   }
 }

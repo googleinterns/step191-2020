@@ -24,7 +24,7 @@ function sendMeetingRequest() {
   // split it into an array of names
   const attendees = attendeesNamesString.split(/\s*,\s*/);
 
-// comma-separated list of names
+  // comma-separated list of names
   const optionalAttendeesNamesString = document.getElementById('optional-attendees').value;
   // split it into an array of names
   const optionalAttendees = optionalAttendeesNamesString.split(/\s*,\s*/);
