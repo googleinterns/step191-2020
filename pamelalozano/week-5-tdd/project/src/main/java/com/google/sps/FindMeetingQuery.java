@@ -47,20 +47,17 @@ public final class FindMeetingQuery {
     List<Event> eventsList = new ArrayList<>(events);
     eventsList.sort(Event.COMPARE_START_TIME);
     HashMap<String, List<TimeRange>> eventsMap = assignEvents(eventsList);
-    printEventsMap(eventsMap);
     
     /*
     ToDo: Iterate through mandatory attendees of request and make list of time ranges with availability
-    of all the attendees
+    of all the attendees    */
 
     HashSet<String> mandatoryAttendees = new HashSet<String>(request.getAttendees());
-    for (String person : mandatoryAttendees) {
-         checkAvailability(person);
-    }
-    */
-   
+    List<TimeRange> timeAvailable = checkAvailability(mandatoryAttendees, eventsMap);
+    printTimeList(timeAvailable);
 
-    throw new UnsupportedOperationException("TODO: Implement this method.");
+    return timeAvailable;
+
   }
   /*
   * Function that assigns the occupied times of each person in a hashmap. This is done by iterating through each
@@ -96,6 +93,52 @@ public final class FindMeetingQuery {
       return eventsMap;
   }
 
+  /*
+  * This function will merge all the occupied times of the mandatory attendees
+  * into a single list of TimeRanges, that way I can create a lit of available 
+  * times that they all have in common.
+  *
+  * 
+  * Runtime: O(p * m) where p is the number of attendees and m the number of events
+  * 
+  * @param mandatoryAttendees   A list of the mandatory attendes
+  * @param eventsMap            A map with the keys as the name of the attendees 
+  *                             and the values as a list with the occupied time ranges
+  *
+  * returns  a list of the available times of the request
+  */
+  public List<TimeRange> checkAvailability(HashSet<String> mandatoryAttendees, HashMap<String, List<TimeRange>> eventsMap){
+    
+    LinkedList<TimeRange> timeOccupied = new LinkedList<>();
+    for (String person : mandatoryAttendees) {
+        List<TimeRange> schedule = eventsMap.get(person);
+        for(TimeRange range : schedule){
+          timeOccupied.add(range);
+       }
+    }
+    //ToDo: Merge times
+
+    List<TimeRange> timeAvailable = new ArrayList<>();
+    TimeRange currentEvent = null;
+    for (ListIterator<TimeRange> listIterator = timeOccupied.listIterator(); ;) {
+        if(!listIterator.hasPrevious()) {
+            currentEvent = listIterator.next();
+            timeAvailable.add(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, currentEvent.start(), false));
+        }
+
+        if(!listIterator.hasNext()) {
+            timeAvailable.add(TimeRange.fromStartEnd(currentEvent.end(), TimeRange.END_OF_DAY, true));
+            break;
+        } else {
+             int endOfCurrentEvent = currentEvent.end();
+             currentEvent = listIterator.next();
+             timeAvailable.add(TimeRange.fromStartEnd(endOfCurrentEvent, currentEvent.start(), false));
+        }
+    }
+
+    return timeAvailable;
+  }
+
  /* Helper function this will be deleted*/
   public void printEventsMap(HashMap<String, List<TimeRange>> eventsMap){
       for (String i : eventsMap.keySet()) {
@@ -105,6 +148,12 @@ public final class FindMeetingQuery {
            log.info(range.toString());
        }
     }
+  }
+   /* Helper function this will be deleted*/
+  public void printTimeList(List<TimeRange> times){
+    for (TimeRange i : times) {
+       log.info(times.toString());
+    } 
   }
 }
 
