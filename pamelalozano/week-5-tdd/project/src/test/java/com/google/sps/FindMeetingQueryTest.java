@@ -95,6 +95,25 @@ public final class FindMeetingQueryTest {
   }
 
   @Test
+  public void twoSeparatedEvents() {
+    // The event should split the day into two options (before and after the event).
+    Collection<Event> events = Arrays.asList(new Event("Event 1",
+        TimeRange.fromStartDuration(TIME_0800AM, DURATION_30_MINUTES), Arrays.asList(PERSON_A)),
+        new Event("Event 2",
+        TimeRange.fromStartDuration(TIME_0900AM, DURATION_30_MINUTES), Arrays.asList(PERSON_A)));
+
+    MeetingRequest request = new MeetingRequest(Arrays.asList(PERSON_A), DURATION_30_MINUTES);
+
+    Collection<TimeRange> actual = query.query(events, request);
+    Collection<TimeRange> expected =
+        Arrays.asList(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TIME_0800AM, false),
+            TimeRange.fromStartEnd(TIME_0830AM, TIME_0900AM, false),
+            TimeRange.fromStartEnd(TIME_0930AM, TimeRange.END_OF_DAY, true));
+
+    Assert.assertEquals(expected, actual);
+  }
+
+  @Test
   public void eventsSorting() {
     // The event should split the day into two options (before and after the event).
     Collection<Event> events = Arrays.asList(new Event("Event 1",
