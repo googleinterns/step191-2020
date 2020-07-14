@@ -45,6 +45,7 @@ public final class FindMeetingQuery {
     }
 
     List<Event> eventsList = new ArrayList<>(events);
+    eventsList.sort(Event.COMPARE_START_TIME);
     HashMap<String, List<TimeRange>> eventsMap = assignEvents(eventsList);
     printEventsMap(eventsMap);
     
