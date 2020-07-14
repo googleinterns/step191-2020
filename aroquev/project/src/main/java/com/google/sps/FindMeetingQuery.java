@@ -32,10 +32,11 @@ public final class FindMeetingQuery {
       for (String attendee : event.getAttendees()) {
         if (request.getAttendees().contains(attendee)) {
           // Someone who is requested in the meeting is in this meeting, so remove this time range from options
+
+          Collection<TimeRange> aux = new ArrayList<TimeRange>();
           for (TimeRange option : options) {
             if (option.overlaps(event.getWhen())) {
               // Remove this TimeRange option 
-              options.remove(option);
               
               // The occupied TimeRange by the meeting
               TimeRange occupied = event.getWhen();
@@ -44,19 +45,27 @@ public final class FindMeetingQuery {
 
               // Check if there is any time left before the meeting starts
               if (option.start() < occupied.start()) {
-                options.add(TimeRange.fromStartEnd(option.start(), occupied.start(), false));
+                //options.add(TimeRange.fromStartEnd(option.start(), occupied.start(), false));
+                aux.add(TimeRange.fromStartEnd(option.start(), occupied.start(), false));
               }
 
               // Check if there is any time left after the meeting ends
               if (option.end() > occupied.end()) {
-                options.add(TimeRange.fromStartEnd(occupied.end(), option.end(), false));
+                //options.add(TimeRange.fromStartEnd(occupied.end(), option.end(), false));
+                aux.add(TimeRange.fromStartEnd(occupied.end(), option.end(), false));
               }
 
+            } else {
+              // add the timerange to the aux
+              aux.add(option);
             }
+            
 
-            // If there is at least one attendee that is in this event, there is no need to check for more
-            break;
+            
           }
+          cloneList(options, aux);
+          // If there is at least one attendee that is in this event, there is no need to check for more
+          break;
           
         }
       }
@@ -64,6 +73,21 @@ public final class FindMeetingQuery {
 
 
     // Now all possible TimeRanges are here, remove all that do not have the desired duration
+    Collection<TimeRange> aux = new ArrayList<TimeRange>();
+    for (TimeRange option : options) {
+      if (option.duration() >= request.getDuration()) {
+        aux.add(option);
+      }
+    }
+    cloneList(options, aux);
     return options;
   }
+
+  void cloneList(Collection<TimeRange> dest, Collection<TimeRange> src) {
+    dest.clear();
+    for (TimeRange timeRange : src) {
+      dest.add(timeRange);
+    }
+  }
+
 }
