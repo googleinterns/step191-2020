@@ -696,7 +696,7 @@ function createMap() {
   map.mapTypes.set('dark_mode', darkModeMapType);
 
   infowindow = new google.maps.InfoWindow({
-    content: 'Hi'
+    content: ''
   });
 
   // Add markers
