@@ -480,10 +480,8 @@ function createMap() {
       {center: {lat: 23.167, lng: -101.842}, zoom: 5});
 }
 
-let panorama;
 function initializeStadiumSV() {
-  console.log('here');
-  panorama = new google.maps.StreetViewPanorama(
+  let panorama = new google.maps.StreetViewPanorama(
     document.getElementById("stadium-streetview"),
     {
       position: { lat: 25.653622, lng: -100.285649 },
