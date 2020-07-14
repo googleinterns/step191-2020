@@ -16,74 +16,84 @@ package com.google.sps;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public final class FindMeetingQuery {
 
-  /**
-  * 
-  */
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    Collection<TimeRange> options = new ArrayList<TimeRange>();
-    options.add(TimeRange.WHOLE_DAY);
+    // Initialize the options for the meeting
+    ArrayList<TimeRange> options = new ArrayList<TimeRange>();
     // Initially all the day is available
+    options.add(TimeRange.WHOLE_DAY);
 
-    // for each event check if there are people that need to be in the Meeting
-    for (Event event : events) {
-      for (String attendee : event.getAttendees()) {
-        if (request.getAttendees().contains(attendee)) {
-          // Someone who is requested in the meeting is in this meeting, so remove this time range from options
+    // This variable stores where the next TimeRange opportunity begins when traversing meetings
+    int nextOptionStart = 0;
 
-          Collection<TimeRange> aux = new ArrayList<TimeRange>();
-          for (TimeRange option : options) {
-            if (option.overlaps(event.getWhen())) {
-              // Remove this TimeRange option 
-              
-              // The occupied TimeRange by the meeting
-              TimeRange occupied = event.getWhen();
-              
-              // Add the remaining TimeRanges, if there are any
+    // Sort events for their start time
+    ArrayList<Event> meetings = new ArrayList<Event>(events);
+    Collections.sort(meetings, Event.COMPARE_START_TIME);
 
-              // Check if there is any time left before the meeting starts
-              if (option.start() < occupied.start()) {
-                //options.add(TimeRange.fromStartEnd(option.start(), occupied.start(), false));
-                aux.add(TimeRange.fromStartEnd(option.start(), occupied.start(), false));
+    // See if the meetings overlap with the options list of TimeRange objects
+    for (Event meeting : meetings) {
+      // See if the meeting overlaps with a possible option TimeRange
+      if (meeting.getWhen().end() > nextOptionStart) {
+        // The meeting occurs in a posible option TimeRange
+        
+        // Check if there is an attendee in this meeting that is required for the new one
+        for (String attendee : meeting.getAttendees()) { 
+          if (request.getAttendees().contains(attendee)) { 
+            // The time at which this meeting happens must be taken away from the options
+            
+            ArrayList<TimeRange> aux = new ArrayList<TimeRange>();
+
+            TimeRange occupied = meeting.getWhen();
+
+            // Check which option must be modified because of the meeting
+            for (TimeRange option : options) {
+              // Check which option must be modified in the options list
+              if (option.start() == nextOptionStart) {
+                // This is THE option affected by the meeting
+
+                // Check if there is any time left before the meeting starts
+                if (option.start() < occupied.start()) {
+                  aux.add(TimeRange.fromStartEnd(option.start(), occupied.start(), false));
+                }
+
+                // Check if there is any time left after the meeting ends
+                if (option.end() > occupied.end()) {
+                  aux.add(TimeRange.fromStartEnd(occupied.end(), option.end(), false));
+                }
+
+                nextOptionStart = occupied.end();
+              } else {
+                // The meeting does not affect this TimeRange option
+                aux.add(option);
               }
-
-              // Check if there is any time left after the meeting ends
-              if (option.end() > occupied.end()) {
-                //options.add(TimeRange.fromStartEnd(occupied.end(), option.end(), false));
-                aux.add(TimeRange.fromStartEnd(occupied.end(), option.end(), false));
-              }
-
-            } else {
-              // add the timerange to the aux
-              aux.add(option);
             }
-            
+            // Update the options TimeRange
+            cloneList(options, aux);
 
-            
+            // With one attendee is enough to discard this meeting's TimeRange
+            break;
           }
-          cloneList(options, aux);
-          // If there is at least one attendee that is in this event, there is no need to check for more
-          break;
-          
         }
       }
     }
 
-
-    // Now all possible TimeRanges are here, remove all that do not have the desired duration
-    Collection<TimeRange> aux = new ArrayList<TimeRange>();
+    // Now that all possible TimeRanges are here, remove all that do not have the desired duration
+    ArrayList<TimeRange> aux = new ArrayList<TimeRange>();
     for (TimeRange option : options) {
       if (option.duration() >= request.getDuration()) {
         aux.add(option);
       }
     }
     cloneList(options, aux);
+
+    
     return options;
   }
 
-  void cloneList(Collection<TimeRange> dest, Collection<TimeRange> src) {
+  void cloneList(ArrayList<TimeRange> dest, ArrayList<TimeRange> src) {
     dest.clear();
     for (TimeRange timeRange : src) {
       dest.add(timeRange);
