@@ -93,4 +93,12 @@ public final class Event {
     // interface documentation, equals will check for set-equality across all set implementations.
     return a.title.equals(b.title) && a.when.equals(b.when) && a.attendees.equals(b.attendees);
   }
+
+  public static final Comparator<Event> COMPARE_START_TIME = new Comparator<Event>() {
+        @Override
+        public int compare(Event one, Event two) {
+            return TimeRange.ORDER_BY_START.compare(one.getWhen(), two.getWhen());
+        }
+   };
+   
 }
