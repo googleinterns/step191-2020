@@ -45,8 +45,7 @@ public final class FindMeetingQuery {
     }
 
     List<Event> eventsList = new ArrayList<>(events);
-    HashMap<String, List<TimeRange>> eventsMap = new HashMap<>();
-    assignEvents(eventsList, eventsMap);
+    HashMap<String, List<TimeRange>> eventsMap = assignEvents(eventsList);
     printEventsMap(eventsMap);
     
     /*
@@ -60,7 +59,7 @@ public final class FindMeetingQuery {
     */
    
 
-    //throw new UnsupportedOperationException("TODO: Implement this method.");
+    throw new UnsupportedOperationException("TODO: Implement this method.");
   }
   /*
   * Function that assigns the occupied times of each person in a hashmap. This is done by iterating through each
@@ -74,7 +73,9 @@ public final class FindMeetingQuery {
   *
   * returns nothing
   */
-  public void assignEvents(List<Event> eventsList, HashMap<String, List<TimeRange>> eventsMap){
+  public HashMap<String, List<TimeRange>> assignEvents(List<Event> eventsList){
+      HashMap<String, List<TimeRange>> eventsMap = new HashMap<>();
+
       for(Event event : eventsList){
           Set<String> attendees = event.getAttendees();
           for(String attendee : attendees ){
@@ -90,6 +91,8 @@ public final class FindMeetingQuery {
           }
           
       }
+      
+      return eventsMap;
   }
 
  /* Helper function this will be deleted*/
