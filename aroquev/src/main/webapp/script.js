@@ -475,7 +475,6 @@ function submitComment(commentForm, loginInfo) {
 
 
 let map;
-let markers = [];
 let infowindow;
 
 const MEXICO_CITY = {
@@ -726,5 +725,4 @@ function addMarker(location, markerTitle, image, size, description) {
     infowindow.setContent(description);
     infowindow.open(map, marker);
   });
-  markers.push(marker);
 }
