@@ -122,6 +122,11 @@ public final class FindMeetingQueryTest {
   }
 
   @Test
+  public void everyOptionalAttendeeIsConsidered() {
+    
+  }
+
+  @Test
   public void overlappingEvents() {
     // Have an event for each person, but have their events overlap. We should only see two options.
     //
