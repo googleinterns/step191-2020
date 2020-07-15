@@ -23,7 +23,14 @@ public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
     // Initialize the options for the meeting not including optional attendees
     ArrayList<TimeRange> optionsMandatory = new ArrayList<TimeRange>();
+
+    boolean optionalsExist = !request.getOptionalAttendees().isEmpty();
+
+
     // Initialize the options for the meeting including optional attendees
+    if (optionalsExist) {
+
+    }
     ArrayList<TimeRange> optionsOptionals = new ArrayList<TimeRange>();
     // Initially all the day is available
     optionsMandatory.add(TimeRange.WHOLE_DAY);
@@ -45,7 +52,7 @@ public final class FindMeetingQuery {
         
         // Initially this TimeRange is an option
         boolean isOption = true;
-        // There are initialli no optional attendees in this meeting
+        // There are initially no optional attendees in this meeting
         int optionalAttendees = 0; 
 
         // Check if there are attendees in this meeting that is required for the new one
@@ -67,35 +74,7 @@ public final class FindMeetingQuery {
 
 
             // Now update the list with TimeRange objects that include optional attendees
-
-            ArrayList<TimeRange> auxOptional = new ArrayList<TimeRange>();
-            
-            for (TimeRange option : optionsOptionals) {
-              // Check which option must be modified in the options list
-              if (option.start() == nextOptionOptionalStart) {
-                // This is THE option affected by the meeting
-
-                // Check if there is any time left before the meeting starts
-                if (option.start() < occupied.start()) {
-                  auxOptional.add(TimeRange.fromStartEnd(option.start(), occupied.start(), false));
-                }
-
-                // Check if there is any time left after the meeting ends
-                if (option.end() > occupied.end()) {
-                  auxOptional.add(TimeRange.fromStartEnd(occupied.end(), option.end(), false));
-                }
-
-                
-              } else {
-                // The meeting does not affect this TimeRange option
-                auxOptional.add(option);
-              }
-            }
-
-            cloneList(optionsOptionals, auxOptional);
-
-            // Update when the next option TimeRange begins
-            nextOptionOptionalStart = occupied.end();
+            nextOptionOptionalStart = removeTimeRangeFromList(optionsOptionals, occupied, nextOptionOptionalStart);
             
             // With one attendee is enough to discard this meeting's TimeRange
             break;
@@ -108,35 +87,14 @@ public final class FindMeetingQuery {
           // Check for optional attendees
           if (!request.getOptionalAttendees().isEmpty() && optionalAttendees == request.getOptionalAttendees().size()) {
             // All the optional attendees are needed in this meeting, so remove this TimeRange from optionsOptionals 
-            ArrayList<TimeRange> aux = new ArrayList<TimeRange>();
+
 
             TimeRange occupied = meeting.getWhen();
 
-            // Check which option must be modified because of the meeting
-            for (TimeRange option : optionsOptionals) { 
-              // Check which option must be modified in the options list
-              if (option.start() == nextOptionOptionalStart) {
-                // This is THE option affected by the meeting
+            
 
-                // Check if there is any time left before the meeting starts
-                if (option.start() < occupied.start()) {
-                  aux.add(TimeRange.fromStartEnd(option.start(), occupied.start(), false));
-                }
+            nextOptionOptionalStart = removeTimeRangeFromList(optionsOptionals, occupied, nextOptionOptionalStart);
 
-                // Check if there is any time left after the meeting ends
-                if (option.end() > occupied.end()) {
-                  aux.add(TimeRange.fromStartEnd(occupied.end(), option.end(), false));
-                }
-                
-              } else {
-                // The meeting does not affect this TimeRange option
-                aux.add(option);
-              }
-            }
-
-            nextOptionOptionalStart = occupied.end();
-
-            cloneList(optionsOptionals, aux);
 
           }
 
@@ -155,8 +113,7 @@ public final class FindMeetingQuery {
     }
     cloneList(optionsOptionals, aux);
 
-    System.out.println(optionsOptionals.toString());
-    System.out.println(optionsMandatory.toString());
+    optionsOptionals = checkDurationOfTimeRange(optionsOptionals, request.getDuration());
 
     // If there is any option with optional attendees left, return it
     if (!optionsOptionals.isEmpty()) {
@@ -167,13 +124,8 @@ public final class FindMeetingQuery {
     // No TimeRange with optional attendees is viable, so
     // now that all possible TimeRanges with mandatory attendees are here, 
     // remove all that do not have the desired duration
-    aux = new ArrayList<TimeRange>();
-    for (TimeRange option : optionsMandatory) {
-      if (option.duration() >= request.getDuration()) {
-        aux.add(option);
-      }
-    }
-    cloneList(optionsMandatory, aux);
+    
+    optionsMandatory = checkDurationOfTimeRange(optionsMandatory, request.getDuration());
 
     return optionsMandatory;
   }
@@ -211,7 +163,19 @@ public final class FindMeetingQuery {
     return occupied.end();
   }
 
-  void cloneList(ArrayList<TimeRange> dest, ArrayList<TimeRange> src) {
+  private ArrayList<TimeRange> checkDurationOfTimeRange(ArrayList<TimeRange> options, long duration) {
+    ArrayList<TimeRange> aux = new ArrayList<TimeRange>();
+
+    for (TimeRange option : options) {
+      if (option.duration() >= duration) {
+        aux.add(option);
+      }
+    }
+
+    return aux;
+  }
+
+  private void cloneList(ArrayList<TimeRange> dest, ArrayList<TimeRange> src) {
     dest.clear();
     for (TimeRange timeRange : src) {
       dest.add(timeRange);
