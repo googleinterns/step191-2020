@@ -63,13 +63,14 @@ public final class FindMeetingQuery {
                 if (option.end() > occupied.end()) {
                   aux.add(TimeRange.fromStartEnd(occupied.end(), option.end(), false));
                 }
-
-                nextOptionStart = occupied.end();
               } else {
                 // The meeting does not affect this TimeRange option
                 aux.add(option);
               }
             }
+            // Update where next option TimeRange starts
+            nextOptionStart = occupied.end();
+
             // Update the options TimeRange
             cloneList(options, aux);
 
