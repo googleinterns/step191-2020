@@ -60,39 +60,11 @@ public final class FindMeetingQuery {
             // This TimeRange is no longer an option
             isOption = false;
             
-            // An auxiliar list to keep the new available TimeRange objects with mandatory attendees only
-            ArrayList<TimeRange> auxMandatory = new ArrayList<TimeRange>();
-            
             TimeRange occupied = meeting.getWhen();
 
-            // Check which option must be modified because of the meeting
-            for (TimeRange option : optionsMandatory) {
-              // Check which option must be modified in the options list
-              if (option.start() == nextOptionMandatoryStart) {
-                // This is THE option affected by the meeting
+            
+            nextOptionMandatoryStart = removeTimeRangeFromList(optionsMandatory, occupied, nextOptionMandatoryStart);
 
-                // Check if there is any time left before the meeting starts
-                if (option.start() < occupied.start()) {
-                  auxMandatory.add(TimeRange.fromStartEnd(option.start(), occupied.start(), false));
-                }
-
-                // Check if there is any time left after the meeting ends
-                if (option.end() > occupied.end()) {
-                  auxMandatory.add(TimeRange.fromStartEnd(occupied.end(), option.end(), false));
-                }
-
-                
-              } else {
-                // The meeting does not affect this TimeRange option
-                auxMandatory.add(option);
-              }
-            }
-
-            // Make the original list have the updated available TimeRange objects
-            cloneList(optionsMandatory, auxMandatory);
-
-            // Update when the next option TimeRange begins
-            nextOptionMandatoryStart = occupied.end();
 
             // Now update the list with TimeRange objects that include optional attendees
 
@@ -203,8 +175,40 @@ public final class FindMeetingQuery {
     }
     cloneList(optionsMandatory, aux);
 
-    System.out.println("Return with mandatory");
     return optionsMandatory;
+  }
+
+  private int removeTimeRangeFromList(ArrayList<TimeRange> options, TimeRange occupied, int nextOptionStart) {
+    ArrayList<TimeRange> aux = new ArrayList<TimeRange>();
+
+    // Check which option must be modified because of the meeting
+    for (TimeRange option : options) {
+      // Check which option must be modified in the options list
+      if (option.start() == nextOptionStart) {
+        // This is THE option affected by the meeting
+
+        // Check if there is any time left before the meeting starts
+        if (option.start() < occupied.start()) {
+          aux.add(TimeRange.fromStartEnd(option.start(), occupied.start(), false));
+        }
+
+        // Check if there is any time left after the meeting ends
+        if (option.end() > occupied.end()) {
+          aux.add(TimeRange.fromStartEnd(occupied.end(), option.end(), false));
+        }
+
+        
+      } else {
+        // The meeting does not affect this TimeRange option
+        aux.add(option);
+      }
+    }
+
+    // Make the original list have the updated available TimeRange objects
+    cloneList(options, aux);
+
+    // Update when the next option TimeRange begins
+    return occupied.end();
   }
 
   void cloneList(ArrayList<TimeRange> dest, ArrayList<TimeRange> src) {
