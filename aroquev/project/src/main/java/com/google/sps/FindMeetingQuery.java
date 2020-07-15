@@ -21,26 +21,23 @@ import java.util.Collections;
 public final class FindMeetingQuery {
 
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    // Initialize the options for the meeting not including optional attendees
+    // Initialize the options for the meeting not including optional attendees 
+    // (initially the whole day is available)
     ArrayList<TimeRange> optionsMandatory = new ArrayList<TimeRange>();
-
-    boolean optionalsExist = !request.getOptionalAttendees().isEmpty();
-
-
-    // Initialize the options for the meeting including optional attendees
-    if (optionalsExist) {
-
-    }
-    ArrayList<TimeRange> optionsOptionals = new ArrayList<TimeRange>();
-    // Initially all the day is available
     optionsMandatory.add(TimeRange.WHOLE_DAY);
+
+    // Now do the same for optional attendees
+    ArrayList<TimeRange> optionsOptionals = new ArrayList<TimeRange>();
     optionsOptionals.add(TimeRange.WHOLE_DAY);
+
+    // To keep reference of whether or not there are optional attendees in the request
+    boolean optionalsExist = !request.getOptionalAttendees().isEmpty();
 
     // These variables store where the next TimeRange opportunity for each list begins when traversing meetings
     int nextOptionMandatoryStart = 0;
     int nextOptionOptionalStart = 0;
 
-    // Sort events for their start time
+    // Sort events by their start time
     ArrayList<Event> meetings = new ArrayList<Event>(events);
     Collections.sort(meetings, Event.COMPARE_START_TIME);
 
@@ -50,7 +47,8 @@ public final class FindMeetingQuery {
       if (meeting.getWhen().end() > nextOptionMandatoryStart) {
         // The meeting occurs in a posible option TimeRange with mandatory attendees
         
-        // Initially this TimeRange is an option
+        // Initially this TimeRange is an option (we still do not know
+        // of any mandatory attendee yet)
         boolean isOption = true;
         // There are initially no optional attendees in this meeting
         int optionalAttendees = 0; 
@@ -59,77 +57,73 @@ public final class FindMeetingQuery {
         for (String attendee : meeting.getAttendees()) { 
 
           // Check if its an optional attendee, if not, check if it's a mandatory attendee
-          if (request.getOptionalAttendees().contains(attendee)) {
+          if (optionalsExist && request.getOptionalAttendees().contains(attendee)) {
             optionalAttendees++;
           } else if (request.getAttendees().contains(attendee)) { 
             // The time at which this meeting happens must be taken away from the options
+            // because a mandatory attendee is registered for this event
 
             // This TimeRange is no longer an option
             isOption = false;
             
             TimeRange occupied = meeting.getWhen();
 
-            
+            // Update the mandatory attendees' list and get when the next available TimeRange begins
             nextOptionMandatoryStart = removeTimeRangeFromList(optionsMandatory, occupied, nextOptionMandatoryStart);
 
-
-            // Now update the list with TimeRange objects that include optional attendees
-            nextOptionOptionalStart = removeTimeRangeFromList(optionsOptionals, occupied, nextOptionOptionalStart);
+            if (optionalsExist) {
+              // Update the optional attendees' list and get when the next available TimeRange begins
+              nextOptionOptionalStart = removeTimeRangeFromList(optionsOptionals, occupied, nextOptionOptionalStart);
+            }
             
-            // With one attendee is enough to discard this meeting's TimeRange
+            // With one mandatory attendee is enough to discard this meeting's TimeRange
             break;
           }
         }
 
-        // Check if the meeting does not have mandatory attendees
-        if (isOption) {
+        // Check if the meeting has optional attendees
+        if (optionalsExist && isOption) {
           
           // Check for optional attendees
-          if (!request.getOptionalAttendees().isEmpty() && optionalAttendees == request.getOptionalAttendees().size()) {
+          if (optionalAttendees == request.getOptionalAttendees().size()) {
             // All the optional attendees are needed in this meeting, so remove this TimeRange from optionsOptionals 
-
 
             TimeRange occupied = meeting.getWhen();
 
-            
-
+            // Update the optional attendees' list and get when the next available TimeRange begins
             nextOptionOptionalStart = removeTimeRangeFromList(optionsOptionals, occupied, nextOptionOptionalStart);
-
-
           }
-
         }
-
-
       }
     }
 
-    // Check if the TimeRanges with optional attendees have the desired duration
-    ArrayList<TimeRange> aux = new ArrayList<TimeRange>();
-    for (TimeRange option : optionsOptionals) {
-      if (option.duration() >= request.getDuration()) {
-        aux.add(option);
+    if (optionalsExist) {
+      // Check if the TimeRanges with optional attendees have the desired duration
+      optionsOptionals = checkDurationOfTimeRange(optionsOptionals, request.getDuration());
+
+      // If there is any option with optional attendees left, return it
+      if (!optionsOptionals.isEmpty()) {
+        return optionsOptionals;
       }
     }
-    cloneList(optionsOptionals, aux);
-
-    optionsOptionals = checkDurationOfTimeRange(optionsOptionals, request.getDuration());
-
-    // If there is any option with optional attendees left, return it
-    if (!optionsOptionals.isEmpty()) {
-      System.out.println("Return with optional");
-      return optionsOptionals;
-    }
+    
 
     // No TimeRange with optional attendees is viable, so
-    // now that all possible TimeRanges with mandatory attendees are here, 
-    // remove all that do not have the desired duration
+    // return all possible TimeRanges with mandatory attendees
     
+    // Get all the TimeRanges that have the desired duration
     optionsMandatory = checkDurationOfTimeRange(optionsMandatory, request.getDuration());
 
     return optionsMandatory;
   }
 
+  /**
+   * Function that removes an unavailable TimeRange from a list of TimeRange objects that are current options
+   * @param options The list of TimeRange objects that contains all the options for the new meeting
+   * @param occupied The TimeRange that must be taken away from the options
+   * @param nextOptionStart An integer that signals when does the next free TimeRange option begins
+   * @return The new nextOptionStart signaling the new next free TimeRange option
+   */
   private int removeTimeRangeFromList(ArrayList<TimeRange> options, TimeRange occupied, int nextOptionStart) {
     ArrayList<TimeRange> aux = new ArrayList<TimeRange>();
 
@@ -163,6 +157,12 @@ public final class FindMeetingQuery {
     return occupied.end();
   }
 
+  /**
+   * This function checks the duration of each TimeRange option and discards the ones that are not long enough
+   * @param options a list of TimeRange options
+   * @param duration the length of the new meeting included in the request
+   * @return the list containing only the TimeRange objects that have the desired duration
+   */
   private ArrayList<TimeRange> checkDurationOfTimeRange(ArrayList<TimeRange> options, long duration) {
     ArrayList<TimeRange> aux = new ArrayList<TimeRange>();
 
@@ -175,6 +175,11 @@ public final class FindMeetingQuery {
     return aux;
   }
 
+  /**
+   * Function that passes the elements of a list to another one
+   * @param dest Destination list
+   * @param src Source list
+   */
   private void cloneList(ArrayList<TimeRange> dest, ArrayList<TimeRange> src) {
     dest.clear();
     for (TimeRange timeRange : src) {
