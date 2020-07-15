@@ -18,6 +18,13 @@ import java.util.Collection;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    throw new UnsupportedOperationException("TODO: Implement this method.");
+    Collection<TimeRange> returnQuery = Collections.emptySet();
+    if(request.getDuration() > (24 * 60)){
+        returnQuery = Arrays.asList();
+        return returnQuery;
+    }else if(events.isEmpty()){
+        returnQuery = Arrays.asList(TimeRange.WHOLE_DAY);
+        return returnQuery;
+    } 
   }
 }
