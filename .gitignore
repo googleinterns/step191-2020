@@ -1,15 +1,3 @@
 target/
 .idea
-aroquev/portfolio/.classpath
-aroquev/project/.settings/org.eclipse.core.resources.prefs
-aroquev/project/.settings/org.eclipse.jdt.apt.core.prefs
-aroquev/project/.settings/org.eclipse.jdt.core.prefs
-aroquev/project/.settings/org.eclipse.m2e.core.prefs
-aroquev/portfolio/.factorypath
-aroquev/portfolio/.project
-aroquev/portfolio/.settings/org.eclipse.core.resources.prefs
-aroquev/portfolio/.settings/org.eclipse.jdt.apt.core.prefs
-aroquev/portfolio/.settings/org.eclipse.jdt.core.prefs
-aroquev/portfolio/.settings/org.eclipse.m2e.core.prefs
-aroquev/project/.classpath
-aroquev/project/.project
+
