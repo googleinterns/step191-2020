@@ -15,6 +15,7 @@
 package com.google.sps;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -32,6 +33,15 @@ public final class FindMeetingQuery {
 
     // To keep reference of whether or not there are optional attendees in the request
     boolean optionalsExist = !request.getOptionalAttendees().isEmpty();
+
+    // To keep reference of whether or not there are no mandatory attendees
+    boolean mandatoryExist = !request.getAttendees().isEmpty();
+
+    // If there are no mandatory attendees, treat them as mandatory
+    if (!mandatoryExist) {
+      request = new MeetingRequest(request.getOptionalAttendees(), request.getDuration());
+      optionalsExist = false;
+    }
 
     // These variables store where the next TimeRange opportunity for each list begins when traversing meetings
     int nextOptionMandatoryStart = 0;
@@ -113,6 +123,11 @@ public final class FindMeetingQuery {
     
     // Get all the TimeRanges that have the desired duration
     optionsMandatory = checkDurationOfTimeRange(optionsMandatory, request.getDuration());
+
+    // Check if there are only optionals and they are all overlapped
+    if (!mandatoryExist && optionsMandatory.isEmpty()) {
+      return Arrays.asList(TimeRange.WHOLE_DAY);
+    }
 
     return optionsMandatory;
   }
