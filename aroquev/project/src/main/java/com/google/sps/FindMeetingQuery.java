@@ -14,7 +14,6 @@
 
 package com.google.sps;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,36 +27,27 @@ public final class FindMeetingQuery {
     // (initially the whole day is available)
     ArrayList<TimeRange> optionsMandatory = new ArrayList<TimeRange>();
     optionsMandatory.add(TimeRange.WHOLE_DAY);
+    
+    // This variablee stores where the next TimeRange opportunity for each list begins when traversing meetings
+    int nextOptionMandatoryStart = 0;
 
-    // Now do the same for optional attendees
-    // Includes all time ranges where there is at least ONE optional
-    ArrayList<TimeRange> optionsOptionals = new ArrayList<TimeRange>();
-    optionsOptionals.add(TimeRange.WHOLE_DAY);
+    int requestedOptionalAttendees = request.getOptionalAttendees().size();
 
-    int optionals = request.getOptionalAttendees().size();
+    // List of Pair objects that will store available times with the number of available optional attendees
     ArrayList<Pair> coolList = new ArrayList<Pair>();
-    coolList.add(new Pair(optionals, TimeRange.WHOLE_DAY));
-    int lastCool = 0;
+    coolList.add(new Pair(requestedOptionalAttendees, TimeRange.WHOLE_DAY));
 
     // To keep reference of whether or not there are optional attendees in the request
     boolean optionalsExist = !request.getOptionalAttendees().isEmpty();
 
-    // To keep reference of whether or not there are no mandatory attendees
+    // To keep reference of whether or not there are mandatory attendees
     boolean mandatoryExist = !request.getAttendees().isEmpty();
 
-
-
-    // If there are no mandatory attendees, treat them as mandatory
+    // If there are no mandatory attendees, treat optionals as mandatory
     if (!mandatoryExist) {
       request = new MeetingRequest(request.getOptionalAttendees(), request.getDuration());
       optionalsExist = false;
     }
-
-    // These variables store where the next TimeRange opportunity for each list begins when traversing meetings
-    int nextOptionMandatoryStart = 0;
-    int nextOptionOptionalStart = 0;
-
-    // To order the meetings containing optionals
 
     // Sort events by their start time
     ArrayList<Event> meetings = new ArrayList<Event>(events);
@@ -73,14 +63,14 @@ public final class FindMeetingQuery {
         // of any mandatory attendee yet)
         boolean isOption = true;
         // There are initially no optional attendees in this meeting
-        int optionalAttendees = 0; 
+        int optionalAttendeesInScheduledMeeting = 0; 
 
-        // Check if there are attendees in this meeting that is required for the new one
+        // Check if there are attendees in this meeting that are required for the new one
         for (String attendee : meeting.getAttendees()) { 
 
           // Check if its an optional attendee, if not, check if it's a mandatory attendee
           if (optionalsExist && request.getOptionalAttendees().contains(attendee)) {
-            optionalAttendees++;
+            optionalAttendeesInScheduledMeeting++;
           } else if (request.getAttendees().contains(attendee)) { 
             // The time at which this meeting happens must be taken away from the options
             // because a mandatory attendee is registered for this event
@@ -93,40 +83,9 @@ public final class FindMeetingQuery {
             // Update the mandatory attendees' list and get when the next available TimeRange begins
             nextOptionMandatoryStart = removeTimeRangeFromList(optionsMandatory, occupied, nextOptionMandatoryStart);
 
+            // Remove this TimeRange from the list of options with optional attendees
             if (optionalsExist) {
-
-              int leftOptionals = optionals - optionalAttendees;
-
-              ArrayList<Pair> aux = new ArrayList<Pair>();
-
-              for (Pair option : coolList) {
-                if (option.timeRange.overlaps(occupied)) {
-                  TimeRange tr = option.timeRange;
-
-                  // Check if there is any time left before the meeting starts
-                  if (tr.start() < occupied.start()) {
-                    aux.add(new Pair(option.optionals, TimeRange.fromStartEnd(tr.start(), occupied.start(), false)));
-                  }
-
-                  // Add this slot with less people
-                  //aux.add(new Pair(leftOptionals, TimeRange.fromStartDuration(occupied.start(), occupied.duration())));
-
-                  // Check if there is any time left after the meeting ends
-                  if (tr.end() > occupied.end()) {
-                    aux.add(new Pair(option.optionals, TimeRange.fromStartEnd(occupied.end(), tr.end(), false)));
-                  }
-
-                  //lastCool = option.timeRange.start();
-                } else {
-                  // The meeting does not affect this TimeRange option
-                  aux.add(option);
-                }
-              }
-
-              clonePairList(coolList, aux);
-
-              // Update the optional attendees' list and get when the next available TimeRange begins
-              nextOptionOptionalStart = removeTimeRangeFromList(optionsOptionals, occupied, nextOptionOptionalStart);
+              removeTimeRangeFromPairList(coolList, occupied, false, 0);
             }
             
             // With one mandatory attendee is enough to discard this meeting's TimeRange
@@ -134,137 +93,59 @@ public final class FindMeetingQuery {
           }
         }
 
-        // Check if the meeting has optional attendees
+        // If valid (no mandatory attendee), check if there are any optional attendees left in this TimeRange
         if (optionalsExist && isOption) {
-          
           TimeRange occupied = meeting.getWhen();
 
-          // Check for optional attendees
-          if (optionalAttendees == request.getOptionalAttendees().size()) {
-            // All the optional attendees are needed in this meeting, so remove this TimeRange from optionsOptionals 
-
-            int leftOptionals = optionals - optionalAttendees;
-
-              ArrayList<Pair> aux = new ArrayList<Pair>();
-
-              for (Pair option : coolList) {
-                if (option.timeRange.overlaps(occupied)) {
-                  TimeRange tr = option.timeRange;
-
-                  // Check if there is any time left before the meeting starts
-                  if (tr.start() < occupied.start()) {
-                    aux.add(new Pair(option.optionals, TimeRange.fromStartEnd(tr.start(), occupied.start(), false)));
-                  }
-
-                  // Add this slot with less people
-                  //aux.add(new Pair(leftOptionals, TimeRange.fromStartDuration(occupied.start(), occupied.duration())));
-
-                  // Check if there is any time left after the meeting ends
-                  if (tr.end() > occupied.end()) {
-                    aux.add(new Pair(option.optionals, TimeRange.fromStartEnd(occupied.end(), tr.end(), false)));
-                  }
-
-                  //lastCool = option.timeRange.start();
-                } else {
-                  // The meeting does not affect this TimeRange option
-                  aux.add(option);
-                }
-              }
-
-              clonePairList(coolList, aux);
-
-            // Update the optional attendees' list and get when the next available TimeRange begins
-            nextOptionOptionalStart = removeTimeRangeFromList(optionsOptionals, occupied, nextOptionOptionalStart);
+          if (requestedOptionalAttendees == optionalAttendeesInScheduledMeeting) {
+            // All the optional attendees are needed in this meeting, so remove this TimeRange from the list of options with optional attendees 
+            removeTimeRangeFromPairList(coolList, occupied, false, 0);
           } else {
-
-            int leftOptionals = optionals - optionalAttendees;
-
-            ArrayList<Pair> aux = new ArrayList<Pair>();
-
-            for (Pair option : coolList) {
-              if (option.timeRange.overlaps(occupied)) {
-                TimeRange tr = option.timeRange;
-
-                // Check if there is any time left before the meeting starts
-                if (tr.start() < occupied.start()) {
-                  aux.add(new Pair(option.optionals, TimeRange.fromStartEnd(tr.start(), occupied.start(), false)));
-                }
-
-                // Add this slot with less people
-                aux.add(new Pair(leftOptionals, TimeRange.fromStartDuration(occupied.start(), occupied.duration())));
-
-                // Check if there is any time left after the meeting ends
-                if (tr.end() > occupied.end()) {
-                  aux.add(new Pair(option.optionals, TimeRange.fromStartEnd(occupied.end(), tr.end(), false)));
-                }
-
-                //lastCool = option.timeRange.start();
-              } else {
-                // The meeting does not affect this TimeRange option
-                aux.add(option);
-              }
-            }
-
-            clonePairList(coolList, aux);
-
+            // Update the options and include this meeting's TimeRange with the updated number of optional attendees
+            int leftOptionals = requestedOptionalAttendees - optionalAttendeesInScheduledMeeting;
+            removeTimeRangeFromPairList(coolList, occupied, true, leftOptionals);
           }
         }
       }
     }
 
     if (optionalsExist) {
-      System.out.println("Here");
       if (!coolList.isEmpty()) {
-        //There are slots with optionals!!
-
+        // There are TimeRange options with optionals, sort to find the ones with the most optionals
         Collections.sort(coolList, Pair.COMPARE_NUMBER_OPTIONALS);
 
-        ArrayList<TimeRange> ans = new ArrayList<TimeRange>();
-
-        int highest = 1;
-        for (Pair option : coolList) {
-          System.out.println(option.optionals);
-          if (option.optionals >= highest) {
-            highest = option.optionals;
-            if (option.timeRange.duration() >= request.getDuration()) {
-              ans.add(option.timeRange);
-            }
-          }
-          else {
-            break;
-          }
-        }
+        // Get the options that have the desired duration 
+        ArrayList<TimeRange> ans = checkDurationOfPairList(coolList, request.getDuration());
         if (!ans.isEmpty()) {
           return ans;
         }
-        
-      }
-
-      // Check if the TimeRanges with optional attendees have the desired duration
-      optionsOptionals = checkDurationOfTimeRange(optionsOptionals, request.getDuration());
-
-      // If there is any option with optional attendees left, return it
-      if (!optionsOptionals.isEmpty()) {
-        System.out.println("Returned with optionals");
-        return optionsOptionals;
       }
     }
     
-    System.out.println("Got heeer");
-
     // No TimeRange with optional attendees is viable, so
     // return all possible TimeRanges with mandatory attendees
     
     // Get all the TimeRanges that have the desired duration
     optionsMandatory = checkDurationOfTimeRange(optionsMandatory, request.getDuration());
 
-   // System.out.println()
     // Check if there are only optionals and they are all overlapped
     if (!mandatoryExist && optionsMandatory.isEmpty()) {
       return Arrays.asList(TimeRange.WHOLE_DAY);
     }
 
     return optionsMandatory;
+  }
+
+  private ArrayList<TimeRange> checkDurationOfPairList(ArrayList<Pair> options, long duration) {
+    ArrayList<TimeRange> optionalsTRs = new ArrayList<TimeRange>();
+    int highest = 1;
+    for (Pair option : options) {
+      if (option.timeRange.duration() >= duration && option.optionals >= highest) {
+        highest = option.optionals;
+        optionalsTRs.add(option.timeRange);
+      }
+    }
+    return optionalsTRs;
   }
 
   /**
@@ -308,6 +189,43 @@ public final class FindMeetingQuery {
   }
 
   /**
+   * Function that removes an unavailable TimeRange or updates it with a new number of optional attendees
+   * @param options The options with optional attendees
+   * @param occupied The TimeRange that is updated or excluded from the options
+   * @param includeThisTR Tells whether or not this TR is still viable
+   * @param optionals If applicable, the number of optional attendees in the updated occupied TimeRange
+   */
+  private void removeTimeRangeFromPairList(ArrayList<Pair> options, TimeRange occupied, boolean includeThisTR, int optionals) {
+    ArrayList<Pair> aux = new ArrayList<Pair>();
+
+    for (Pair option : options) {
+      if (option.timeRange.overlaps(occupied)) {
+        TimeRange tr = option.timeRange;
+
+        // Check if there is any time left before the meeting starts
+        if (tr.start() < occupied.start()) {
+          aux.add(new Pair(option.optionals, TimeRange.fromStartEnd(tr.start(), occupied.start(), false)));
+        }
+
+        if (includeThisTR) {
+          // Add this slot with less people
+          aux.add(new Pair(optionals, TimeRange.fromStartDuration(occupied.start(), occupied.duration())));
+        }
+        
+        // Check if there is any time left after the meeting ends
+        if (tr.end() > occupied.end()) {
+          aux.add(new Pair(option.optionals, TimeRange.fromStartEnd(occupied.end(), tr.end(), false)));
+        }
+      } else {
+        // The meeting does not affect this TimeRange option
+        aux.add(option);
+      }
+    }
+
+    clonePairList(options, aux);
+  }
+
+  /**
    * This function checks the duration of each TimeRange option and discards the ones that are not long enough
    * @param options a list of TimeRange options
    * @param duration the length of the new meeting included in the request
@@ -325,6 +243,9 @@ public final class FindMeetingQuery {
     return aux;
   }
 
+  /**
+   * To clone a list of Pair objects
+   */
   private void clonePairList(ArrayList<Pair> dest, ArrayList<Pair> src) {
     dest.clear();
     for (Pair option : src) {
@@ -351,12 +272,13 @@ class Pair {
   int optionals; 
   TimeRange timeRange; 
   
-    // Constructor 
+  // Constructor 
   public Pair(int optionals, TimeRange timeRange) { 
     this.optionals = optionals; 
     this.timeRange = timeRange; 
   } 
 
+  // Comparator to be able to sort according to number of optional attendees
   public static final Comparator<Pair> COMPARE_NUMBER_OPTIONALS = new Comparator<Pair>() {
     @Override
     public int compare(Pair one, Pair two) {
