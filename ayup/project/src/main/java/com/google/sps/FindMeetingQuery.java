@@ -23,25 +23,22 @@ import java.util.Iterator;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    Collection<TimeRange> returnQuery = new ArrayList<>();
+    Collection<TimeRange> resultTimeRanges = new ArrayList<>();
     List<TimeRange> conflicts = new ArrayList<>();
 
     // If the request is longer than one day we return an empty query.
     if (request.getDuration() > (24 * 60)) {
-      return returnQuery;
+      return resultTimeRanges;
     }
 
     /**
-     * Check in every event if the attendees are in the requests.
-     * If true, we add the event to the conflicted set of events.
-     * Then we sert the conflicted time ranges by start.
+     * Add the events where there are conflicts to a set and then sort them.
     */
     for (Event event: events) {
       if (!Collections.disjoint(request.getAttendees(), event.getAttendees())) {
         conflicts.add(event.getWhen());
       }
     }
-
     Collections.sort(conflicts, TimeRange.ORDER_BY_START);
 
     /**
@@ -49,34 +46,30 @@ public final class FindMeetingQuery {
      * We return a time range for the whole day.
      */
     if (events.isEmpty() || conflicts.isEmpty()) {
-      returnQuery.add(TimeRange.WHOLE_DAY);
-      return returnQuery;
+      resultTimeRanges.add(TimeRange.WHOLE_DAY);
+      return resultTimeRanges;
     } 
     
     /**
      * We go through all of the conflicts and if there is a time difference between the previous
-     * and current conflicts bitter than the duration of the request, we add to the query we are
+     * and current conflicts bigger than the duration of the request, we add to the query we are
      * goint to return a time range between the ending of the previous event and the begining of
      * the new event.
      */
-    TimeRange previous = TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TimeRange.START_OF_DAY, false);
+    int maxEndSoFar = TimeRange.START_OF_DAY;
 
-    for (TimeRange current: conflicts) { 
-
-      // If the previous event cointains the current event we break the for loop
-      if (previous.contains(current)) break;
-
-      if (current.start() - previous.end() >= request.getDuration()) {
-        returnQuery.add(TimeRange.fromStartEnd(previous.end(), current.start(), false));
+    for (TimeRange current : conflicts) {
+      if (current.start() - maxEndSoFar >= request.getDuration()) {
+        resultTimeRanges.add(TimeRange.fromStartEnd(maxEndSoFar, current.start(), false));
       }
-      previous = current;
-    }
-
-    // If there's space, we add a time range between the ending of the last event to the end of the day.
-    if (TimeRange.END_OF_DAY - previous.end() >= request.getDuration()) {
-      returnQuery.add(TimeRange.fromStartEnd(previous.end(), TimeRange.END_OF_DAY, true));
+      maxEndSoFar = Math.max(maxEndSoFar, current.end());
     }
     
-    return returnQuery;
+    // If there's space, we add a time range between the ending of the last event to the end of the day.
+    if (TimeRange.END_OF_DAY - maxEndSoFar >= request.getDuration()) {
+      resultTimeRanges.add(TimeRange.fromStartEnd(maxEndSoFar, TimeRange.END_OF_DAY, true));
+    }
+    
+    return resultTimeRanges;
   }
 }
