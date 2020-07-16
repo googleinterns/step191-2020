@@ -97,7 +97,7 @@ public final class FindMeetingQueryTest {
 
   @Test
   public void everyAttendeeIsConsidered() {
-    // Have each person have different events. We should see two options because each person has
+    // Have each person have different events. We should see three options because each person has
     // split the restricted times.
     //
     // Events  :       |--A--|     |--B--|
@@ -124,6 +124,14 @@ public final class FindMeetingQueryTest {
 
   @Test
   public void everyAttendeeIsConsideredWithUnavailableOptional() {
+    // Two mandatory attendees and one optional with an all day event
+    // We should see three options because each mandatory person has
+    // split the restricted times, and the optional is unavailable all day.
+    //
+    // Events  :       |--A--|     |--B--|
+    //           |--------------C--------------|
+    // Day     : |-----------------------------|
+    // Options : |--1--|     |--2--|     |--3--|
     Collection<Event> events = Arrays.asList(
         new Event("Event 1", TimeRange.fromStartDuration(TIME_0800AM, DURATION_30_MINUTES),
             Arrays.asList(PERSON_A)),
@@ -148,6 +156,15 @@ public final class FindMeetingQueryTest {
 
   @Test
   public void everyAttendeeIsConsideredWithAvailableOptional() {
+    // Two mandatory attendees and one optional.
+    // We should see two options because each mandatory person has
+    // split the restricted times, and the optional is unavailable at a 
+    // time at which the mandatory are available.
+    //
+    // Events  :       |--A--|     |--B--|
+    //                       |--C--|
+    // Day     : |-----------------------------|
+    // Options : |--1--|                 |--2--|
     Collection<Event> events = Arrays.asList(
         new Event("Event 1", TimeRange.fromStartDuration(TIME_0800AM, DURATION_30_MINUTES),
             Arrays.asList(PERSON_A)),
