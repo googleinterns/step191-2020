@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 
 public final class FindMeetingQuery {
 
@@ -46,6 +47,8 @@ public final class FindMeetingQuery {
     // These variables store where the next TimeRange opportunity for each list begins when traversing meetings
     int nextOptionMandatoryStart = 0;
     int nextOptionOptionalStart = 0;
+
+    // To order the meetings containing optionals
 
     // Sort events by their start time
     ArrayList<Event> meetings = new ArrayList<Event>(events);
@@ -102,6 +105,8 @@ public final class FindMeetingQuery {
 
             // Update the optional attendees' list and get when the next available TimeRange begins
             nextOptionOptionalStart = removeTimeRangeFromList(optionsOptionals, occupied, nextOptionOptionalStart);
+          } else {
+            // Some optional attendees can make it, add to possible ones.
           }
         }
       }
@@ -203,3 +208,22 @@ public final class FindMeetingQuery {
   }
 
 }
+
+// User defined Pair class 
+class Pair { 
+  int optionals; 
+  TimeRange timeRange; 
+  
+    // Constructor 
+  public Pair(int optionals, TimeRange timeRange) { 
+    this.optionals = optionals; 
+    this.timeRange = timeRange; 
+  } 
+
+  public static final Comparator<Pair> COMPARE_NUMBER_OPTIONALS = new Comparator<Pair>() {
+    @Override
+    public int compare(Pair one, Pair two) {
+      return one.optionals - two.optionals;
+    }
+  };
+} 
