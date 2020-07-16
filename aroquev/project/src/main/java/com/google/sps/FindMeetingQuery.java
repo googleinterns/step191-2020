@@ -85,11 +85,7 @@ public final class FindMeetingQuery {
 
             // Remove this TimeRange from the list of options with optional attendees
             if (optionalsExist) {
-              System.out.println("NO VALID");
-              System.out.println(occupied.toString());
-              printList(optionalsPairList);
               removeTimeRangeFromPairList(optionalsPairList, occupied, false, 0);
-              printList(optionalsPairList);
             }
             
             // With one mandatory attendee is enough to discard this meeting's TimeRange
@@ -103,17 +99,11 @@ public final class FindMeetingQuery {
 
           if (requestedOptionalAttendees == optionalAttendeesInScheduledMeeting) {
             // All the optional attendees are needed in this meeting, so remove this TimeRange from the list of options with optional attendees 
-            System.out.println("Still remove");
-            System.out.println(occupied.toString());
               printList(optionalsPairList);
             removeTimeRangeFromPairList(optionalsPairList, occupied, false, 0);
             printList(optionalsPairList);
           } else {
             // Update the options and include this meeting's TimeRange with the updated number of optional attendees
-            System.out.println("should keep");
-            System.out.println(occupied.toString());
-              printList(optionalsPairList);
-
             int leftOptionals = requestedOptionalAttendees - optionalAttendeesInScheduledMeeting;
             removeTimeRangeFromPairList(optionalsPairList, occupied, true, leftOptionals);
             printList(optionalsPairList);
