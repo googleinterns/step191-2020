@@ -196,7 +196,7 @@ public final class FindMeetingQuery {
    * @param options The options with optional attendees
    * @param occupied The TimeRange that is updated or excluded from the options
    * @param includeThisTR Tells whether or not this TR is still viable
-   * @param optionals If applicable, the number of optional attendees in the updated occupied TimeRange
+   * @param optionals If applicable, the number of optional attendees that were avilable in this TimeRange without considering this new meeting 
    */
   private void removeTimeRangeFromPairList(ArrayList<Pair> options, TimeRange occupied, boolean includeThisTR, int optionals) {
     ArrayList<Pair> aux = new ArrayList<Pair>();
