@@ -431,13 +431,36 @@ public final class FindMeetingQueryTest {
 
   // Extra Armando tests
   // One for meetings not in order
-  // Have two persons, both optional, with several gaps among their schedules
+  @Test
+  public void eventsNotInOrder() {
+    // Have two persons, both mandatory, with several gaps among their schedules
     // Should return all the gaps they have in common
     //
     // Events  :       |--A--|     |-A-|
     //           |B|       |-B-|
     // Day     : |---------------------|
     // Options :    |1|        |-2-|
+
+    Collection<Event> events = Arrays.asList(
+        new Event("Event 1", TimeRange.fromStartDuration(TIME_0900AM, DURATION_90_MINUTES),
+            Arrays.asList(PERSON_A)),
+        new Event("Event 2", TimeRange.fromStartEnd(TimeRange.getTimeInMinutes(16, 00), TimeRange.END_OF_DAY, true),
+            Arrays.asList(PERSON_A)),
+        new Event("Event 3", TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TIME_0800AM, false),
+            Arrays.asList(PERSON_B)),
+        new Event("Event 4", TimeRange.fromStartDuration(TIME_1000AM, DURATION_1_HOUR),
+            Arrays.asList(PERSON_B)));
+
+    MeetingRequest request = new MeetingRequest(Arrays.asList(PERSON_A, PERSON_B), DURATION_30_MINUTES);
+
+    Collection<TimeRange> actual = query.query(events, request);
+    Collection<TimeRange> expected =
+        Arrays.asList(TimeRange.fromStartDuration(TIME_0800AM, DURATION_60_MINUTES),
+            TimeRange.fromStartEnd(TIME_1100AM, TimeRange.getTimeInMinutes(16, 00), false));
+
+    Assert.assertEquals(expected, actual);
+  }
+    
     
 }
 
