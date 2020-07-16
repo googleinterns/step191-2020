@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -493,6 +492,41 @@ public final class FindMeetingQueryTest {
     Collection<TimeRange> actual = query.query(events, request);
     Collection<TimeRange> expected =
         Arrays.asList(TimeRange.fromStartDuration(TIME_0800AM, DURATION_60_MINUTES));
+
+    Assert.assertEquals(expected, actual);
+
+  }
+
+  @Test
+  public void mostOverlappingOptionalsWithMandatory() {
+    // Have three persons, one mandatory, and two optionals
+    // Should return all the gaps they have in common
+    // A is mandatory, B and C are optionals
+    //
+    // Events  : |--A--|    |-A-|
+    //           |--------B--------|            
+    //           |----------C----------|        
+    // Day     : |---------------------|
+    // Options :                   |-1-|
+
+    Collection<Event> events = Arrays.asList(
+        new Event("Event 1", TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TIME_0900AM, false),
+            Arrays.asList(PERSON_A)),
+        new Event("Event 2", TimeRange.fromStartDuration(TIME_1100AM, DURATION_2_HOUR),
+            Arrays.asList(PERSON_A)),
+        new Event("Event 3", TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TimeRange.getTimeInMinutes(16, 00), false),
+            Arrays.asList(PERSON_B)),
+        new Event("Event 4", TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TimeRange.END_OF_DAY, true),
+            Arrays.asList(PERSON_C)));
+
+    MeetingRequest request = new MeetingRequest(Arrays.asList(PERSON_A), DURATION_60_MINUTES);
+    
+    request.addOptionalAttendee(PERSON_B);
+    request.addOptionalAttendee(PERSON_C);
+
+    Collection<TimeRange> actual = query.query(events, request);
+    Collection<TimeRange> expected =
+        Arrays.asList(TimeRange.fromStartEnd(TimeRange.getTimeInMinutes(16, 00), TimeRange.END_OF_DAY, true));
 
     Assert.assertEquals(expected, actual);
 

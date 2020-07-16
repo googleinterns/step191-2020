@@ -102,7 +102,7 @@ public final class FindMeetingQuery {
             removeTimeRangeFromPairList(coolList, occupied, false, 0);
           } else {
             // Update the options and include this meeting's TimeRange with the updated number of optional attendees
-            int leftOptionals = requestedOptionalAttendees - optionalAttendeesInScheduledMeeting;
+            int leftOptionals = optionalAttendeesInScheduledMeeting;
             removeTimeRangeFromPairList(coolList, occupied, true, leftOptionals);
           }
         }
