@@ -34,8 +34,8 @@ public final class FindMeetingQuery {
     int requestedOptionalAttendees = request.getOptionalAttendees().size();
 
     // List of Pair objects that will store available times with the number of available optional attendees
-    ArrayList<Pair> coolList = new ArrayList<Pair>();
-    coolList.add(new Pair(requestedOptionalAttendees, TimeRange.WHOLE_DAY));
+    ArrayList<Pair> optionalsPairList = new ArrayList<Pair>();
+    optionalsPairList.add(new Pair(requestedOptionalAttendees, TimeRange.WHOLE_DAY));
 
     // To keep reference of whether or not there are optional attendees in the request
     boolean optionalsExist = !request.getOptionalAttendees().isEmpty();
@@ -85,7 +85,11 @@ public final class FindMeetingQuery {
 
             // Remove this TimeRange from the list of options with optional attendees
             if (optionalsExist) {
-              removeTimeRangeFromPairList(coolList, occupied, false, 0);
+              System.out.println("NO VALID");
+              System.out.println(occupied.toString());
+              printList(optionalsPairList);
+              removeTimeRangeFromPairList(optionalsPairList, occupied, false, 0);
+              printList(optionalsPairList);
             }
             
             // With one mandatory attendee is enough to discard this meeting's TimeRange
@@ -99,23 +103,32 @@ public final class FindMeetingQuery {
 
           if (requestedOptionalAttendees == optionalAttendeesInScheduledMeeting) {
             // All the optional attendees are needed in this meeting, so remove this TimeRange from the list of options with optional attendees 
-            removeTimeRangeFromPairList(coolList, occupied, false, 0);
+            System.out.println("Still remove");
+            System.out.println(occupied.toString());
+              printList(optionalsPairList);
+            removeTimeRangeFromPairList(optionalsPairList, occupied, false, 0);
+            printList(optionalsPairList);
           } else {
             // Update the options and include this meeting's TimeRange with the updated number of optional attendees
-            int leftOptionals = optionalAttendeesInScheduledMeeting;
-            removeTimeRangeFromPairList(coolList, occupied, true, leftOptionals);
+            System.out.println("should keep");
+            System.out.println(occupied.toString());
+              printList(optionalsPairList);
+
+            int leftOptionals = requestedOptionalAttendees - optionalAttendeesInScheduledMeeting;
+            removeTimeRangeFromPairList(optionalsPairList, occupied, true, leftOptionals);
+            printList(optionalsPairList);
           }
         }
       }
     }
 
     if (optionalsExist) {
-      if (!coolList.isEmpty()) {
+      if (!optionalsPairList.isEmpty()) {
         // There are TimeRange options with optionals, sort to find the ones with the most optionals
-        Collections.sort(coolList, Pair.COMPARE_NUMBER_OPTIONALS);
+        Collections.sort(optionalsPairList, Pair.COMPARE_NUMBER_OPTIONALS);
 
         // Get the options that have the desired duration 
-        ArrayList<TimeRange> ans = checkDurationOfPairList(coolList, request.getDuration());
+        ArrayList<TimeRange> ans = checkDurationOfPairList(optionalsPairList, request.getDuration());
         if (!ans.isEmpty()) {
           return ans;
         }
@@ -209,11 +222,19 @@ public final class FindMeetingQuery {
 
         if (includeThisTR) {
           // Add this slot with less people
-          aux.add(new Pair(optionals, TimeRange.fromStartDuration(occupied.start(), occupied.duration())));
+
+          int timeStart = 0;
+          if (occupied.start() < tr.start()) {
+            timeStart = tr.start();
+          } else {
+            timeStart = tr.start();
+          }
+
+          aux.add(new Pair(option.optionals - optionals, TimeRange.fromStartEnd(timeStart, occupied.end(), false)));
         }
         
         // Check if there is any time left after the meeting ends
-        if (tr.end() > occupied.end()) {
+        if (tr.end() >= occupied.end()) {
           aux.add(new Pair(option.optionals, TimeRange.fromStartEnd(occupied.end(), tr.end(), false)));
         }
       } else {
@@ -263,6 +284,14 @@ public final class FindMeetingQuery {
     for (TimeRange timeRange : src) {
       dest.add(timeRange);
     }
+  }
+
+  private void printList(ArrayList<Pair> list) {
+    System.out.println("Init list");
+    for (Pair pair : list) {
+      System.out.println("Num: " + pair.optionals + " TR: " + pair.timeRange.toString());
+    }
+    System.out.println("End list");
   }
 
 }
