@@ -365,5 +365,79 @@ public final class FindMeetingQueryTest {
 
     Assert.assertEquals(expected, actual);
   }
+
+  @Test
+  public void justAvailableOptionals() {
+    // Have two persons, both optional, with several gaps among their schedules
+    // Should return all the their gaps
+    // If there are no mandatory employees, consider optional employees as mandatory
+    //
+    // Events  : |--A--|  |-A-|
+    //                       |B|   |-B-|
+    // Day     : |---------------------|
+    // Options :       |1-|    |-2-|
+
+    Collection<Event> events = Arrays.asList(
+        new Event("Event 1", TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TIME_0830AM, false),
+            Arrays.asList(PERSON_A)),
+        new Event("Event 2", TimeRange.fromStartDuration(TIME_0900AM, DURATION_90_MINUTES),
+            Arrays.asList(PERSON_A)),
+        new Event("Event 3", TimeRange.fromStartDuration(TIME_1000AM, DURATION_60_MINUTES),
+            Arrays.asList(PERSON_B)),
+        new Event("Event 4", TimeRange.fromStartEnd(TimeRange.getTimeInMinutes(16, 00), TimeRange.END_OF_DAY, true),
+            Arrays.asList(PERSON_B)));
+
+    MeetingRequest request = new MeetingRequest(new ArrayList<String>(), DURATION_30_MINUTES);
+
+    request.addOptionalAttendee(PERSON_A);
+    request.addOptionalAttendee(PERSON_B);
+
+    Collection<TimeRange> actual = query.query(events, request);
+    Collection<TimeRange> expected =
+        Arrays.asList(TimeRange.fromStartDuration(TIME_0830AM, DURATION_30_MINUTES),
+            TimeRange.fromStartEnd(TIME_1100AM, TimeRange.getTimeInMinutes(16, 00), false));
+
+    Assert.assertEquals(expected, actual);
+  }
+
+  @Test
+  public void onlyOptionalsNotAvailable() {
+    // Have two persons, both optional, with no gaps in their schedules
+    // Should return all day since the optional attendees cannot be accommodated 
+    // and the mandatory ones (all zero of them) are free all day.
+    //
+    // Events  : |---------A-----------|
+    //           |---------B-----------|
+    // Day     : |---------------------|
+    // Options : |---------------------|
+
+    Collection<Event> events = Arrays.asList(
+        new Event("Event 1", TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TimeRange.END_OF_DAY, true),
+            Arrays.asList(PERSON_A)),
+        new Event("Event 4", TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TimeRange.END_OF_DAY, true),
+            Arrays.asList(PERSON_B)));
+
+    MeetingRequest request = new MeetingRequest(new ArrayList<String>(), DURATION_30_MINUTES);
+
+    request.addOptionalAttendee(PERSON_A);
+    request.addOptionalAttendee(PERSON_B);
+
+    Collection<TimeRange> actual = query.query(events, request);
+    Collection<TimeRange> expected =
+        Arrays.asList(TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TimeRange.END_OF_DAY, true));
+
+    Assert.assertEquals(expected, actual);
+  }
+
+  // Extra Armando tests
+  // One for meetings not in order
+  // Have two persons, both optional, with several gaps among their schedules
+    // Should return all the gaps they have in common
+    //
+    // Events  :       |--A--|     |-A-|
+    //           |B|       |-B-|
+    // Day     : |---------------------|
+    // Options :    |1|        |-2-|
+    
 }
 
