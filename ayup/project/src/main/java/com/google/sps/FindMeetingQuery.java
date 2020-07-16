@@ -45,7 +45,7 @@ public final class FindMeetingQuery {
      * If the are no events or if there are no conflicts, that means the whole day is free.
      * We return a time range for the whole day.
      */
-    if (events.isEmpty() || conflicts.isEmpty()) {
+    if (events.isEmpty()) {
       resultTimeRanges.add(TimeRange.WHOLE_DAY);
       return resultTimeRanges;
     } 
