@@ -57,12 +57,11 @@ public class DataServlet extends HttpServlet {
     .build();
 
       FirebaseApp.initializeApp(options);
-      System.out.println("HIIII");
 
       // [START fs_initialize_project_id]
       FirestoreOptions firestoreOptions =
       FirestoreOptions.getDefaultInstance().toBuilder()
-          .setProjectId("quizy-step-2020")
+          .setProjectId("quizzy-step-2020")
           .setCredentials(GoogleCredentials.getApplicationDefault())
           .build();
       Firestore db = firestoreOptions.getService();
@@ -73,17 +72,6 @@ public class DataServlet extends HttpServlet {
       ie.printStackTrace();
       System.out.println("FAIL");
     }
-
-    
-    
-    
-    // FirebaseOptions options = new FirebaseOptions.Builder()
-    //     .setServiceAccount(config.getServletContext().getResourceAsStream(credential))
-    //     .setDatabaseUrl(databaseUrl)
-    //     .build();
-    // FirebaseApp.initializeApp(options);
-    // firebase = FirebaseDatabase.getInstance().getReference();
-
 
   }
 
