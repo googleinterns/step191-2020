@@ -47,20 +47,17 @@ public final class FindMeetingQuery {
     List<Event> eventsList = new ArrayList<>(events);
     eventsList.sort(Event.COMPARE_START_TIME);
     HashMap<String, List<TimeRange>> eventsMap = assignEvents(eventsList);
-    printEventsMap(eventsMap);
     
     /*
     ToDo: Iterate through mandatory attendees of request and make list of time ranges with availability
-    of all the attendees
+    of all the attendees    */
 
     HashSet<String> mandatoryAttendees = new HashSet<String>(request.getAttendees());
-    for (String person : mandatoryAttendees) {
-         checkAvailability(person);
-    }
-    */
-   
+    List<TimeRange> timeAvailable = checkAvailability(mandatoryAttendees, eventsMap, request);
+   // printTimeList(timeAvailable);
 
-    throw new UnsupportedOperationException("TODO: Implement this method.");
+    return timeAvailable;
+
   }
   /*
   * Function that assigns the occupied times of each person in a hashmap. This is done by iterating through each
@@ -96,15 +93,103 @@ public final class FindMeetingQuery {
       return eventsMap;
   }
 
- /* Helper function this will be deleted*/
-  public void printEventsMap(HashMap<String, List<TimeRange>> eventsMap){
-      for (String i : eventsMap.keySet()) {
-       log.info(i);
-       List<TimeRange> personEvents =  eventsMap.get(i);
-       for(TimeRange range : personEvents){
-           log.info(range.toString());
+  /*
+  * This function will merge all the occupied times of the mandatory attendees
+  * into a single list of TimeRanges, that way I can create a lit of available 
+  * times that they all have in common.
+  *
+  * 
+  * Runtime: O(p * m) where p is the number of attendees and m the number of events
+  * 
+  * @param mandatoryAttendees   A list of the mandatory attendes
+  * @param eventsMap            A map with the keys as the name of the attendees 
+  *                             and the values as a list with the occupied time ranges
+  *
+  * returns  a list of the available times of the request
+  */
+  public List<TimeRange> checkAvailability(HashSet<String> mandatoryAttendees, HashMap<String, List<TimeRange>> eventsMap,
+  MeetingRequest request){
+    
+    LinkedList<TimeRange> timeOccupied = new LinkedList<>();
+    for (String person : mandatoryAttendees) {
+        List<TimeRange> schedule = eventsMap.get(person);
+        if(schedule == null) {
+            continue;
+        }
+        for(TimeRange range : schedule){
+          timeOccupied.add(range);
        }
     }
+    if(timeOccupied.size() == 0) {
+        return Arrays.asList(TimeRange.WHOLE_DAY);
+    }
+
+    timeOccupied.sort(TimeRange.ORDER_BY_START);
+    mergeTimes(timeOccupied);
+
+    List<TimeRange> timeAvailable = new ArrayList<>();
+    TimeRange currentEvent = null;
+    for (ListIterator<TimeRange> listIterator = timeOccupied.listIterator(); ;) {
+        if(!listIterator.hasPrevious()) {
+            currentEvent = listIterator.next();
+            TimeRange newTime = TimeRange.fromStartEnd(TimeRange.START_OF_DAY, currentEvent.start(), false); 
+            if(request.getDuration() <= newTime.duration()) {
+                timeAvailable.add( newTime );
+            }
+        }
+
+        if(!listIterator.hasNext()) {
+            TimeRange newTime = TimeRange.fromStartEnd(currentEvent.end(), TimeRange.END_OF_DAY, true); 
+            if(request.getDuration() <= newTime.duration()) {
+                timeAvailable.add( newTime );
+            }
+            break;
+        } else {
+             int endOfCurrentEvent = currentEvent.end();
+             currentEvent = listIterator.next();
+             TimeRange newTime = TimeRange.fromStartEnd(endOfCurrentEvent, currentEvent.start(), false); 
+            if(request.getDuration() <= newTime.duration()) {
+                timeAvailable.add( newTime );
+            }
+        }
+    }
+
+    return timeAvailable;
   }
+
+  /*
+  * This function will merge all the occupied times of the mandatory attendees
+  * into a single list of TimeRanges, that way I can create a lit of available 
+  * times that they all have in common.
+  *
+  * 
+  * Runtime: O(p * m) where p is the number of attendees and m the number of events
+  * 
+  * @param mandatoryAttendees   A list of the mandatory attendes
+  * @param eventsMap            A map with the keys as the name of the attendees 
+  *                             and the values as a list with the occupied time ranges
+  *
+  * returns  a list of the available times of the request
+  */
+  public void mergeTimes(List<TimeRange> timeOccupied){
+      List<TimeRange> timeAvailable = new ArrayList<>();
+      if(1<timeOccupied.size()) {
+        for(int i = 0, j = 1; j < timeOccupied.size(); i++, j++){
+            TimeRange first = timeOccupied.get(i);
+            TimeRange second = timeOccupied.get(j);
+            if(first.contains(second)){
+                timeOccupied.remove(j);
+                i--;
+                j--;
+            } else if(second.start() <= first.end()) {
+                TimeRange combined = TimeRange.fromStartEnd(first.start(), second.end(), false);
+                timeOccupied.set(i, combined);
+                timeOccupied.remove(j);
+            }
+        }
+      }
+
+  }
+
 }
 
