@@ -14,7 +14,14 @@
 
 package com.google.sps.servlets;
 
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.database.DatabaseReference;
+
+import com.google.auth.oauth2.GoogleCredentials;
+
 import java.io.IOException;
+
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +30,34 @@ import javax.servlet.http.HttpServletResponse;
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
+
+  private DatabaseReference firebase;
+
+  @Override
+  public void init() {
+
+    try {
+      FirebaseOptions options = new FirebaseOptions.Builder()
+    .setCredentials(GoogleCredentials.getApplicationDefault())
+    .setDatabaseUrl("https://<DATABASE_NAME>.firebaseio.com/")
+    .build();
+
+      FirebaseApp.initializeApp(options);
+      System.out.println("HIIII");
+    } catch(IOException ie) {
+      ie.printStackTrace();
+    }
+    
+    
+    // FirebaseOptions options = new FirebaseOptions.Builder()
+    //     .setServiceAccount(config.getServletContext().getResourceAsStream(credential))
+    //     .setDatabaseUrl(databaseUrl)
+    //     .build();
+    // FirebaseApp.initializeApp(options);
+    // firebase = FirebaseDatabase.getInstance().getReference();
+
+
+  }
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
