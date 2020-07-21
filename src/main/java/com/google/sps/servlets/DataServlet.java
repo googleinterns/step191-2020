@@ -20,7 +20,6 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.WriteResult;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DataSnapshot;
@@ -37,7 +36,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
@@ -69,14 +67,14 @@ public class DataServlet extends HttpServlet {
       final FirebaseDatabase database = FirebaseDatabase.getInstance();
       
       // Reference to the "counter" object
-      realtimeDb = database.getReference("/users-counter");
+      realtimeDb = database.getReference("/users-counter/counter");
 
-      realtimeDb.child("counter").addValueEventListener(new ValueEventListener() {
+      // Add a listener to the counter, executed when counter is changed
+      realtimeDb.addValueEventListener(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-          System.out.println("Event listener triggered");
-          Counter changedCounter = dataSnapshot.getValue(Counter.class);
-          System.out.println("The updated value in EL is: " + changedCounter.value);
+          counter = dataSnapshot.getValue(Counter.class);
+          System.out.println("Listener executed " + counter.value);
         }
       
         @Override
@@ -85,29 +83,6 @@ public class DataServlet extends HttpServlet {
         }
       });
 
-      realtimeDb.addChildEventListener(new ChildEventListener() {
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
-          System.out.println("Child added triggered");
-          counter = dataSnapshot.getValue(Counter.class);
-        }
-      
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
-          System.out.println("Child listener triggered");
-          counter = dataSnapshot.getValue(Counter.class);
-          System.out.println("The updated value is: " + counter.value);
-        }
-      
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {}
-      
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String prevChildKey) {}
-      
-        @Override
-        public void onCancelled(DatabaseError databaseError) {}
-      });
 
       // Initialization of Firestore database
 
@@ -134,15 +109,26 @@ public class DataServlet extends HttpServlet {
 
     // Writing to Realtime DB
 
-    // Add childs to "users" object
-    // Get counter
-
-    //counter.value++;
+    // Creating a tempCounter just to show that counter is not updated locally, but in the DB
     Counter tempCounter = new Counter(counter.value + 1);
     response.getWriter().println(tempCounter.value);
-    System.out.println("At the moment of posting counter: " + tempCounter.value);
-    //realtimeDb.child("counter").updateChildrenAsync(tempCounter);
-    realtimeDb.child("counter").setValueAsync(tempCounter);
+
+    // Update counter asynchronously in Realtime DB with no callback
+    realtimeDb.setValueAsync(tempCounter);
+
+    // Set value and attach a callback for when it is ready, may not work because of AppEngine thread management?
+    realtimeDb.setValue(tempCounter, new DatabaseReference.CompletionListener() {
+      @Override
+      public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+        if (databaseError != null) {
+          System.out.println("Data could not be saved " + databaseError.getMessage());
+        } else {
+          System.out.println("Data saved successfully. " + counter.value);
+        }
+      }
+    }
+    );
+
 
     // Writing to Firestore
 
@@ -156,11 +142,11 @@ public class DataServlet extends HttpServlet {
         data.put("born", 1815);
 
     // Asynchronously write data
-    ApiFuture<WriteResult> result = docRef.set(data);
+    ApiFuture<WriteResult> resultFirebase = docRef.set(data);
 
     // result.get() blocks on response
     try {
-      System.out.println("Update time : " + result.get().getUpdateTime());
+      System.out.println("Update time : " + resultFirebase.get().getUpdateTime());
     } catch(Exception e) {
       e.printStackTrace();
     }
