@@ -20,10 +20,15 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.WriteResult;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.sps.data.Counter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +46,9 @@ public class DataServlet extends HttpServlet {
 
   // Reference to Realtime database
   private DatabaseReference realtimeDb;
+
+  // Counter that will be updated 
+  Counter counter = new Counter();
 
   @Override
   public void init() {
@@ -60,10 +68,41 @@ public class DataServlet extends HttpServlet {
       // Reference to the whole Realtime DB
       final FirebaseDatabase database = FirebaseDatabase.getInstance();
       
-      // Reference to the "users" object
-      realtimeDb = database.getReference("/users");
+      // Reference to the "counter" object
+      realtimeDb = database.getReference("/users-counter");
 
+      realtimeDb.addValueEventListener(new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+          Counter changedCounter = dataSnapshot.getValue(Counter.class);
+          System.out.println("Listener detected change: " + changedCounter.value);
+        }
       
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+          System.out.println("The read failed: " + databaseError.getCode());
+        }
+      });
+
+      realtimeDb.addChildEventListener(new ChildEventListener() {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {}
+      
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
+          counter = dataSnapshot.getValue(Counter.class);
+          System.out.println("The updated value is: " + counter.value);
+        }
+      
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {}
+      
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String prevChildKey) {}
+      
+        @Override
+        public void onCancelled(DatabaseError databaseError) {}
+      });
 
       // Initialization of Firestore database
 
@@ -91,9 +130,14 @@ public class DataServlet extends HttpServlet {
     // Writing to Realtime DB
 
     // Add childs to "users" object
-    realtimeDb.child("alanisawesome").setValueAsync("Alan Turing");
-    realtimeDb.child("greacehop").setValueAsync("Grace Hopper");
+    // Get counter
 
+    counter.value++;
+    System.out.println(counter.value);
+    realtimeDb.child("counter").setValueAsync(counter);
+
+
+    
     // Writing to Firestore
 
     // Get a reference to document alovelace
