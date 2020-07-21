@@ -15,35 +15,18 @@
 package com.google.sps.servlets;
 
 import com.google.api.core.ApiFuture;
-
 import com.google.auth.oauth2.GoogleCredentials;
-
 import com.google.cloud.firestore.DocumentReference;
-
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.MutableData;
-import com.google.firebase.database.Transaction;
-
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
-
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
-
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import java.io.IOException;
-
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -53,40 +36,49 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
-  private Firestore db;
-  private DatabaseReference rtDb;
+  // Reference to Firestore database
+  private Firestore firestoreDb;
+
+  // Reference to Realtime database
+  private DatabaseReference realtimeDb;
 
   @Override
   public void init() {
 
     try {
+      // Initialization of reference to Realtime database
+
+      // Building options, include credentials and which DB to use
       FirebaseOptions options = new FirebaseOptions.Builder()
           .setCredentials(GoogleCredentials.getApplicationDefault())
           .setDatabaseUrl("https://quizzy-step-2020.firebaseio.com/")
           .build();
 
+      // Initialize DB with options
       FirebaseApp.initializeApp(options);
 
+      // Reference to the whole Realtime DB
       final FirebaseDatabase database = FirebaseDatabase.getInstance();
-      rtDb = database.getReference("/users");
+      
+      // Reference to the "users" object
+      realtimeDb = database.getReference("/users");
 
       
 
-      // [START fs_initialize_project_id]
+      // Initialization of Firestore database
+
+      // Building options, include projectID, access credentials
       FirestoreOptions firestoreOptions =
       FirestoreOptions.getDefaultInstance().toBuilder()
           .setProjectId("quizzy-step-2020")
           .setCredentials(GoogleCredentials.getApplicationDefault())
           .build();
-      Firestore db = firestoreOptions.getService();
-      // [END fs_initialize_project_id]
-      this.db = db;
 
-      
+      // Get database and store the reference in firestoreDb variable
+      firestoreDb = firestoreOptions.getService();
 
     } catch(IOException ie) {
       ie.printStackTrace();
-      System.out.println("FAIL");
     }
 
   }
@@ -94,30 +86,35 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("text/html;");
-    response.getWriter().println("<h1>Hello world!</h1>");
+    response.getWriter().println("<h1>Writting to the DBs</h1>");
 
-    DocumentReference docRef = db.collection("messages").document("alovelace");
+    // Writing to Realtime DB
+
+    // Add childs to "users" object
+    realtimeDb.child("alanisawesome").setValueAsync("Alan Turing");
+    realtimeDb.child("greacehop").setValueAsync("Grace Hopper");
+
+    // Writing to Firestore
+
+    // Get a reference to document alovelace
+    DocumentReference docRef = firestoreDb.collection("messages").document("alovelace");
+
+    // Prepare data to be inserted
     Map<String, Object> data = new HashMap<>();
         data.put("first", "Ada");
         data.put("last", "Lovelace");
         data.put("born", 1815);
 
-    //asynchronously write data
+    // Asynchronously write data
     ApiFuture<WriteResult> result = docRef.set(data);
-    // ...
+
     // result.get() blocks on response
-
-    
-
-
     try {
       System.out.println("Update time : " + result.get().getUpdateTime());
     } catch(Exception e) {
       e.printStackTrace();
     }
     
-    rtDb.child("alanisawesome").setValueAsync("Alan Turing");
-    rtDb.child("greacehop").setValueAsync("Grace Hopper");
-
   }
+
 }
