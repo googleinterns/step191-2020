@@ -50,7 +50,7 @@ function isUserSignedIn() {
 }
 
 // Saves a new message to your Cloud Firestore database.
-async function saveMessage() {
+async function increaseCounter() {
 
     firebase.firestore().collection('counter').get().then(function(querySnapshot) {
         if(querySnapshot.size == 0){
@@ -70,7 +70,7 @@ async function saveMessage() {
 }
 
 // Loads chat messages history and listens for upcoming ones.
-function loadMessages() {
+function loadCounter() {
 
  // Create the query to load the last 12 messages and listen for new ones.
   var queryCounter = firebase.firestore().collection('counter').limit(1);
@@ -98,7 +98,7 @@ function onCounterFormSubmit(e) {
   e.preventDefault();
   // Check that the user entered a message and is signed in.
   if (checkSignedInWithMessage()) {
-    saveMessage();
+    increaseCounter();
   }
 }
 
@@ -194,4 +194,4 @@ initFirebaseAuth();
 
 
 // We load currently existing chat messages and listen to new ones.
-loadMessages();
+loadCounter();
