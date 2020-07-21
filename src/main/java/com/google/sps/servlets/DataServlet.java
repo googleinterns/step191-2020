@@ -20,6 +20,14 @@ import com.google.auth.oauth2.GoogleCredentials;
 
 import com.google.cloud.firestore.DocumentReference;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
+
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
@@ -46,17 +54,23 @@ import javax.servlet.http.HttpServletResponse;
 public class DataServlet extends HttpServlet {
 
   private Firestore db;
+  private DatabaseReference rtDb;
 
   @Override
   public void init() {
 
     try {
       FirebaseOptions options = new FirebaseOptions.Builder()
-    .setCredentials(GoogleCredentials.getApplicationDefault())
-    .setDatabaseUrl("https://quizzy-step-2020.firebaseio.com/")
-    .build();
+          .setCredentials(GoogleCredentials.getApplicationDefault())
+          .setDatabaseUrl("https://quizzy-step-2020.firebaseio.com/")
+          .build();
 
       FirebaseApp.initializeApp(options);
+
+      final FirebaseDatabase database = FirebaseDatabase.getInstance();
+      rtDb = database.getReference("/users");
+
+      
 
       // [START fs_initialize_project_id]
       FirestoreOptions firestoreOptions =
@@ -67,6 +81,8 @@ public class DataServlet extends HttpServlet {
       Firestore db = firestoreOptions.getService();
       // [END fs_initialize_project_id]
       this.db = db;
+
+      
 
     } catch(IOException ie) {
       ie.printStackTrace();
@@ -90,12 +106,18 @@ public class DataServlet extends HttpServlet {
     ApiFuture<WriteResult> result = docRef.set(data);
     // ...
     // result.get() blocks on response
+
+    
+
+
     try {
       System.out.println("Update time : " + result.get().getUpdateTime());
     } catch(Exception e) {
       e.printStackTrace();
     }
     
+    rtDb.child("alanisawesome").setValueAsync("Alan Turing");
+    rtDb.child("greacehop").setValueAsync("Grace Hopper");
 
   }
 }
