@@ -48,7 +48,7 @@ public class DataServlet extends HttpServlet {
   private DatabaseReference realtimeDb;
 
   // Counter that will be updated 
-  Counter counter = new Counter();
+  Counter counter = new Counter(0);
 
   @Override
   public void init() {
@@ -74,6 +74,7 @@ public class DataServlet extends HttpServlet {
       realtimeDb.addValueEventListener(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+          System.out.println("Value Event Listener triggered");
           Counter changedCounter = dataSnapshot.getValue(Counter.class);
           System.out.println("Listener detected change: " + changedCounter.value);
         }
@@ -90,8 +91,9 @@ public class DataServlet extends HttpServlet {
       
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
-          counter = dataSnapshot.getValue(Counter.class);
-          System.out.println("The updated value is: " + counter.value);
+          System.out.println("Child listener triggered");
+          Counter changedCounter = dataSnapshot.getValue(Counter.class);
+          System.out.println("The updated value is: " + changedCounter.value);
         }
       
         @Override
@@ -133,11 +135,10 @@ public class DataServlet extends HttpServlet {
     // Get counter
 
     counter.value++;
-    System.out.println(counter.value);
+    response.getWriter().println(counter.value);
+    System.out.println("At the moment of posting counter: " + counter.value);
     realtimeDb.child("counter").setValueAsync(counter);
 
-
-    
     // Writing to Firestore
 
     // Get a reference to document alovelace
