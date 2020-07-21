@@ -5,10 +5,17 @@ public class Counter {
   public int value;
 
   public Counter() {
-    value = 0;
   }
 
   public Counter(int value) {
+    this.value = value;
+  }
+
+  public int getValue() {
+    return value;
+  }
+
+  public void setCounter(int value) {
     this.value = value;
   }
   

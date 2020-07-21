@@ -71,13 +71,12 @@ public class DataServlet extends HttpServlet {
       // Reference to the "counter" object
       realtimeDb = database.getReference("/users-counter");
 
-      realtimeDb.addValueEventListener(new ValueEventListener() {
+      realtimeDb.child("counter").addValueEventListener(new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-          System.out.println("Value Event Listener triggered");
+          System.out.println("Event listener triggered");
           Counter changedCounter = dataSnapshot.getValue(Counter.class);
-          System.out.println(changedCounter);
-          System.out.println("Listener detected change: " + changedCounter.value);
+          System.out.println("The updated value in EL is: " + changedCounter.value);
         }
       
         @Override
@@ -142,6 +141,7 @@ public class DataServlet extends HttpServlet {
     Counter tempCounter = new Counter(counter.value + 1);
     response.getWriter().println(tempCounter.value);
     System.out.println("At the moment of posting counter: " + tempCounter.value);
+    //realtimeDb.child("counter").updateChildrenAsync(tempCounter);
     realtimeDb.child("counter").setValueAsync(tempCounter);
 
     // Writing to Firestore
