@@ -1,11 +1,14 @@
 steps:
   - name: maven
     entrypoint: mvn
-    args: ['-f', './pamelalozano', 'package']
+    args: ['-f', './', 'package']
   - name: maven
     entrypoint: mvn
-    args: ['-f', './aroquev/portfolio', 'package']
+    args: ['-f', './starters/pamelalozano', 'package']
   - name: maven
     entrypoint: mvn
-    args: ['-f', './ayup/portfolio', 'package']
-
+    args: ['-f', './starters/aroquev/portfolio', 'package']
+  - name: maven
+    entrypoint: mvn
+    args: ['-f', './starters/ayup/portfolio', 'package']
+    
