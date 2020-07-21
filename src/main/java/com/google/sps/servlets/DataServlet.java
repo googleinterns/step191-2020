@@ -92,8 +92,8 @@ public class DataServlet extends HttpServlet {
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
           System.out.println("Child listener triggered");
-          Counter changedCounter = dataSnapshot.getValue(Counter.class);
-          System.out.println("The updated value is: " + changedCounter.value);
+          counter = dataSnapshot.getValue(Counter.class);
+          System.out.println("The updated value is: " + counter.value);
         }
       
         @Override
@@ -134,10 +134,11 @@ public class DataServlet extends HttpServlet {
     // Add childs to "users" object
     // Get counter
 
-    counter.value++;
-    response.getWriter().println(counter.value);
-    System.out.println("At the moment of posting counter: " + counter.value);
-    realtimeDb.child("counter").setValueAsync(counter);
+    //counter.value++;
+    Counter tempCounter = new Counter(counter.value + 1);
+    response.getWriter().println(tempCounter.value);
+    System.out.println("At the moment of posting counter: " + tempCounter.value);
+    realtimeDb.child("counter").setValueAsync(tempCounter);
 
     // Writing to Firestore
 
