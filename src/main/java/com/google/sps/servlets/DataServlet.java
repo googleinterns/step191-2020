@@ -76,6 +76,7 @@ public class DataServlet extends HttpServlet {
         public void onDataChange(DataSnapshot dataSnapshot) {
           System.out.println("Value Event Listener triggered");
           Counter changedCounter = dataSnapshot.getValue(Counter.class);
+          System.out.println(changedCounter);
           System.out.println("Listener detected change: " + changedCounter.value);
         }
       
@@ -87,7 +88,10 @@ public class DataServlet extends HttpServlet {
 
       realtimeDb.addChildEventListener(new ChildEventListener() {
         @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {}
+        public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
+          System.out.println("Child added triggered");
+          counter = dataSnapshot.getValue(Counter.class);
+        }
       
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
