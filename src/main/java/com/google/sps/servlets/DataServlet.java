@@ -27,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.sps.daos.CounterDao;
 import com.google.sps.data.Counter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -45,44 +46,10 @@ public class DataServlet extends HttpServlet {
   // Reference to Realtime database
   private DatabaseReference realtimeDb;
 
-  // Counter that will be updated 
-  Counter counter = new Counter(0);
-
   @Override
   public void init() {
 
     try {
-      // Initialization of reference to Realtime database
-
-      // Building options, include credentials and which DB to use
-      FirebaseOptions options = new FirebaseOptions.Builder()
-          .setCredentials(GoogleCredentials.getApplicationDefault())
-          .setDatabaseUrl("https://quizzy-step-2020.firebaseio.com/")
-          .build();
-
-      // Initialize DB with options
-      FirebaseApp.initializeApp(options);
-
-      // Reference to the whole Realtime DB
-      final FirebaseDatabase database = FirebaseDatabase.getInstance();
-      
-      // Reference to the "counter" object
-      realtimeDb = database.getReference("/users-counter/counter");
-
-      // Add a listener to the counter, executed when counter is changed
-      realtimeDb.addValueEventListener(new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-          counter = dataSnapshot.getValue(Counter.class);
-          System.out.println("Listener executed " + counter.value);
-        }
-      
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-          System.out.println("The read failed: " + databaseError.getCode());
-        }
-      });
-
 
       // Initialization of Firestore database
 
@@ -108,28 +75,15 @@ public class DataServlet extends HttpServlet {
     response.getWriter().println("<h1>Writting to the DBs</h1>");
 
     // Writing to Realtime DB
+    CounterDao counterDao = (CounterDao) this.getServletContext().getAttribute("dao");
 
-    // Creating a tempCounter just to show that counter is not updated locally, but in the DB
-    Counter tempCounter = new Counter(counter.value + 1);
-    response.getWriter().println(tempCounter.value);
-
-    // Set in DB with one of the following two options:
-
-    // Update counter asynchronously in Realtime DB with no callback
-    //realtimeDb.setValueAsync(tempCounter);
-
-    // Set value and attach a callback for when it is ready, may not work because of AppEngine thread management?
-    realtimeDb.setValue(tempCounter, new DatabaseReference.CompletionListener() {
-      @Override
-      public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-        if (databaseError != null) {
-          System.out.println("Data could not be saved " + databaseError.getMessage());
-        } else {
-          System.out.println("Data saved successfully. " + counter.value);
-        }
-      }
-    }
-    );
+    Counter counter = counterDao.getCounter();
+    response.getWriter().println("<p>The counter right now is: " + counter.getValue() + "</p>");
+    response.getWriter().println("<p>Reloading the page will increase it by one</p>");
+    
+    Counter updatedCounter = new Counter(counter.getValue() + 1);
+    counterDao.updateCounter(updatedCounter);
+    
 
 
     // Writing to Firestore
