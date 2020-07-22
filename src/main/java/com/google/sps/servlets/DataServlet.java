@@ -113,8 +113,10 @@ public class DataServlet extends HttpServlet {
     Counter tempCounter = new Counter(counter.value + 1);
     response.getWriter().println(tempCounter.value);
 
+    // Set in DB with one of the following two options:
+
     // Update counter asynchronously in Realtime DB with no callback
-    realtimeDb.setValueAsync(tempCounter);
+    //realtimeDb.setValueAsync(tempCounter);
 
     // Set value and attach a callback for when it is ready, may not work because of AppEngine thread management?
     realtimeDb.setValue(tempCounter, new DatabaseReference.CompletionListener() {
