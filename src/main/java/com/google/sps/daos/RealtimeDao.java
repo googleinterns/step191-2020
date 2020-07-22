@@ -15,7 +15,7 @@ import java.io.IOException;
 
 public class RealtimeDao implements CounterDao {
   
-  Counter counter;
+  private Counter counter;
 
   private DatabaseReference realtimeDb;
 
@@ -41,7 +41,7 @@ public class RealtimeDao implements CounterDao {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
           counter = dataSnapshot.getValue(Counter.class);
-          System.out.println("Listener executed " + counter.value);
+          System.out.println("Listener executed " + counter.getValue());
         }
       
         @Override

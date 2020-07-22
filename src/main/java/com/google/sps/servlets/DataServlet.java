@@ -43,8 +43,6 @@ public class DataServlet extends HttpServlet {
   // Reference to Firestore database
   private Firestore firestoreDb;
 
-  // Reference to Realtime database
-  private DatabaseReference realtimeDb;
 
   @Override
   public void init() {
