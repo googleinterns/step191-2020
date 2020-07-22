@@ -15,6 +15,20 @@
  */
 'use strict';
 
+  // Your web app's Firebase configuration
+var firebaseConfig = {
+    apiKey: "AIzaSyCoNJFqs76_GbI1i1T7hhPmyxqv1Oc2hU4",
+    authDomain: "quizzy-step-2020.firebaseapp.com",
+    databaseURL: "https://quizzy-step-2020.firebaseio.com",
+    projectId: "quizzy-step-2020",
+    storageBucket: "quizzy-step-2020.appspot.com",
+    messagingSenderId: "1029940211712",
+    appId: "1:1029940211712:web:8e31fe1fcb8423d4a728e5",
+    measurementId: "G-M62T74PK0V"
+};
+  
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
 function signIn() {
   // Sign into Firebase using popup auth & Google as the identity provider.
@@ -63,7 +77,7 @@ function increaseCounter() {
                     console.error('Error writing new counter to database', error);
                 });
         }
-        
+
         querySnapshot.forEach(function(count) {
                 firebase.firestore().collection("counter").doc(count.id).update({
                     number: count.data().number + 1 
