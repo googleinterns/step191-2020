@@ -20,15 +20,7 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.WriteResult;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
 import com.google.sps.daos.CounterDao;
-import com.google.sps.data.Counter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +34,6 @@ public class DataServlet extends HttpServlet {
 
   // Reference to Firestore database
   private Firestore firestoreDb;
-
 
   @Override
   public void init() {
@@ -75,15 +66,11 @@ public class DataServlet extends HttpServlet {
     // Writing to Realtime DB
     CounterDao counterDao = (CounterDao) this.getServletContext().getAttribute("dao");
 
-    Counter counter = counterDao.getCounter();
-    response.getWriter().println("<p>The counter right now is: " + counter.getValue() + "</p>");
-    response.getWriter().println("<p>Reloading the page will increase it by one</p>");
+    response.getWriter().println("<p>Reloading the page will increase the counter by one</p>");
     
-    Counter updatedCounter = new Counter(counter.getValue() + 1);
-    counterDao.updateCounter(updatedCounter);
+    // Increase counter by one
+    counterDao.increaseCounter();
     
-
-
     // Writing to Firestore
 
     // Get a reference to document alovelace

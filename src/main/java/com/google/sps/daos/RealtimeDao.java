@@ -1,46 +1,19 @@
 package com.google.sps.daos;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.sps.data.Counter;
-
-import java.io.IOException;
 
 public class RealtimeDao implements CounterDao {
 
-  Counter counter = null;
-  
   private DatabaseReference counterDBReference;
 
   public RealtimeDao(FirebaseDatabase database) {
-
-    counterDBReference = database.getReference("/users-counter/counter");
-    
-  }
-
-  @Override
-  public Counter getCounter() {
-    // Query the counter value from the DB
-    counterDBReference.addListenerForSingleValueEvent(new ValueEventListener() {
-      @Override
-      public void onDataChange(DataSnapshot dataSnapshot) {
-        System.out.println("First");
-        counter = dataSnapshot.getValue(Counter.class);
-      }
-    
-      @Override
-      public void onCancelled(DatabaseError databaseError) {
-        // ...
-      }
-    });
-    System.out.println("Second");
-    return counter;
+    counterDBReference = database.getReference("/users-counter/counter/value");
   }
 
   @Override
@@ -53,4 +26,27 @@ public class RealtimeDao implements CounterDao {
     counterDBReference.setValueAsync(null);
   }
 
+  @Override
+  public void increaseCounter() {
+    counterDBReference.runTransaction(new Transaction.Handler() {
+      @Override
+      public Transaction.Result doTransaction(MutableData mutableData) {
+        Integer currentValue = mutableData.getValue(Integer.class);
+        if (currentValue == null) {
+          mutableData.setValue(1);
+        } else {
+          mutableData.setValue(currentValue + 1);
+        }
+    
+        return Transaction.success(mutableData);
+      }
+    
+      @Override
+      public void onComplete(
+          DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+        System.out.println("Transaction completed");
+      }
+    });
+  }
+  
 }
