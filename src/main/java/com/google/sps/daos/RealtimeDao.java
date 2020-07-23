@@ -1,7 +1,5 @@
 package com.google.sps.daos;
 
-import java.io.IOException;
-
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -11,64 +9,48 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.sps.data.Counter;
+
 import java.io.IOException;
 
 public class RealtimeDao implements CounterDao {
+
+  Counter counter = null;
   
-  private Counter counter;
+  private DatabaseReference counterDBReference;
 
-  private DatabaseReference realtimeDb;
+  public RealtimeDao(FirebaseDatabase database) {
 
-  public RealtimeDao() {
-
-    try {
-      FirebaseOptions options = new FirebaseOptions.Builder()
-          .setCredentials(GoogleCredentials.getApplicationDefault())
-          .setDatabaseUrl("https://quizzy-step-2020.firebaseio.com/")
-          .build();
-
-      // Initialize DB with options
-      FirebaseApp.initializeApp(options);
-
-      // Reference to the whole Realtime DB
-      final FirebaseDatabase database = FirebaseDatabase.getInstance();
-
-      // Reference to the "counter" object
-      realtimeDb = database.getReference("/users-counter/counter");
-
-      // Add a listener to the counter, executed when counter is changed
-      realtimeDb.addValueEventListener(new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-          counter = dataSnapshot.getValue(Counter.class);
-          System.out.println("Listener executed " + counter.getValue());
-        }
-      
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-          System.out.println("The read failed: " + databaseError.getCode());
-        }
-      });
-
-    } catch(IOException ie) {
-      ie.printStackTrace();
-    }
+    counterDBReference = database.getReference("/users-counter/counter");
     
   }
 
   @Override
   public Counter getCounter() {
+    // Query the counter value from the DB
+    counterDBReference.addListenerForSingleValueEvent(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        System.out.println("First");
+        counter = dataSnapshot.getValue(Counter.class);
+      }
+    
+      @Override
+      public void onCancelled(DatabaseError databaseError) {
+        // ...
+      }
+    });
+    System.out.println("Second");
     return counter;
   }
 
   @Override
   public void updateCounter(Counter counter) {
-    realtimeDb.setValueAsync(counter);
+    counterDBReference.setValueAsync(counter);
   }
 
   @Override
   public void deleteCounter() {
-    realtimeDb.setValueAsync(null);
+    counterDBReference.setValueAsync(null);
   }
 
 }
