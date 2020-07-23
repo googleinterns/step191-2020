@@ -69,7 +69,6 @@ public class LogInServlet extends HttpServlet {
 		response.setCharacterEncoding("UTF-8");
     
     User user = new User(username, email, uid);
-    System.out.println("Username = " + user.getUsername() + " User email = " + user.getEmail() + " User id = " + user.getUid());
 	}	
 
 }
