@@ -63,10 +63,12 @@ public class DatabaseDao implements CounterDao {
     counterDBReference.addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
-        // ...
         Map<String, Object> data = new HashMap<>();
         data.put("value", dataSnapshot.getValue(Integer.class));
         collectionReference.add(data);
+        
+        // Reset counter in Firebase Realtime
+        counterDBReference.setValueAsync(null);
       }
     
       @Override
