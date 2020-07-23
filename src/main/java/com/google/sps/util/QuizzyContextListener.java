@@ -39,9 +39,8 @@ public class QuizzyContextListener implements ServletContextListener {
   }
 
   private FirebaseDatabase initializeRealtimeFirebase() {
-
     FirebaseDatabase database = null;
-
+    
     try {
       FirebaseOptions options = new FirebaseOptions.Builder()
           .setCredentials(GoogleCredentials.getApplicationDefault())
@@ -53,14 +52,10 @@ public class QuizzyContextListener implements ServletContextListener {
 
       // Reference to the whole Realtime DB
       database = FirebaseDatabase.getInstance();
-
-      
-
     } catch(IOException ie) {
       ie.printStackTrace();
     }
-
     return database;
-    
   }
+
 }
