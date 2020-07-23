@@ -49,25 +49,17 @@ public class LogInServlet extends HttpServlet {
   
 
   private FirebaseOptions options;
-  @Override
-  public void init() {
 
-  }
-
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    
-  }
   @Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) 
-			throws  IOException {
+	  throws  IOException {
+    
+    // Retrieve the parameters from the user that was logged in.
 		String username = request.getParameter("username");
 		String email = request.getParameter("email");
 		String uid = request.getParameter("uid");
-		
-		response.setContentType("text/html");
-		response.setCharacterEncoding("UTF-8");
-    
+
+    //Creates a new User class with the parameters retrieved
     User user = new User(username, email, uid);
 	}	
 
