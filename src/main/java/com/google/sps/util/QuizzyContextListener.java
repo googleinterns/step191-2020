@@ -3,11 +3,7 @@ package com.google.sps.util;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 
@@ -40,7 +36,7 @@ public class QuizzyContextListener implements ServletContextListener {
 
   private FirebaseDatabase initializeRealtimeFirebase() {
     FirebaseDatabase database = null;
-    
+
     try {
       FirebaseOptions options = new FirebaseOptions.Builder()
           .setCredentials(GoogleCredentials.getApplicationDefault())
