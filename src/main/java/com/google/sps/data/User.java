@@ -2,6 +2,8 @@ package com.google.sps.data;
 
 public class User {
     
+  public static final User null_user = new User();
+
   private String username;
   private String email;
   private String uid;
