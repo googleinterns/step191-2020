@@ -8,4 +8,6 @@ public interface CounterDao {
   public void updateCounter(Counter counter);
 
   public void deleteCounter();
+
+  public void storeCounter();
 }
