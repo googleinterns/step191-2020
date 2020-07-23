@@ -142,6 +142,15 @@ function authStateObserver(user) {
     // Hide sign-in button.
     signInButtonElement.setAttribute('hidden', 'true');
 
+    var postParams = new URLSearchParams();
+    postParams.append('username', firebase.auth().currentUser.displayName);
+    postParams.append('email', firebase.auth().currentUser.email);
+    postParams.append('uid', firebase.auth().currentUser.uid);
+    fetch("/login", {method: "POST", body: postParams}).then(() => {
+      console.log("works?");
+    })
+    console.log("works 2?");
+
   } else { // User is signed out!
     // Hide user's profile and sign-out button.
     userNameElement.setAttribute('hidden', 'true');
