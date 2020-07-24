@@ -65,62 +65,15 @@ function isUserSignedIn() {
 
 //When vote button is clicked it calls this function
 function increaseCounter() {
-
   fetch('/increase', {method: 'POST'});
-
-    // //Gets the document from firebase and updates the value to +1
-    // firebase.firestore().collection('counter').get().then(function(querySnapshot) {
-
-    //     if(querySnapshot.size == 0){
-    //         //If there is no document it adds the first one with value 1
-    //           return firebase.firestore().collection('counter').add({
-    //                 number: 1 
-    //             }).catch(function(error) {
-    //                 console.error('Error writing new counter to database', error);
-    //             });
-    //     }
-
-    //     querySnapshot.forEach(function(count) {
-    //             firebase.firestore().collection("counter").doc(count.id).update({
-    //                 number: count.data().number + 1 
-    //             });
-    //     })
-
-    // });
-
 }
 
 function loadCounter() {
+  var counterRef = firebase.database().ref('/users-counter/counter/value');
 
-  var database = firebase.database();
-
-  var counterRef = database.ref('/users-counter/counter/value');
-  console.log('Hi');
   counterRef.on('value', function(snapshot) {
-    displayCounter(snapshot.val());
-      
-    
+    displayCounter(snapshot.val());    
   });
-
-//  // Gets the document
-//   var queryCounter = firebase.firestore().collection('counter').limit(1);
-
-//   //If there is no document it displays nothing
-//   if(queryCounter == null) { return displayCounter(""); }
-
-//    queryCounter.onSnapshot(function(snapshot) {
-//     //Listens for changes in the document   
-//     snapshot.docChanges().forEach(function(change) {
-//         if (change.type === 'removed') {
-//         displayCounter("");
-//         } else {
-//          var counter = change.doc.data();
-//          displayCounter(counter.number);
-//         }
-//     });
-
-//   });
-
 }
 
 function displayCounter(number){
@@ -224,7 +177,6 @@ signInButtonElement.addEventListener('click', signIn);
 
 // initialize Firebase
 initFirebaseAuth();
-
 
 // We load currently existing votes and listen to new ones.
 loadCounter();
