@@ -26,4 +26,14 @@ public class DatabaseRoomDao implements RoomDao {
     return newRoomRef.getKey();
   }
 
+  @Override
+  public void joinRoom(String roomId, String uId) {
+    DatabaseReference roomMembersDbRef = roomsDBReference.child(roomId + "/members");
+    
+    Map<String, Object> data = new HashMap<>();
+    data.put("UID", uId);
+
+    roomMembersDbRef.push().setValueAsync(data);
+  }
+
 }

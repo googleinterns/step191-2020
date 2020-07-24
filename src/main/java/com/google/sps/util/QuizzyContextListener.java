@@ -43,6 +43,7 @@ public class QuizzyContextListener implements ServletContextListener {
     if (roomDao == null) {
       roomDao = new DatabaseRoomDao(realtimeDb);
       event.getServletContext().setAttribute("roomDao", roomDao);
+      
     }
 
   }

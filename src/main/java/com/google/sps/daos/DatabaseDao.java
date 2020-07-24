@@ -51,8 +51,7 @@ public class DatabaseDao implements CounterDao {
       }
     
       @Override
-      public void onComplete(
-          DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
+      public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot dataSnapshot) {
         System.out.println("Transaction completed");
       }
     });
