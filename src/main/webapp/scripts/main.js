@@ -30,12 +30,13 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
+var db = firebase.firestore();
+
 function signIn() {
   // Sign into Firebase using popup auth & Google as the identity provider.
   var provider = new firebase.auth.GoogleAuthProvider();
   firebase.auth().signInWithPopup(provider);
 }
-
 
 function signOut() {
   // Sign out of Firebase.
@@ -69,11 +70,9 @@ function increaseCounter() {
 }
 
 function loadCounter() {
-  var counterRef = firebase.database().ref('/users-counter/counter/value');
-
-  counterRef.on('value', function(snapshot) {
-    displayCounter(snapshot.val());    
-  });
+  db.collection("liveCounter").doc("counter").onSnapshot(function(doc) {
+        displayCounter(doc.data().value);
+    });
 }
 
 function displayCounter(number){
