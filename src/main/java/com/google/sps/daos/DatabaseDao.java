@@ -61,8 +61,7 @@ public class DatabaseDao implements CounterDao {
     try {
       snapshot = future.get();
       if (snapshot.exists()) {
-        Map<String, Object> docData = snapshot.getData();
-        firestoreDb.collection("counterHistory").add(docData);
+        firestoreDb.collection("counterHistory").add(snapshot.getData());
       } 
     } catch (InterruptedException e) {
       e.printStackTrace();
