@@ -64,4 +64,13 @@ public class UserDao {
         }
         return false;
     }
+
+    /**
+     * Delete the user that is receved
+     * @param   user    a user class
+     * @return  If the event was succesfull 
+     */
+    public void addUser(User user) {
+        this.users.add(user);
+    }
 }

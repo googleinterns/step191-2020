@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.sps.data.User;
+import com.google.sps.daos.UserDao;
 
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/login")
@@ -61,6 +62,10 @@ public class LogInServlet extends HttpServlet {
 
     //Creates a new User class with the parameters retrieved
     User user = new User(username, email, uid);
+
+    UserDao userDaoTest = new UserDao();
+    userDaoTest.addUser(user);
+    
 	}	
 
 }
