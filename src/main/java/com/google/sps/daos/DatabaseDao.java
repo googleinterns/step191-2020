@@ -2,9 +2,7 @@ package com.google.sps.daos;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
-import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
@@ -54,20 +52,19 @@ public class DatabaseDao implements CounterDao {
 
   @Override
   public void storeCounter() {
-    DocumentReference docRef = firestoreDb.collection("liveCounter").document("counter");
-    ApiFuture<DocumentSnapshot> future = docRef.get();
 
-    DocumentSnapshot snapshot;
-    try {
-      snapshot = future.get();
+    DocumentReference liveCounterReference = firestoreDb.collection("liveCounter").document("counter");
+
+    firestoreDb.runTransaction(transaction -> {
+      DocumentSnapshot snapshot = transaction.get(liveCounterReference).get();
+
       if (snapshot.exists()) {
         firestoreDb.collection("counterHistory").add(snapshot.getData());
+        transaction.update(liveCounterReference, "value", 0);
       } 
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } catch (ExecutionException e) {
-      e.printStackTrace();
-    }
+
+      return null;
+    });
   }
 
 }
