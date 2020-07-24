@@ -18,6 +18,7 @@ public class User {
       this.username = "N/A";
       this.email = "N/A";
       this.uid = "N/A";
+      
   }
 
   /**
