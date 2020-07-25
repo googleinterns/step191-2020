@@ -19,7 +19,13 @@ public class CreateRoomServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
     // Generate room key
     RoomDao dao = (RoomDao) this.getServletContext().getAttribute("roomDao");
-    dao.createNewRoom();
+    String roomId = dao.createNewRoom();
+    
+    JsonObject jsonObj = new JsonObject();
+    jsonObj.addProperty("roomId", roomId);
+    
+    String json = new Gson().toJson(jsonObj);
+    response.getWriter().println(json);
   }
 
   @Override

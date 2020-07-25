@@ -37,7 +37,7 @@ public class QuizzyContextListener implements ServletContextListener {
 
     RoomDao roomDao = (RoomDao) event.getServletContext().getAttribute("roomDao");
     if (roomDao == null) {
-      roomDao = new DatabaseRoomDao(realtimeDb);
+      roomDao = new DatabaseRoomDao(firestoreDb);
       event.getServletContext().setAttribute("roomDao", roomDao);
       
     }
