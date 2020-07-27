@@ -86,8 +86,9 @@ function authStateObserver(user) {
 
     // Hide sign-in button.
     signInButtonElement.setAttribute('hidden', 'true');
-
-    document.getElementById("user-id").value = getUserId();
+    
+    // The value for the user id on the form will be recieved directly from Firebase
+    document.getElementById("user-id").value = firebase.auth().currentUser.uid;
   } else { // User is signed out!
     // Hide user's profile and sign-out button.
     userNameElement.setAttribute('hidden', 'true');
@@ -154,7 +155,3 @@ signInButtonElement.addEventListener('click', signIn);
 
 // initialize Firebase
 initFirebaseAuth();
-
-
-// We load currently existing votes and listen to new ones.
-loadCounter();

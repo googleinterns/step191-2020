@@ -13,12 +13,11 @@
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
 
     <link rel="stylesheet" href="styles/main.css">
-
   </head>
   <body>
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
      
-  <!-- Header section containing logo -->
+  <!-- Header section containing auth buttons (Retrieved from index.html) -->
   <header class="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
     <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
       <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
@@ -43,6 +42,7 @@
             <div class="mdl-cell mdl-cell--8-col">
               <h3>Create Game</h3>
               <br>
+
               <form method="POST" action="/new-game">
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                   <input class="mdl-textfield__input" type="text" id="game-title" name="title"> <label class="mdl-textfield__label" for="game-title">Title</label>
@@ -60,6 +60,7 @@
                   <input class="mdl-textfield__input" type="text" id="game-wrong-answer" name="wrong-answer"> <label class="mdl-textfield__label" for="game-wrong-answer">Wrong Answer</label>
                 </div>
                 <br>
+                <!-- Hidden parameter to add the user id -->
                 <input type="hidden" id="user-id" name="uid">
                 <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" id="submit-game"> Submit </button>
               </form>
