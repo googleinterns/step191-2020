@@ -328,7 +328,7 @@ function deleteAllComments() {
     getServletComments();
   });
 }
-
+f
 /**
  * Function that loads necessary info onLoad()
  */
