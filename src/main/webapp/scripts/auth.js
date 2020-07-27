@@ -154,7 +154,3 @@ signInButtonElement.addEventListener('click', signIn);
 
 // initialize Firebase
 initFirebaseAuth();
-
-
-// We load currently existing votes and listen to new ones.
-loadCounter();
