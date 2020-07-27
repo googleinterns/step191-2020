@@ -18,10 +18,11 @@ public class JoinRoomServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
     // Generate room key
-    String roomId = "gMzFmKGoYXTqtSTQuqfL";
+
     String uId = "aroquev";
     RoomDao dao = (RoomDao) this.getServletContext().getAttribute("roomDao");
-    dao.joinRoom(roomId, uId);
+    dao.joinRoom(dao.getActualRoom(), uId);
+    response.getWriter().println(dao.getActualRoom());
   }
 
   @Override

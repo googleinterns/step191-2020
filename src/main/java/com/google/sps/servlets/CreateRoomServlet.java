@@ -19,7 +19,7 @@ public class CreateRoomServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
     // Generate room key
     RoomDao dao = (RoomDao) this.getServletContext().getAttribute("roomDao");
-    String roomId = dao.createNewRoom();
+    String roomId = dao.createNewRoom("5GoXkueDimFjk1wEBLhV");
     
     JsonObject jsonObj = new JsonObject();
     jsonObj.addProperty("roomId", roomId);
@@ -32,7 +32,7 @@ public class CreateRoomServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // Generate room key
     RoomDao dao = (RoomDao) this.getServletContext().getAttribute("roomDao");
-    dao.createNewRoom();
+    dao.createNewRoom("5GoXkueDimFjk1wEBLhV");
 
   }
 
