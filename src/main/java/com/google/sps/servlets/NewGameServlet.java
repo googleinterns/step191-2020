@@ -75,22 +75,43 @@ public class NewGameServlet extends HttpServlet {
       System.out.println(uid);
 
     // Get a reference to document alovelace
-    CollectionReference colRef = firestoreDb.collection("games");
+    CollectionReference gamesCol = firestoreDb.collection("games");
 
     // Prepare data to be inserted
-    Map<String, Object> data = new HashMap<>();
-        data.put("creator", uid);
+    Map<String, Object> gameData = new HashMap<>();
+        gameData.put("creator", uid);
+        gameData.put("title", gameTitle);
 
-    DocumentReference docRef = colRef.document();
-    // Asynchronously write data
-    ApiFuture<WriteResult> resultFirebase = docRef.set(data);
+    DocumentReference gameDoc = gamesCol.document();
+    gameDoc.set(gameData);
 
-    // result.get() blocks on response
-    try {
-      System.out.println("Update time : " + resultFirebase.get().getUpdateTime());
-    } catch(Exception e) {
-      e.printStackTrace();
-    }
+    // Prepare data to be inserted
+    Map<String, Object> questionData = new HashMap<>();
+        questionData.put("title", question);
+
+    CollectionReference questionCol = gameDoc.collection("questions");
+    DocumentReference questionDoc = questionCol.document();
+
+    questionDoc.set(questionData);
+
+
+    CollectionReference answerCol = questionDoc.collection("answers");
+    DocumentReference correctAns = answerCol.document();
+    DocumentReference wrongAns = answerCol.document();
+
+
+    Map<String, Object> correctData = new HashMap<>();
+        correctData.put("title", correctAnswer);
+        correctData.put("correct", true);
+    
+    correctAns.set(correctData);
+
+    Map<String, Object> wrongData = new HashMap<>();
+        wrongData.put("title", wrongAnswer);
+        correctData.put("correct", false);
+        
+    wrongAns.set(correctData);
+    
     
       response.sendRedirect("/create-game.html");
   }
