@@ -15,9 +15,6 @@
  */
 'use strict';
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
   // Your web app's Firebase configuration
 var firebaseConfig = {
     apiKey: "AIzaSyCoNJFqs76_GbI1i1T7hhPmyxqv1Oc2hU4",
