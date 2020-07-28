@@ -116,18 +116,7 @@ var submitButtonElement = document.getElementById('submit');
 
 // Saves vote on form submit.
 counterFormElement.addEventListener('submit', onCounterFormSubmit);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-signOutButtonElement.addEventListener('click', signOut);
-signInButtonElement.addEventListener('click', signIn);
 
-// initialize Firebase
-initFirebaseAuth();
->>>>>>> origin/master
-=======
-
->>>>>>> 8e0f9a973e55c66f48e1f831d438f32c76a3e23d
 
 // We load currently existing votes and listen to new ones.
 loadCounter();
