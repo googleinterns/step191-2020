@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
+
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletContext;
@@ -32,12 +33,11 @@ import com.google.sps.daos.RoomDao;
 import com.google.sps.servlets.CreateRoomServlet;
 
 import org.springframework.mock.web.DelegatingServletInputStream;
-import org.junit.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.mockito.Mock;
 
 @RunWith(JUnit4.class)
 public final class CreateGameInstanceServletTest {
@@ -63,20 +63,20 @@ public final class CreateGameInstanceServletTest {
   }
 
   @Test
-  public void test1() throws IOException {
+  public void doPostNewGameInstance() throws IOException {
     
-    String json = "{\"id\":213213213, \"amount\":222}";
+    String json = "{\"idToken\":\"asdfqwerty\", \"gameId\":\"222\"}";
 
     when(request.getInputStream()).thenReturn(
-    new DelegatingServletInputStream(
-        new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))));
+        new DelegatingServletInputStream(
+            new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))));
     when(request.getReader()).thenReturn(
         new BufferedReader(new StringReader(json)));
     when(request.getContentType()).thenReturn("application/json");
     when(request.getCharacterEncoding()).thenReturn("UTF-8");
 
     servletUnderTest.doPost(request, response);
-    verify(mockRoomDao).createNewRoom("1", "1");
+    verify(mockRoomDao).createNewRoom("asdfqwerty", "222");
   }
   
 }
