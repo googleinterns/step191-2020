@@ -13,60 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
 
-  // Your web app's Firebase configuration
-var firebaseConfig = {
-    apiKey: "AIzaSyCoNJFqs76_GbI1i1T7hhPmyxqv1Oc2hU4",
-    authDomain: "quizzy-step-2020.firebaseapp.com",
-    databaseURL: "https://quizzy-step-2020.firebaseio.com",
-    projectId: "quizzy-step-2020",
-    storageBucket: "quizzy-step-2020.appspot.com",
-    messagingSenderId: "1029940211712",
-    appId: "1:1029940211712:web:8e31fe1fcb8423d4a728e5",
-    measurementId: "G-M62T74PK0V"
-};
-  
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
-var db = firebase.firestore();
-
-function signIn() {
-  // Sign into Firebase using popup auth & Google as the identity provider.
-  var provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider);
-}
-
-function signOut() {
-  // Sign out of Firebase.
-  firebase.auth().signOut();
-}
-
-// Initiate Firebase Auth.
-function initFirebaseAuth() {
-  // Listen to auth state changes.
-  firebase.auth().onAuthStateChanged(authStateObserver);
-}
-
-// Returns the signed-in user's profile pic URL.
-function getProfilePicUrl() {
-  return firebase.auth().currentUser.photoURL || '/images/profile_placeholder.png';
-}
-
-// Returns the signed-in user's display name.
-function getUserName() {
-  return firebase.auth().currentUser.displayName;
-}
-
-// Returns true if a user is signed-in.
-function isUserSignedIn() {
-  return !!firebase.auth().currentUser;
-}
-
->>>>>>> origin/master
-=======
->>>>>>> 8e0f9a973e55c66f48e1f831d438f32c76a3e23d
 //When vote button is clicked it calls this function
 function increaseCounter() {
   fetch('/increase', {method: 'POST'});
