@@ -15,51 +15,67 @@
  */
 'use strict';
 
+<<<<<<< HEAD
+=======
+  // Your web app's Firebase configuration
+var firebaseConfig = {
+    apiKey: "AIzaSyCoNJFqs76_GbI1i1T7hhPmyxqv1Oc2hU4",
+    authDomain: "quizzy-step-2020.firebaseapp.com",
+    databaseURL: "https://quizzy-step-2020.firebaseio.com",
+    projectId: "quizzy-step-2020",
+    storageBucket: "quizzy-step-2020.appspot.com",
+    messagingSenderId: "1029940211712",
+    appId: "1:1029940211712:web:8e31fe1fcb8423d4a728e5",
+    measurementId: "G-M62T74PK0V"
+};
+  
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+var db = firebase.firestore();
+
+function signIn() {
+  // Sign into Firebase using popup auth & Google as the identity provider.
+  var provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider);
+}
+
+function signOut() {
+  // Sign out of Firebase.
+  firebase.auth().signOut();
+}
+
+// Initiate Firebase Auth.
+function initFirebaseAuth() {
+  // Listen to auth state changes.
+  firebase.auth().onAuthStateChanged(authStateObserver);
+}
+
+// Returns the signed-in user's profile pic URL.
+function getProfilePicUrl() {
+  return firebase.auth().currentUser.photoURL || '/images/profile_placeholder.png';
+}
+
+// Returns the signed-in user's display name.
+function getUserName() {
+  return firebase.auth().currentUser.displayName;
+}
+
+// Returns true if a user is signed-in.
+function isUserSignedIn() {
+  return !!firebase.auth().currentUser;
+}
+
+>>>>>>> origin/master
 //When vote button is clicked it calls this function
 function increaseCounter() {
-
-    //Gets the document from firebase and updates the value to +1
-    firebase.firestore().collection('counter').get().then(function(querySnapshot) {
-
-        if(querySnapshot.size == 0){
-            //If there is no document it adds the first one with value 1
-              return firebase.firestore().collection('counter').add({
-                    number: 1 
-                }).catch(function(error) {
-                    console.error('Error writing new counter to database', error);
-                });
-        }
-
-        querySnapshot.forEach(function(count) {
-                firebase.firestore().collection("counter").doc(count.id).update({
-                    number: count.data().number + 1 
-                });
-        })
-
-    });
-
+  fetch('/increase', {method: 'POST'});
 }
 
 function loadCounter() {
- // Gets the document
-  var queryCounter = firebase.firestore().collection('counter').limit(1);
-
-  //If there is no document it displays nothing
-  if(queryCounter == null) { return displayCounter(""); }
-
-   queryCounter.onSnapshot(function(snapshot) {
-    //Listens for changes in the document   
-    snapshot.docChanges().forEach(function(change) {
-        if (change.type === 'removed') {
-        displayCounter("");
-        } else {
-         var counter = change.doc.data();
-         displayCounter(counter.number);
-        }
+  db.collection("liveCounter").doc("counter").onSnapshot(function(doc) {
+        displayCounter(doc.data().value);
     });
-
-  });
-
 }
 
 function displayCounter(number){
@@ -97,6 +113,14 @@ var submitButtonElement = document.getElementById('submit');
 
 // Saves vote on form submit.
 counterFormElement.addEventListener('submit', onCounterFormSubmit);
+<<<<<<< HEAD
+=======
+signOutButtonElement.addEventListener('click', signOut);
+signInButtonElement.addEventListener('click', signIn);
+
+// initialize Firebase
+initFirebaseAuth();
+>>>>>>> origin/master
 
 // We load currently existing votes and listen to new ones.
 loadCounter();
