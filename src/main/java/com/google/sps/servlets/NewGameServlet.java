@@ -23,9 +23,14 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.WriteResult;
 import com.google.sps.daos.CounterDao;
+import com.google.sps.data.Game;
+import com.google.sps.data.Question;
+import com.google.sps.data.Answer;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -65,54 +70,60 @@ public class NewGameServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) 
     throws IOException {
-      // Recieves the inputs from the form
-      String gameTitle = request.getParameter("title");
-      String question = request.getParameter("question");
-      String correctAnswer = request.getParameter("correct-answer");
-      String wrongAnswer = request.getParameter("wrong-answer");
-      String uid = request.getParameter("uid");
+      
         
-      System.out.println(uid);
 
-    // Get a reference to document alovelace
-    CollectionReference gamesCol = firestoreDb.collection("games");
-
-    // Prepare data to be inserted
-    Map<String, Object> gameData = new HashMap<>();
-        gameData.put("creator", uid);
-        gameData.put("title", gameTitle);
-
-    DocumentReference gameDoc = gamesCol.document();
-    gameDoc.set(gameData);
-
-    // Prepare data to be inserted
-    Map<String, Object> questionData = new HashMap<>();
-        questionData.put("title", question);
-
-    CollectionReference questionCol = gameDoc.collection("questions");
-    DocumentReference questionDoc = questionCol.document();
-
-    questionDoc.set(questionData);
-
-
-    CollectionReference answerCol = questionDoc.collection("answers");
-    DocumentReference correctAns = answerCol.document();
-    DocumentReference wrongAns = answerCol.document();
-
-
-    Map<String, Object> correctData = new HashMap<>();
-        correctData.put("title", correctAnswer);
-        correctData.put("correct", true);
+    Answer correct = new Answer(request.getParameter("correct-answer"), true);
+    Answer wrong = new Answer(request.getParameter("wrong-answer"), false);
     
-    correctAns.set(correctData);
+    List<Answer> answers = Arrays.asList(correct, wrong);
 
-    Map<String, Object> wrongData = new HashMap<>();
-        wrongData.put("title", wrongAnswer);
-        correctData.put("correct", false);
+    Question question = new Question(request.getParameter("question"), answers);
+
+    List<Question> questions = Arrays.asList(question);
+
+    Game currentGame = new Game(request.getParameter("uid"), request.getParameter("title"), questions);
+    
+    System.out.println(currentGame.getQuestions().get(0).getAnswers().get(0).getTitle());
+    // // Get a reference to document alovelace
+    // CollectionReference gamesCol = firestoreDb.collection("games");
+
+    // // Prepare data to be inserted
+    // Map<String, Object> gameData = new HashMap<>();
+    //     gameData.put("creator", uid);
+    //     gameData.put("title", gameTitle);
+
+    // DocumentReference gameDoc = gamesCol.document();
+    // gameDoc.set(gameData);
+
+    // // Prepare data to be inserted
+    // Map<String, Object> questionData = new HashMap<>();
+    //     questionData.put("title", question);
+
+    // CollectionReference questionCol = gameDoc.collection("questions");
+    // DocumentReference questionDoc = questionCol.document();
+
+    // questionDoc.set(questionData);
+
+
+    // CollectionReference answerCol = questionDoc.collection("answers");
+    // DocumentReference correctAns = answerCol.document();
+    // DocumentReference wrongAns = answerCol.document();
+
+
+    // Map<String, Object> correctData = new HashMap<>();
+    //     correctData.put("title", correctAnswer);
+    //     correctData.put("correct", true);
+    
+    // correctAns.set(correctData);
+
+    // Map<String, Object> wrongData = new HashMap<>();
+    //     wrongData.put("title", wrongAnswer);
+    //     correctData.put("correct", false);
         
-    wrongAns.set(correctData);
+    // wrongAns.set(correctData);
     
     
-      response.sendRedirect("/create-game.html");
+    response.sendRedirect("/create-game.html");
   }
 }
