@@ -64,9 +64,6 @@ function isUserSignedIn() {
   return !!firebase.auth().currentUser;
 }
 
->>>>>>> origin/master
-=======
->>>>>>> 8e0f9a973e55c66f48e1f831d438f32c76a3e23d
 //When vote button is clicked it calls this function
 function increaseCounter() {
   fetch('/increase', {method: 'POST'});
