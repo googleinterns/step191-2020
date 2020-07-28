@@ -182,7 +182,23 @@ function addGameToList(doc) {
 }
 
 function selectGame(gameId) {
-  fetch('/newRoom', {method: 'POST'});
+  firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function(idToken) {
+    // Send token to your backend via HTTPS
+    // ...
+
+    fetch('/newRoom', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({idToken: idToken, gameId: gameId})
+    });
+
+  }).catch(function(error) {
+    // Handle error
+  });
+  
 }
 
 // Load available games in DB

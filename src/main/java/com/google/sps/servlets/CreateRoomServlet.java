@@ -1,5 +1,6 @@
 package com.google.sps.servlets;
 
+import com.google.firebase.auth.FirebaseToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -30,10 +31,11 @@ public class CreateRoomServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // Generate room key
-    RoomDao dao = (RoomDao) this.getServletContext().getAttribute("roomDao");
-    dao.createNewRoom();
+    JsonObject jsonObj = new Gson().fromJson(request.getReader(), JsonObject.class);
 
+    RoomDao dao = (RoomDao) this.getServletContext().getAttribute("roomDao");
+
+    dao.createNewRoom(jsonObj.get("idToken").getAsString(), jsonObj.get("gameId").getAsString());
   }
 
 }
