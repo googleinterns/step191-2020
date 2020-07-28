@@ -86,9 +86,6 @@ function authStateObserver(user) {
 
     // Hide sign-in button.
     signInButtonElement.setAttribute('hidden', 'true');
-    
-    // The value for the user id on the form will be recieved directly from Firebase
-    document.getElementById("user-id").value = firebase.auth().currentUser.uid;
   } else { // User is signed out!
     // Hide user's profile and sign-out button.
     userNameElement.setAttribute('hidden', 'true');
