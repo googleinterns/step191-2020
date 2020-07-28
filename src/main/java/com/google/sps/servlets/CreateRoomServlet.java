@@ -17,19 +17,6 @@ import com.google.sps.daos.RoomDao;
 public class CreateRoomServlet extends HttpServlet {
   
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
-    // Generate room key
-    RoomDao dao = (RoomDao) this.getServletContext().getAttribute("roomDao");
-    String roomId = dao.createNewRoom();
-    
-    JsonObject jsonObj = new JsonObject();
-    jsonObj.addProperty("roomId", roomId);
-    
-    String json = new Gson().toJson(jsonObj);
-    response.getWriter().println(json);
-  }
-
-  @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     JsonObject jsonObj = new Gson().fromJson(request.getReader(), JsonObject.class);
 
