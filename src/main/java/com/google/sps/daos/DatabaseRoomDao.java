@@ -23,9 +23,7 @@ import com.google.sps.data.Room;
 
 public class DatabaseRoomDao implements RoomDao {
 
-  private DatabaseReference roomsDBReference;
   private Firestore firestoreDb;
-  private String actualRoom;
   private static Logger log = Logger.getLogger(DatabaseRoomDao.class.getName());
 
   public DatabaseRoomDao(Firestore firestoreDb) {
