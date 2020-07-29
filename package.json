@@ -1,0 +1,25 @@
+{
+  "name": "step191-2020",
+  "version": "1.0.0",
+  "description": "Repo for the Awesome Pod! 🔥",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/googleinterns/step191-2020.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/googleinterns/step191-2020/issues"
+  },
+  "homepage": "https://github.com/googleinterns/step191-2020#readme",
+  "devDependencies": {
+    "jest": "^26.1.0",
+    "jest-extended": "^0.11.5"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  }
+}
