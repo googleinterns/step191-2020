@@ -11,8 +11,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import com.google.sps.daos.CounterDao;
-import com.google.sps.daos.DatabaseDao;
 import com.google.sps.daos.DatabaseRoomDao;
 import com.google.sps.daos.RoomDao;
 
@@ -28,12 +26,6 @@ public class QuizzyContextListener implements ServletContextListener {
     // context attributes such as the RealtimeDao
 
     Firestore firestoreDb = initializeFirestore();
-
-    CounterDao dao = (CounterDao) event.getServletContext().getAttribute("dao");
-    if (dao == null) {
-      dao = new DatabaseDao(firestoreDb);
-      event.getServletContext().setAttribute("dao", dao);
-    }
 
     RoomDao roomDao = (RoomDao) event.getServletContext().getAttribute("roomDao");
     if (roomDao == null) {
