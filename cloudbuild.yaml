@@ -1,14 +1,13 @@
 steps:
+  # Install dependencies
+  - name: node
+    entrypoint: npm
+    args: ['install']
+  # Run JS tests
+  - name: node
+    entrypoint: npm
+    args: ['test']
+  # Build Maven project
   - name: maven
     entrypoint: mvn
     args: ['-f', './', 'package']
-  - name: maven
-    entrypoint: mvn
-    args: ['-f', './starters/pamelalozano', 'package']
-  - name: maven
-    entrypoint: mvn
-    args: ['-f', './starters/aroquev/portfolio', 'package']
-  - name: maven
-    entrypoint: mvn
-    args: ['-f', './starters/ayup/portfolio', 'package']
-    
