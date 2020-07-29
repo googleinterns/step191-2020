@@ -1,4 +1,6 @@
-require('jest-extended'); // Provides more matchers like `toBeOneOf`
+// Provides more matchers like `toBeOneOf`
+require('jest-extended'); 
+// module path is relative to 'src/main/webapp/'
 const { addRandomGreeting } = require('script.js');
 
 // `describe` blocks can be used to group related tests together.
