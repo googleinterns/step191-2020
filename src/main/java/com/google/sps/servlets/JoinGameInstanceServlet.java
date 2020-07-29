@@ -9,16 +9,20 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.logging.Logger;
 
-import com.google.sps.daos.RoomDao;
-import com.google.sps.data.Room;
+import com.google.sps.daos.GameInstanceDao;
+import com.google.sps.data.GameInstance;
+import com.google.sps.data.Member;
 
-@WebServlet("/startGame")
-public class StartGame extends HttpServlet {
+@WebServlet("/joinRoom")
+public class JoinGameInstanceServlet extends HttpServlet {
   
+  private static Logger log = Logger.getLogger(JoinGameInstanceServlet.class.getName());
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
-  // Generate room key
+    // Generate room key
     String roomId = request.getParameter("room");
 
     if(roomId==null || roomId.isEmpty()){
@@ -27,20 +31,22 @@ public class StartGame extends HttpServlet {
         return;
     }
 
-    RoomDao dao = (RoomDao) this.getServletContext().getAttribute("roomDao");
-    Room newRoom = dao.getRoom(roomId);
-    // Activate room
+    String uId = "aroquev";
+    GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("roomDao");
+    GameInstance newRoom = dao.getRoom(roomId);
+
     if(newRoom != null){
-        newRoom.setIsActive(true);
+        newRoom.addMember(new Member(uId));
         dao.updateRoom(newRoom);
-        response.getWriter().println("Game started");
+        response.getWriter().println(uId + " added");
     } else {
         response.setStatus(404);
         response.getWriter().println("Error, not found.");
     }
+  }
 
-    //Todo: get room's game and get questions
-
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
   }
 
 }

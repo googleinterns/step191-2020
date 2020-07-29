@@ -19,25 +19,25 @@ import com.google.cloud.firestore.WriteResult;
 import com.google.firestore.v1.StructuredQuery.CollectionSelector;
 
 import com.google.sps.data.Member;
-import com.google.sps.data.Room;
+import com.google.sps.data.GameInstance;
 
-public class DatabaseRoomDao implements RoomDao {
+public class DatabaseGameInstanceDao implements GameInstanceDao {
 
   private Firestore firestoreDb;
-  private static Logger log = Logger.getLogger(DatabaseRoomDao.class.getName());
+  private static Logger log = Logger.getLogger(DatabaseGameInstanceDao.class.getName());
 
-  public DatabaseRoomDao(Firestore firestoreDb) {
+  public DatabaseGameInstanceDao(Firestore firestoreDb) {
     this.firestoreDb = firestoreDb;
   }
   
   @Override
-  public Room createNewRoom(String gameId) {
+  public GameInstance createNewRoom(String gameId) {
 
     DocumentReference newRoomRef = firestoreDb.collection("liveRooms").document();
 
     //Create Room
     String userId = "pamelalozano"; //User id from auth
-    Room newRoom = new Room();
+    GameInstance newRoom = new GameInstance();
     newRoom.setCreator(userId);
     newRoom.setGameId(gameId);
 
@@ -52,13 +52,13 @@ public class DatabaseRoomDao implements RoomDao {
 
 
   @Override
-  public Room getRoom(String uId) {
+  public GameInstance getRoom(String uId) {
     DocumentReference docRef = firestoreDb.collection("liveRooms").document(uId);
     ApiFuture<DocumentSnapshot> future = docRef.get();
-    Room room = new Room();
+    GameInstance room = new GameInstance();
     try {
         DocumentSnapshot document = future.get();
-        room = document.toObject(Room.class);
+        room = document.toObject(GameInstance.class);
     } catch(Exception e) {
         System.out.println(e);
     }
@@ -66,7 +66,7 @@ public class DatabaseRoomDao implements RoomDao {
   }
 
   @Override
-  public void updateRoom(Room update) {
+  public void updateRoom(GameInstance update) {
     ApiFuture<WriteResult> writeResult = firestoreDb.collection("liveRooms").document(update.getId()).set(update, SetOptions.merge());
   }
 
