@@ -1,4 +1,12 @@
 steps:
+  # Install dependencies
+  - name: node
+    entrypoint: npm
+    args: ['install']
+  # Run JS tests
+  - name: node
+    entrypoint: npm
+    args: ['test']
   - name: maven
     entrypoint: mvn
     args: ['-f', './', 'package']
@@ -11,10 +19,5 @@ steps:
   - name: maven
     entrypoint: mvn
     args: ['-f', './starters/ayup/portfolio', 'package']
-  - name: node
-    entrypoint: npm
-    args: ['install']
-  - name: node
-    entrypoint: npm
-    args: ['test']
+ 
     
