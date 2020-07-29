@@ -41,8 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/new-game")
 public class NewGameServlet extends HttpServlet {
 
-  // Reference to Firestore database
-  private Firestore firestoreDb;
 
   @Override
   public void init() {
@@ -72,7 +70,8 @@ public class NewGameServlet extends HttpServlet {
     throws IOException {
       
         
-
+    // Creates classes for answers, questions and games so when Game Dao is implemented you just pass a Game class.
+    
     Answer correct = new Answer(request.getParameter("correct-answer"), true);
     Answer wrong = new Answer(request.getParameter("wrong-answer"), false);
     
@@ -84,45 +83,7 @@ public class NewGameServlet extends HttpServlet {
 
     Game currentGame = new Game(request.getParameter("uid"), request.getParameter("title"), questions);
     
-    System.out.println(currentGame.getQuestions().get(0).getAnswers().get(0).getTitle());
-    // // Get a reference to document alovelace
-    // CollectionReference gamesCol = firestoreDb.collection("games");
 
-    // // Prepare data to be inserted
-    // Map<String, Object> gameData = new HashMap<>();
-    //     gameData.put("creator", uid);
-    //     gameData.put("title", gameTitle);
-
-    // DocumentReference gameDoc = gamesCol.document();
-    // gameDoc.set(gameData);
-
-    // // Prepare data to be inserted
-    // Map<String, Object> questionData = new HashMap<>();
-    //     questionData.put("title", question);
-
-    // CollectionReference questionCol = gameDoc.collection("questions");
-    // DocumentReference questionDoc = questionCol.document();
-
-    // questionDoc.set(questionData);
-
-
-    // CollectionReference answerCol = questionDoc.collection("answers");
-    // DocumentReference correctAns = answerCol.document();
-    // DocumentReference wrongAns = answerCol.document();
-
-
-    // Map<String, Object> correctData = new HashMap<>();
-    //     correctData.put("title", correctAnswer);
-    //     correctData.put("correct", true);
-    
-    // correctAns.set(correctData);
-
-    // Map<String, Object> wrongData = new HashMap<>();
-    //     wrongData.put("title", wrongAnswer);
-    //     correctData.put("correct", false);
-        
-    // wrongAns.set(correctData);
-    
     
     response.sendRedirect("/create-game.html");
   }
