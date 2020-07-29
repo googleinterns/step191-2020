@@ -1,29 +1,37 @@
 package com.google.sps.data;
 
+import java.util.List; 
+import java.util.ArrayList; 
+
 public class Room {
 
-  private int id;
+  private String id;
   private boolean isActive;
   private String creator;
   private String gameId;
+  private List<Member> members;
 
   public Room() {
+    this.members = new ArrayList<Member>();
+    this.isActive = false;
   }
 
-  public Room(int id) {
+  public Room(String id) {
     this.id = id;
+    this.members = new ArrayList<Member>();
+    this.isActive = false;
   }
 
-  public int getId() {
-    return id;
+  public String getId() {
+    return this.id;
   }
 
-  public void setId(int id) {
+  public void setId(String id) {
     this.id = id;
   }
   
   public boolean getIsActive() {
-    return isActive;
+    return this.isActive;
   }
 
   public void setIsActive(boolean isActive) {
@@ -31,7 +39,7 @@ public class Room {
   }
   
   public String getCreator() {
-    return creator;
+    return this.creator;
   }
 
   public void setCreator(String creator) {
@@ -39,11 +47,24 @@ public class Room {
   }
 
   public String getGameId() {
-    return gameId;
+    return this.gameId;
   }
 
   public void setGameId(String gameId) {
     this.gameId = gameId;
+  }
+
+  public Member getMember(int index) {
+    return this.members.get(index);
+  }
+  
+  public List<Member> getMembers() {
+    return this.members;
+  }
+
+  public List<Member> addMember(Member member) {
+    this.members.add(member);
+    return this.members;
   }
   
 }
