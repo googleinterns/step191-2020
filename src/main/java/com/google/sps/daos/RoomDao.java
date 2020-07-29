@@ -1,8 +1,8 @@
 package com.google.sps.daos;
+import com.google.sps.data.Room;
 
 public interface RoomDao {
-  public String createNewRoom(String gameId);
-  public String getActualRoom();
-  public void startGame();
-  public void joinRoom(String roomId, String uId);
+  public Room createNewRoom(String gameId);
+  public Room getRoom(String uId);
+  public void updateRoom(Room update);
 }

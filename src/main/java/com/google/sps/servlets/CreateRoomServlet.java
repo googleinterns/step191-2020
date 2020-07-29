@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.sps.daos.RoomDao;
+import com.google.sps.data.Room;
 
 @WebServlet("/newRoom")
 public class CreateRoomServlet extends HttpServlet {
@@ -19,10 +20,10 @@ public class CreateRoomServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
     // Generate room key
     RoomDao dao = (RoomDao) this.getServletContext().getAttribute("roomDao");
-    String roomId = dao.createNewRoom("5GoXkueDimFjk1wEBLhV");
+    Room newRoom = dao.createNewRoom("5GoXkueDimFjk1wEBLhV");
     
     JsonObject jsonObj = new JsonObject();
-    jsonObj.addProperty("roomId", roomId);
+    jsonObj.addProperty("roomId", newRoom.getId());
     
     String json = new Gson().toJson(jsonObj);
     response.getWriter().println(json);
@@ -30,9 +31,6 @@ public class CreateRoomServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // Generate room key
-    RoomDao dao = (RoomDao) this.getServletContext().getAttribute("roomDao");
-    dao.createNewRoom("5GoXkueDimFjk1wEBLhV");
 
   }
 
