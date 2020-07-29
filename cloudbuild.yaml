@@ -11,4 +11,10 @@ steps:
   - name: maven
     entrypoint: mvn
     args: ['-f', './starters/ayup/portfolio', 'package']
+  - name: node
+    entrypoint: npm
+    args: ['install']
+  - name: node
+    entrypoint: npm
+    args: ['test']
     
