@@ -14,8 +14,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import com.google.sps.daos.DatabaseRoomDao;
-import com.google.sps.daos.RoomDao;
+import com.google.sps.daos.DatabaseGameInstanceDao;
+import com.google.sps.daos.GameInstanceDao;
 
 @WebListener("Context Listener")
 public class QuizzyContextListener implements ServletContextListener {
@@ -33,13 +33,12 @@ public class QuizzyContextListener implements ServletContextListener {
 
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebase);
 
-    RoomDao roomDao = (RoomDao) event.getServletContext().getAttribute("roomDao");
-    if (roomDao == null) {
-      roomDao = new DatabaseRoomDao(firestoreDb, firebaseAuth);
-      event.getServletContext().setAttribute("roomDao", roomDao);
+    GameInstanceDao gameInstanceDao = (GameInstanceDao) event.getServletContext().getAttribute("gameInstanceDao");
+    if (gameInstanceDao == null) {
+      gameInstanceDao = new DatabaseGameInstanceDao(firestoreDb, firebaseAuth);
+      event.getServletContext().setAttribute("gameInstanceDao", gameInstanceDao);
       
     }
-
   }
 
   private FirebaseApp initializeFirebase() {
