@@ -5,11 +5,6 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 public abstract class Answer {
 
-  /**
-   * Creates a new answer
-   * @param title defines the title or the text that the answer will have
-   * @param correct it will define if the answer is correct
-   */
   public static Builder builder() {
     return new AutoValue_Answer.Builder();
   }
