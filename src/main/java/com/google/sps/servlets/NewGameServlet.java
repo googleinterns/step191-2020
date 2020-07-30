@@ -61,7 +61,8 @@ public class NewGameServlet extends HttpServlet {
     Game currentGame = new Game(request.getParameter("uid"), request.getParameter("title"), questions);
     
 
-    
+    System.out.println(correct.toString());
+    System.out.println(wrong.toString());
     response.sendRedirect("/create-game.html");
   }
 }
