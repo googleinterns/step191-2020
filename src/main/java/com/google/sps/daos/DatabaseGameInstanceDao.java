@@ -33,7 +33,7 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
   @Override
   public GameInstance createNewRoom(String gameId) {
 
-    DocumentReference newRoomRef = firestoreDb.collection("liveRooms").document();
+    DocumentReference newRoomRef = firestoreDb.collection("gameInstance").document();
 
     //Create Room
     String userId = "pamelalozano"; //User id from auth
@@ -53,12 +53,17 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
 
   @Override
   public GameInstance getRoom(String uId) {
-    DocumentReference docRef = firestoreDb.collection("liveRooms").document(uId);
+          System.out.println(uId);
+    DocumentReference docRef = firestoreDb.collection("gameInstance").document(uId);
     ApiFuture<DocumentSnapshot> future = docRef.get();
     GameInstance room = new GameInstance();
     try {
         DocumentSnapshot document = future.get();
         room = document.toObject(GameInstance.class);
+
+        //Id is not a field in the db document so we add it manually
+        room.setId(document.getId());
+
     } catch(Exception e) {
         System.out.println(e);
     }
@@ -67,7 +72,7 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
 
   @Override
   public void updateRoom(GameInstance update) {
-    ApiFuture<WriteResult> writeResult = firestoreDb.collection("liveRooms").document(update.getId()).set(update, SetOptions.merge());
+    ApiFuture<WriteResult> writeResult = firestoreDb.collection("gameInstance").document(update.getId()).set(update, SetOptions.merge());
   }
 
 }
