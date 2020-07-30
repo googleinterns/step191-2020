@@ -23,7 +23,7 @@ public class JoinGameInstanceServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
     // Generate room key
-    String roomId = request.getParameter("room");
+    String roomId = request.getParameter("gameInstance");
 
     if(roomId==null || roomId.isEmpty()){
         response.setStatus(500);
@@ -33,11 +33,11 @@ public class JoinGameInstanceServlet extends HttpServlet {
 
     String uId = "aroquev";
     GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
-    GameInstance newRoom = dao.getRoom(roomId);
+    GameInstance newRoom = dao.getGameInstance(roomId);
 
     if(newRoom != null){
         newRoom.addMember(new Member(uId));
-        dao.updateRoom(newRoom);
+        dao.updateGameInstance(newRoom);
         response.getWriter().println(uId + " added");
     } else {
         response.setStatus(404);

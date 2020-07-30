@@ -19,7 +19,7 @@ public class StartGameInstanceServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
   // Generate room key
-    String roomId = request.getParameter("room");
+    String roomId = request.getParameter("gameInstance");
 
     if(roomId==null || roomId.isEmpty()){
         response.setStatus(500);
@@ -28,7 +28,7 @@ public class StartGameInstanceServlet extends HttpServlet {
     }
 
     GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
-    GameInstance newRoom = dao.getRoom(roomId);
+    GameInstance newRoom = dao.getGameInstance(roomId);
 
     if(newRoom == null){
         response.setStatus(404);
@@ -38,7 +38,7 @@ public class StartGameInstanceServlet extends HttpServlet {
     
     // Activate room
     newRoom.setIsActive(true);
-    dao.updateRoom(newRoom);
+    dao.updateGameInstance(newRoom);
 
     //Return object
     Gson gson = new Gson();
