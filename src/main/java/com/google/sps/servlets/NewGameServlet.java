@@ -43,29 +43,6 @@ public class NewGameServlet extends HttpServlet {
 
 
   @Override
-  public void init() {
-
-    try {
-
-      // Initialization of Firestore database
-
-      // Building options, include projectID, access credentials
-      FirestoreOptions firestoreOptions =
-      FirestoreOptions.getDefaultInstance().toBuilder()
-          .setProjectId("quizzy-step-2020")
-          .setCredentials(GoogleCredentials.getApplicationDefault())
-          .build();
-
-      // Get database and store the reference in firestoreDb variable
-      firestoreDb = firestoreOptions.getService();
-
-    } catch(IOException ie) {
-      ie.printStackTrace();
-    }
-
-  }
-
-  @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) 
     throws IOException {
       
