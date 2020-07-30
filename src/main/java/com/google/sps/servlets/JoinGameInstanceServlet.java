@@ -11,14 +11,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.logging.Logger;
 
-import com.google.sps.daos.RoomDao;
-import com.google.sps.data.Room;
+import com.google.sps.daos.GameInstanceDao;
+import com.google.sps.data.GameInstance;
 import com.google.sps.data.Member;
 
-@WebServlet("/joinRoom")
-public class JoinRoomServlet extends HttpServlet {
+@WebServlet("/joinGameInstance")
+public class JoinGameInstanceServlet extends HttpServlet {
   
-  private static Logger log = Logger.getLogger(JoinRoomServlet.class.getName());
+  private static Logger log = Logger.getLogger(JoinGameInstanceServlet.class.getName());
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
@@ -32,12 +32,12 @@ public class JoinRoomServlet extends HttpServlet {
     }
 
     String uId = "aroquev";
-    RoomDao dao = (RoomDao) this.getServletContext().getAttribute("roomDao");
-    Room newRoom = dao.getRoom(roomId);
+    GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
+    GameInstance newRoom = dao.getGameInstance(roomId);
 
     if(newRoom != null){
         newRoom.addMember(new Member(uId));
-        dao.updateRoom(newRoom);
+        dao.updateGameInstance(newRoom);
         response.getWriter().println(uId + " added");
     } else {
         response.setStatus(404);

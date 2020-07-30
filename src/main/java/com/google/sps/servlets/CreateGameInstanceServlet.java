@@ -10,17 +10,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.sps.daos.RoomDao;
-import com.google.sps.data.Room;
+import com.google.sps.daos.GameInstanceDao;
+import com.google.sps.data.GameInstance;
 
-@WebServlet("/newRoom")
-public class CreateRoomServlet extends HttpServlet {
+@WebServlet("/newGameInstance")
+public class CreateGameInstanceServlet extends HttpServlet {
   
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
     // Generate room key
-    RoomDao dao = (RoomDao) this.getServletContext().getAttribute("roomDao");
-    Room newRoom = dao.createNewRoom("5GoXkueDimFjk1wEBLhV");
+    GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
+    GameInstance newRoom = dao.createNewGameInstance("5GoXkueDimFjk1wEBLhV");
     
     JsonObject jsonObj = new JsonObject();
     jsonObj.addProperty("roomId", newRoom.getId());
