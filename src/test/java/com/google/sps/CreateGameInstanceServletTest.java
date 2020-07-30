@@ -29,8 +29,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.sps.daos.RoomDao;
-import com.google.sps.servlets.CreateRoomServlet;
+import com.google.sps.daos.GameInstanceDao;
+import com.google.sps.servlets.CreateGameInstanceServlet;
 
 import org.springframework.mock.web.DelegatingServletInputStream;
 
@@ -42,24 +42,24 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public final class CreateGameInstanceServletTest {
 
-  private RoomDao mockRoomDao = mock(RoomDao.class);
+  private GameInstanceDao mockGameInstanceDao = mock(GameInstanceDao.class);
   private ServletContext mockServletContext = mock(ServletContext.class);
 
   private HttpServletRequest request = mock(HttpServletRequest.class);
   private HttpServletResponse response = mock(HttpServletResponse.class);
 
-  private CreateRoomServlet servletUnderTest;
+  private CreateGameInstanceServlet servletUnderTest;
 
   @Before
   public void setUp() throws Exception {
-    servletUnderTest = new CreateRoomServlet() {
+    servletUnderTest = new CreateGameInstanceServlet() {
       @Override
       public ServletContext getServletContext() {
         return mockServletContext;
       }
     };
 
-    when(mockServletContext.getAttribute("roomDao")).thenReturn(mockRoomDao);
+    when(mockServletContext.getAttribute("gameInstanceDao")).thenReturn(mockGameInstanceDao);
   }
 
   @Test
@@ -76,7 +76,7 @@ public final class CreateGameInstanceServletTest {
     when(request.getCharacterEncoding()).thenReturn("UTF-8");
 
     servletUnderTest.doPost(request, response);
-    verify(mockRoomDao).createNewRoom("asdfqwerty", "222");
+    verify(mockGameInstanceDao).createNewGameInstance("asdfqwerty", "222");
   }
   
 }
