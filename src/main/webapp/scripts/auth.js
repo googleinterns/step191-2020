@@ -47,6 +47,11 @@ function isUserSignedIn() {
   return !!firebase.auth().currentUser;
 }
 
+// Returns the user ID
+function getUserId() {	
+  return firebase.auth().currentUser.uid;	
+}
+
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) { // User is signed in!
