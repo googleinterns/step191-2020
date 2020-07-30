@@ -28,11 +28,11 @@ public class StartGameInstanceServlet extends HttpServlet {
     }
 
     GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
-    GameInstance newRoom = dao.getRoom(roomId);
+    GameInstance newRoom = dao.getGameInstance(roomId);
     // Activate room
     if(newRoom != null){
         newRoom.setIsActive(true);
-        dao.updateRoom(newRoom);
+        dao.updateGameInstance(newRoom);
         response.getWriter().println("Game started");
     } else {
         response.setStatus(404);

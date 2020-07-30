@@ -31,47 +31,47 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
   }
   
   @Override
-  public GameInstance createNewRoom(String gameId) {
+  public GameInstance createNewGameInstance(String gameId) {
 
     DocumentReference newRoomRef = firestoreDb.collection("gameInstance").document();
 
     //Create Room
     String userId = "pamelalozano"; //User id from auth
-    GameInstance newRoom = new GameInstance();
-    newRoom.setCreator(userId);
-    newRoom.setGameId(gameId);
+    GameInstance newGameInstance = new GameInstance();
+    newGameInstance.setCreator(userId);
+    newGameInstance.setGameId(gameId);
 
     //Post to db
-    newRoomRef.set(newRoom);
+    newRoomRef.set(newGameInstance);
     
     //Get id
-    newRoom.setId(newRoomRef.getId());
+    newGameInstance.setId(newRoomRef.getId());
 
-    return newRoom;
+    return newGameInstance;
   }
 
 
   @Override
-  public GameInstance getRoom(String uId) {
+  public GameInstance getGameInstance(String uId) {
           System.out.println(uId);
     DocumentReference docRef = firestoreDb.collection("gameInstance").document(uId);
     ApiFuture<DocumentSnapshot> future = docRef.get();
-    GameInstance room = new GameInstance();
+    GameInstance gameInstance = new GameInstance();
     try {
         DocumentSnapshot document = future.get();
-        room = document.toObject(GameInstance.class);
+        gameInstance = document.toObject(GameInstance.class);
 
         //Id is not a field in the db document so we add it manually
-        room.setId(document.getId());
+        gameInstance.setId(document.getId());
 
     } catch(Exception e) {
         System.out.println(e);
     }
-    return room;
+    return gameInstance;
   }
 
   @Override
-  public void updateRoom(GameInstance update) {
+  public void updateGameInstance(GameInstance update) {
     ApiFuture<WriteResult> writeResult = firestoreDb.collection("gameInstance").document(update.getId()).set(update, SetOptions.merge());
   }
 

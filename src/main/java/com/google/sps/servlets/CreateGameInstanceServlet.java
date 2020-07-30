@@ -20,7 +20,7 @@ public class CreateGameInstanceServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
     // Generate room key
     GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
-    GameInstance newRoom = dao.createNewRoom("5GoXkueDimFjk1wEBLhV");
+    GameInstance newRoom = dao.createNewGameInstance("5GoXkueDimFjk1wEBLhV");
     
     JsonObject jsonObj = new JsonObject();
     jsonObj.addProperty("roomId", newRoom.getId());
