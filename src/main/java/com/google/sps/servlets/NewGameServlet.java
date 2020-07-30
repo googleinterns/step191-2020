@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-/** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/new-game")
 public class NewGameServlet extends HttpServlet {
 
@@ -49,23 +48,22 @@ public class NewGameServlet extends HttpServlet {
         
     // Creates classes for answers, questions and games so when Game Dao is implemented you just pass a Game class.
     
-    // Answer correct = new Answer(request.getParameter("correct-answer"), true);
-    // Answer wrong = new Answer(request.getParameter("wrong-answer"), false);
     Answer correct = Answer.builder().title(request.getParameter("correct-answer")).correct(true).build();
     Answer wrong = Answer.builder().title(request.getParameter("wrong-answer")).correct(false).build();
     
     List<Answer> answers = Arrays.asList(correct, wrong);
 
-    Question question = new Question(request.getParameter("question"), answers);
+    Question question = Question.builder().title(request.getParameter("question")).answers(answers).build();
 
     List<Question> questions = Arrays.asList(question);
 
-    Game currentGame = new Game(request.getParameter("uid"), request.getParameter("title"), questions);
+    Game currentGame = Game.builder().title(request.getParameter("title")).creator(request.getParameter("uid")).questions(questions).build();
     
 
     System.out.println(correct.toString());
-    System.out.println(correct.title() + " - " + correct.correct());
     System.out.println(wrong.toString());
+    System.out.println(question.toString());
+    System.out.println(currentGame.toString());
     response.sendRedirect("/create-game.html");
   }
 }
