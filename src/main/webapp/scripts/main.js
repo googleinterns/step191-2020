@@ -13,53 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
-//When vote button is clicked it calls this function
-function increaseCounter() {
-  fetch('/increase', {method: 'POST'});
-}
+  // Your web app's Firebase configuration
+var firebaseConfig = {
+    apiKey: "AIzaSyCoNJFqs76_GbI1i1T7hhPmyxqv1Oc2hU4",
+    authDomain: "quizzy-step-2020.firebaseapp.com",
+    databaseURL: "https://quizzy-step-2020.firebaseio.com",
+    projectId: "quizzy-step-2020",
+    storageBucket: "quizzy-step-2020.appspot.com",
+    messagingSenderId: "1029940211712",
+    appId: "1:1029940211712:web:8e31fe1fcb8423d4a728e5",
+    measurementId: "G-M62T74PK0V"
+};
+  
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
-function loadCounter() {
-  db.collection("liveCounter").doc("counter").onSnapshot(function(doc) {
-        displayCounter(doc.data().value);
-    });
-}
+// A loading image URL.
+var LOADING_IMAGE_URL = 'https://www.google.com/images/spin-32.gif?a';
 
-function displayCounter(number){
-    document.getElementById("counter").innerText = number;
-}
 
-//Listens to vote button
-function onCounterFormSubmit(e) {
-  e.preventDefault();
-  // Check that the user is signed in.
-  if (checkSignedInWithVote()) {
-    increaseCounter();
+// Checks that the Firebase SDK has been correctly setup and configured.
+function checkSetup() {
+  if (!window.firebase || !(firebase.app instanceof Function) || !firebase.app().options) {
+    window.alert('You have not configured and imported the Firebase SDK. ' +
+        'Make sure you go through the codelab setup instructions and make ' +
+        'sure you are running the codelab using `firebase serve`');
   }
 }
 
-// Returns true if user is signed-in. Otherwise false and displays a message.
-function checkSignedInWithVote() {
-  // Return true if the user is signed in Firebase
-  if (isUserSignedIn()) {
-    return true;
-  }
-
-  // Display a message to the user using a Toast.
-  var data = {
-    message: 'You must sign-in first',
-    timeout: 2000
-  };
-  signInSnackbarElement.MaterialSnackbar.showSnackbar(data);
-  return false;
-}
-
-// Shortcuts to DOM Elements.
-var counterFormElement = document.getElementById('counter-form');
-var submitButtonElement = document.getElementById('submit');
-
-// Saves vote on form submit.
-counterFormElement.addEventListener('submit', onCounterFormSubmit);
-
-// We load currently existing votes and listen to new ones.
-loadCounter();
+// Checks that Firebase has been imported.
+checkSetup();
