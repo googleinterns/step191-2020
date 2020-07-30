@@ -44,6 +44,9 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
 
     //Post to db
     newGameInstanceRef.set(newGameInstance);
+
+    // Update the User's entry with game he just started
+    firestoreDb.collection("users").document(userId).update("activeGameInstanceId", newGameInstanceRef.getId());
   }
 
 
