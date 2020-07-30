@@ -3,7 +3,7 @@ package com.google.sps.data;
 import java.util.List; 
 import java.util.ArrayList; 
 
-public class Room {
+public class GameInstance {
 
   private String id;
   private boolean isActive;
@@ -11,12 +11,12 @@ public class Room {
   private String gameId;
   private List<Member> members;
 
-  public Room() {
+  public GameInstance() {
     this.members = new ArrayList<Member>();
     this.isActive = false;
   }
 
-  public Room(String id) {
+  public GameInstance(String id) {
     this.id = id;
     this.members = new ArrayList<Member>();
     this.isActive = false;

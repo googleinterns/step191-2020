@@ -10,11 +10,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.sps.daos.RoomDao;
-import com.google.sps.data.Room;
+import com.google.sps.daos.GameInstanceDao;
+import com.google.sps.data.GameInstance;
 
-@WebServlet("/startGame")
-public class StartGame extends HttpServlet {
+@WebServlet("/startGameInstance")
+public class StartGameInstanceServlet extends HttpServlet {
   
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
@@ -27,12 +27,12 @@ public class StartGame extends HttpServlet {
         return;
     }
 
-    RoomDao dao = (RoomDao) this.getServletContext().getAttribute("roomDao");
-    Room newRoom = dao.getRoom(roomId);
+    GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
+    GameInstance newRoom = dao.getGameInstance(roomId);
     // Activate room
     if(newRoom != null){
         newRoom.setIsActive(true);
-        dao.updateRoom(newRoom);
+        dao.updateGameInstance(newRoom);
         response.getWriter().println("Game started");
     } else {
         response.setStatus(404);

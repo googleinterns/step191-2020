@@ -22,7 +22,6 @@ import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.WriteResult;
-import com.google.sps.daos.CounterDao;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
