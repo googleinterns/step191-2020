@@ -32,7 +32,7 @@ public class JoinGameInstanceServlet extends HttpServlet {
     }
 
     String uId = "aroquev";
-    GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("roomDao");
+    GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
     GameInstance newRoom = dao.getRoom(roomId);
 
     if(newRoom != null){

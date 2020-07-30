@@ -27,10 +27,10 @@ public class QuizzyContextListener implements ServletContextListener {
 
     Firestore firestoreDb = initializeFirestore();
 
-    GameInstanceDao roomDao = (GameInstanceDao) event.getServletContext().getAttribute("roomDao");
+    GameInstanceDao roomDao = (GameInstanceDao) event.getServletContext().getAttribute("gameInstanceDao");
     if (roomDao == null) {
       roomDao = new DatabaseGameInstanceDao(firestoreDb);
-      event.getServletContext().setAttribute("roomDao", roomDao);
+      event.getServletContext().setAttribute("gameInstanceDao", roomDao);
       
     }
 
