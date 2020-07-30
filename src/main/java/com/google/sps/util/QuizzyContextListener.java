@@ -4,6 +4,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
+
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,7 +38,6 @@ public class QuizzyContextListener implements ServletContextListener {
     if (gameInstanceDao == null) {
       gameInstanceDao = new DatabaseGameInstanceDao(firestoreDb, firebaseAuth);
       event.getServletContext().setAttribute("gameInstanceDao", gameInstanceDao);
-      
     }
   }
 
@@ -53,7 +53,6 @@ public class QuizzyContextListener implements ServletContextListener {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    
     return firebase;
   }
 

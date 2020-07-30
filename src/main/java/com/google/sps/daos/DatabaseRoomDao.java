@@ -31,18 +31,18 @@ public class DatabaseRoomDao implements RoomDao {
     DocumentReference newRoomRef = firestoreDb.collection("liveRooms").document();
 
     FirebaseToken decodedToken = null;
-    String uid = null;
+    String userId = null;
 
     try {
       decodedToken = firebaseAuth.verifyIdToken(idToken);
-      uid = decodedToken.getUid();
+      userId = decodedToken.getUid();
     } catch (FirebaseAuthException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
     Map<String, Object> data = new HashMap<>();
-    data.put("creator", uid);
+    data.put("creator", userId);
     data.put("gameId", gameId);
     data.put("timestamp", new java.util.Date());
     

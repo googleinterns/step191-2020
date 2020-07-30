@@ -1,60 +1,55 @@
 package com.google.sps.daos;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List; 
-import java.util.logging.Logger;
-
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.CollectionReference;
+
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.SetOptions;
 import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.WriteResult;
-import com.google.firestore.v1.StructuredQuery.CollectionSelector;
 
-import com.google.sps.data.Member;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
+
 import com.google.sps.data.GameInstance;
 
 public class DatabaseGameInstanceDao implements GameInstanceDao {
 
+  private FirebaseAuth firebaseAuth;
   private Firestore firestoreDb;
-  private static Logger log = Logger.getLogger(DatabaseGameInstanceDao.class.getName());
 
-  public DatabaseGameInstanceDao(Firestore firestoreDb) {
+  public DatabaseGameInstanceDao(Firestore firestoreDb, FirebaseAuth firebaseAuth) {
     this.firestoreDb = firestoreDb;
+    this.firebaseAuth = firebaseAuth;
   }
   
   @Override
-  public GameInstance createNewGameInstance(String gameId) {
+  public void createNewGameInstance(String idToken, String gameId) {
+    DocumentReference newGameInstanceRef = firestoreDb.collection("gameInstance").document();
 
-    DocumentReference newRoomRef = firestoreDb.collection("gameInstance").document();
+    FirebaseToken decodedToken = null;
+    String userId = null;
 
-    //Create Room
-    String userId = "pamelalozano"; //User id from auth
+    try {
+      decodedToken = firebaseAuth.verifyIdToken(idToken);
+      userId = decodedToken.getUid();
+    } catch (FirebaseAuthException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
     GameInstance newGameInstance = new GameInstance();
     newGameInstance.setCreator(userId);
     newGameInstance.setGameId(gameId);
 
     //Post to db
-    newRoomRef.set(newGameInstance);
-    
-    //Get id
-    newGameInstance.setId(newRoomRef.getId());
-
-    return newGameInstance;
+    newGameInstanceRef.set(newGameInstance);
   }
 
 
   @Override
-  public GameInstance getGameInstance(String uId) {
-          System.out.println(uId);
-    DocumentReference docRef = firestoreDb.collection("gameInstance").document(uId);
+  public GameInstance getGameInstance(String gameInstanceId) {
+    DocumentReference docRef = firestoreDb.collection("gameInstance").document(gameInstanceId);
     ApiFuture<DocumentSnapshot> future = docRef.get();
     GameInstance gameInstance = new GameInstance();
     try {
@@ -72,7 +67,7 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
 
   @Override
   public void updateGameInstance(GameInstance update) {
-    ApiFuture<WriteResult> writeResult = firestoreDb.collection("gameInstance").document(update.getId()).set(update, SetOptions.merge());
+    firestoreDb.collection("gameInstance").document(update.getId()).set(update, SetOptions.merge());
   }
 
 }
