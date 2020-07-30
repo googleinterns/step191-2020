@@ -22,10 +22,13 @@ import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.WriteResult;
+<<<<<<< HEAD
 import com.google.sps.daos.CounterDao;
 import com.google.sps.data.Game;
 import com.google.sps.data.Question;
 import com.google.sps.data.Answer;
+=======
+>>>>>>> origin/master
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
