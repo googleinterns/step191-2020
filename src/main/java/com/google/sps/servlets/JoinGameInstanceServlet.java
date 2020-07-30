@@ -15,7 +15,7 @@ import com.google.sps.daos.GameInstanceDao;
 import com.google.sps.data.GameInstance;
 import com.google.sps.data.Member;
 
-@WebServlet("/joinRoom")
+@WebServlet("/joinGameInstance")
 public class JoinGameInstanceServlet extends HttpServlet {
   
   private static Logger log = Logger.getLogger(JoinGameInstanceServlet.class.getName());

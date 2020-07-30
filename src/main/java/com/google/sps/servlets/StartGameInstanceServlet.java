@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.sps.daos.GameInstanceDao;
 import com.google.sps.data.GameInstance;
 
-@WebServlet("/startGame")
+@WebServlet("/startGameInstance")
 public class StartGameInstanceServlet extends HttpServlet {
   
   @Override
