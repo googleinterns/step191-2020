@@ -49,7 +49,7 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
     newGameInstanceRef.set(newGameInstance);
 
     // Update the User's entry with game he just started
-    ApiFuture<WriteResult> future = firestoreDb.collection("users").document(uid).update("activeGameInstanceId", newRoomRef.getId());
+    ApiFuture<WriteResult> future = firestoreDb.collection("users").document(userId).update("activeGameInstanceId", newGameInstanceRef.getId());
     // Block until room is created to continue, since it will be redirected to admin game panel
     try {
       future.get();

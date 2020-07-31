@@ -49,7 +49,7 @@ function getActiveGameInstanceId(user) {
 }
 
 function queryActiveGameInstanceDocument(gameInstanceId) {
-  db.collection("liveRooms").doc(gameInstanceId).get().then(function(doc) {
+  db.collection("gameInstance").doc(gameInstanceId).get().then(function(doc) {
     if (doc.exists) {
       addGameInstanceIdToUI(gameInstanceId);
       buildActiveGameInstanceUI(doc.data());
