@@ -12,15 +12,14 @@
   limitations under the License
 -->
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Counter</title>
 
-  <link rel="icon" 
-      type="image/png" 
-      href="images/noogler-hat.png">
+  <link rel="icon" type="image/png" href="images/noogler-hat.png">
 
   <!-- Disable tap highlight on IE -->
   <meta name="msapplication-tap-highlight" content="no">
@@ -46,60 +45,62 @@
   <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
 
   <!-- App Styling -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
   <link rel="stylesheet" href="styles/main.css">
 
 
 </head>
+
 <body>
-<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
+  <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
 
-  <!-- Header section containing logo -->
-  <header class="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
-    <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
-      <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
-        <h3>Counter</h3>
+    <!-- Header section containing logo -->
+    <header class="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
+      <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
+        <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
+          <h3>Counter</h3>
+        </div>
+        <div id="user-container">
+          <div hidden id="user-pic"></div>
+          <div hidden id="user-name"></div>
+          <button hidden id="sign-out" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+            Sign-out
+          </button>
+          <button id="sign-in" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+            <i class="material-icons">account_circle</i>Sign-in with Google
+          </button>
+        </div>
       </div>
-      <div id="user-container">
-        <div hidden id="user-pic"></div>
-        <div hidden id="user-name"></div>
-        <button hidden id="sign-out" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
-          Sign-out
-        </button>
-        <button id="sign-in" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
-          <i class="material-icons">account_circle</i>Sign-in with Google
-        </button>
-      </div>
-    </div>
-  </header>
+    </header>
 
-  <main class="mdl-layout__content mdl-color--grey-100">
-    <div style="    
+    <main class="mdl-layout__content mdl-color--grey-100">
+      <div style="    
     margin-left: auto;
     margin-right: auto;
     text-align: center;">
 
-    <h1 id="counter"></h1>
-    <form id="counter-form" action="#">
-            <button id="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-              Vote
-            </button>
-    </form>
-    
-    </div>
-    
+        <h1 id="counter"></h1>
+        <form id="counter-form" action="#">
+          <button id="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+            Vote
+          </button>
+        </form>
 
-    <div class="mdl-cell mdl-cell--12-col mdl-grid">
-
-
-      <div id="must-signin-snackbar" class="mdl-js-snackbar mdl-snackbar">
-        <div class="mdl-snackbar__text"></div>
-        <button class="mdl-snackbar__action" type="button"></button>
       </div>
 
-    </div>
-  </main>
-</div>
+
+      <div class="mdl-cell mdl-cell--12-col mdl-grid">
+
+
+        <div id="must-signin-snackbar" class="mdl-js-snackbar mdl-snackbar">
+          <div class="mdl-snackbar__text"></div>
+          <button class="mdl-snackbar__action" type="button"></button>
+        </div>
+
+      </div>
+    </main>
+  </div>
 
   <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
   <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
@@ -108,7 +109,8 @@
   <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-database.js"></script>
 
-<script src="scripts/auth.js"></script>
-<script src="scripts/main.js"></script>
+  <script src="scripts/auth.js"></script>
+  <script src="scripts/main.js"></script>
 </body>
+
 </html>
