@@ -77,6 +77,7 @@ function queryGameDetails(gameId) {
       addGameIdToUI(gameId);
       game = doc.data();
       addGameDetailsToUI(game);
+      initGameInstanceListener();
     } else {
         // doc.data() will be undefined in this case
       console.log("No such document!");
@@ -92,13 +93,27 @@ function addGameIdToUI(gameId) {
 }
 
 function addGameDetailsToUI(game) {
-  console.log(game);
   const gameTitleElement = document.getElementById("jsGameTitle");
   gameTitleElement.innerText = "The game's title is: " + game.title;
+
+  const numberOfQuestionsOfGameElement = document.getElementById('jsNumberOfQuestionsOfGame');
+  numberOfQuestionsOfGameElement.innerText = 'This game has a total of ' + game.numberOfQuestions + ' questions.';
 }
 
-function initActiveQuestionListener() {
+function initGameInstanceListener() {
+  db.collection('gameInstance').doc(activeGameInstanceId).onSnapshot(function(doc) {
+    const gameInstanceUpdate = doc.data();
+    updateGameInfo(gameInstanceUpdate.activeQuestionNumber);
+    console.log(gameInstanceUpdate);
+  });
+}
+
+function updateGameInfo(activeQuestionNumber) {
+  const activeQuestionNumberElement = document.getElementById('jsActiveQuestionNumber');
+  activeQuestionNumberElement.innerText = "This is question #" + (activeQuestionNumber + 1);
   
+  const activeQuestionTextElement = document.getElementById('jsActiveQuestionText');
+  activeQuestionTextElement.innerText = 'The question is: \"' + game.questions[activeQuestionNumber].question + '\"'
 }
 
 initAuthStateObserver();
