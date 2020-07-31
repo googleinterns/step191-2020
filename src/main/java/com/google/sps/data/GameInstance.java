@@ -9,6 +9,8 @@ public class GameInstance {
   private boolean isActive;
   private String creator;
   private String gameId;
+  private String currentQuestion;
+  private boolean currentQuestionActive;
   private List<Member> members;
 
   public GameInstance() {
@@ -52,6 +54,22 @@ public class GameInstance {
 
   public void setGameId(String gameId) {
     this.gameId = gameId;
+  }
+
+  public String getCurrentQuestion() {
+    return this.currentQuestion;
+  }
+
+  public void setCurrentQuestion(String currentQuestion) {
+    this.currentQuestion = currentQuestion;
+  }
+
+  public boolean isCurrentQuestionActive() {
+    return this.currentQuestionActive;
+  }
+
+  public void setCurrentQuestionActive(boolean currentQuestionActive) {
+    this.currentQuestionActive = currentQuestionActive;
   }
 
   public Member getMember(int index) {
