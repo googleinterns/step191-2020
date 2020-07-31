@@ -53,7 +53,6 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
 
   @Override
   public GameInstance getGameInstance(String uId) {
-          System.out.println(uId);
     DocumentReference docRef = firestoreDb.collection("gameInstance").document(uId);
     ApiFuture<DocumentSnapshot> future = docRef.get();
     GameInstance gameInstance = new GameInstance();
