@@ -1,27 +1,45 @@
 package com.google.sps.data;
 
-import com.google.auto.value.AutoValue;
 import com.google.sps.data.Question;
 import java.util.List;
 
-@AutoValue
-public abstract class Game {
+public class Game {
 
-  public static Builder builder() {
-    return new AutoValue_Game.Builder();
+  private String creator;
+  private String title;
+  private int numberOfQuestions;
+
+  public Game () {
   }
 
-  public abstract String title();
-  public abstract String creator();
-  public abstract List<Question> questions();
-
-
-  @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder title(String title);
-    public abstract Builder creator(String creator);
-    public abstract Builder questions(List<Question> questions);
-
-    public abstract Game build();
+  public Game(String creator, String title, int numberOfQuestions) {
+    this.title = title;  
+    this.creator = creator;  
+    this.numberOfQuestions = numberOfQuestions;
   }
+
+  public String getTitle() {
+    return this.title;  
+  }
+
+  public void setTitle(String title) {
+    this.title = title;  
+  }
+
+  public String getCreator() {
+    return this.creator;  
+  }
+
+  public void setCreator(String creator) {
+    this.creator = creator;  
+  }
+
+  public int getNumberOfQuestions() {
+    return this.numberOfQuestions;
+  }
+
+  public void setNumberOfQuestions(int numberOfQuestions) {
+    this.numberOfQuestions = numberOfQuestions;
+  }
+
 }

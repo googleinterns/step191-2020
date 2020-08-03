@@ -47,22 +47,29 @@ public class NewGameServlet extends HttpServlet {
         
     // Creates classes for answers, questions and games so when Game Dao is implemented you just pass a Game class.
     
-    Answer correct = Answer.builder().title(request.getParameter("correct-answer")).correct(true).build();
-    Answer wrong = Answer.builder().title(request.getParameter("wrong-answer")).correct(false).build();
+    Answer correct = new Answer(request.getParameter("correct-answer"), true);
+    Answer wrong = new Answer(request.getParameter("wrong-answer"), false);
     
     List<Answer> answers = Arrays.asList(correct, wrong);
 
-    Question question = Question.builder().title(request.getParameter("question")).answers(answers).build();
+    Question question = new Question(request.getParameter("question"), answers);
 
     List<Question> questions = Arrays.asList(question);
-
-    Game currentGame = Game.builder().title(request.getParameter("title")).creator(request.getParameter("uid")).questions(questions).build();
+    Game currentGame = new Game(request.getParameter("uid"), request.getParameter("title"), questions.size());
     
+    Firestore db = (Firestore) this.getServletContext().getAttribute("firestoreDb");
 
-    System.out.println(correct.toString());
-    System.out.println(wrong.toString());
-    System.out.println(question.toString());
-    System.out.println(currentGame.toString());
+    // Temporal adding
+    ApiFuture<DocumentReference> addedDocRef = db.collection("games").add(currentGame);
+    try{
+        CollectionReference questionsRef = db.collection("games").document(addedDocRef.get().getId()).collection("questions");
+        for(Question q : questions){
+            questionsRef.add(q);
+        }
+    } catch(Exception e){
+        System.out.println(e);
+    }
+
     response.sendRedirect("/create-game.html");
   }
 }
