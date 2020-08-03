@@ -21,7 +21,7 @@ public class JoinGameInstanceServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
     // Generate room key
-    String roomId = request.getParameter("room");
+    String roomId = request.getParameter("gameInstance");
 
     if(roomId==null || roomId.isEmpty()){
         response.setStatus(500);
