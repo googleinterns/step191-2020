@@ -63,7 +63,7 @@ function queryActiveGameInstanceDocument(gameInstanceId) {
       buildActiveGameInstanceUI(doc.data(), gameInstanceId);
       
       // Add buttons to control the GameInstance state
-      //initUIButtons(gameInstanceId);
+      initUIButtons(gameInstanceId);
     } else {
         // doc.data() will be undefined in this case
       console.log("No such document!");
@@ -130,30 +130,42 @@ function initGameInstanceListener() {
   db.collection('gameInstance').doc(activeGameInstanceId).onSnapshot(function(doc) {
     // If this is triggered it's because the GameInstance's activeQuestion changed
     const gameInstanceUpdate = doc.data();
-    updateGameInfo(gameInstanceUpdate.activeQuestionId);
+    updateGameInfo(gameInstanceUpdate.currentQuestion, gameInstanceUpdate.gameId);
     console.log(gameInstanceUpdate);
   });
 }
 
-function updateGameInfo(activeQuestionNumber) {
-  const activeQuestionNumberElement = document.getElementById('jsActiveQuestionNumber');
-  activeQuestionNumberElement.innerText = "Students are seeing question #" + (activeQuestionNumber + 1);
-  
-  const activeQuestionTextElement = document.getElementById('jsActiveQuestionText');
-  activeQuestionTextElement.innerText = 'The question is: \"' + game.questions[activeQuestionNumber].question + '\"'
+async function updateGameInfo(currentQuestion, gameId) {
+    const games = db.collection('games').doc(gameId);
+    games.collection('questions').doc(currentQuestion).get().then(function(doc) {
+        if (doc.exists) {
+            const activeQuestionTextElement = document.getElementById('jsActiveQuestionText');
+            activeQuestionTextElement.innerText = 'The question is: \"' + doc.data().title + '\"';
+        }
+    })
+    const activeQuestionNumberElement = document.getElementById('jsActiveQuestionNumber');
+    activeQuestionNumberElement.innerText = "Students are seeing question #" + (currentQuestion);
+
 }
 
 function initUIButtons(gameInstanceId) {
   const startGameInstanceButtonElement = document.getElementById('startGameInstanceButton');
+  const nextQuestionButton = document.getElementById("nextQuestionButton");
+  const previousQuestionButton = document.getElementById("previousQuestionButton");
+  const endGameInstanceButton = document.getElementById("endGameInstanceButton");
+  
   startGameInstanceButtonElement.addEventListener('click', () => {
-    console.log("Hi");
-    // fetch('/newGameInstance', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Accept': 'application/json',
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify({idToken: idToken, gameId: gameId})
+      fetch('/startGameInstance?action=start&gameInstance='+activeGameInstanceId);
+  });
+  nextQuestionButton.addEventListener('click', () => {
+      fetch('/startGameInstance?action=next&gameInstance='+activeGameInstanceId);
+  });
+  previousQuestionButton.addEventListener('click', () => {
+      fetch('/startGameInstance?action=previous&gameInstance='+activeGameInstanceId);
+  });
+  endGameInstanceButton.addEventListener('click', () => {
+      fetch('/startGameInstance?action=end&gameInstance='+activeGameInstanceId);
+      window.location.href = "/teacher/controlGameInstance.html";
   });
 }
 
