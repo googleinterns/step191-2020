@@ -34,6 +34,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import com.google.sps.daos.DatabaseGameDao;
+import com.google.sps.daos.GameDao;
 
 
 @WebServlet("/new-game")
@@ -58,7 +60,8 @@ public class NewGameServlet extends HttpServlet {
 
     Game currentGame = Game.builder().title(request.getParameter("title")).creator(request.getParameter("uid")).questions(questions).build();
     
-
+    GameDao dao = (GameDao) this.getServletContext().getAttribute("gameDao");
+    dao.createNewGame(currentGame);
     System.out.println(correct.toString());
     System.out.println(wrong.toString());
     System.out.println(question.toString());

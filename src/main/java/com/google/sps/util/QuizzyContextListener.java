@@ -13,6 +13,8 @@ import javax.servlet.annotation.WebListener;
 
 import com.google.sps.daos.DatabaseGameInstanceDao;
 import com.google.sps.daos.GameInstanceDao;
+import com.google.sps.daos.DatabaseGameDao;
+import com.google.sps.daos.GameDao;
 
 @WebListener("Context Listener")
 public class QuizzyContextListener implements ServletContextListener {
@@ -34,6 +36,11 @@ public class QuizzyContextListener implements ServletContextListener {
       
     }
 
+    GameDao gameDao = (DatabaseGameDao) event.getServletContext().getAttribute("gameDao");
+    if(gameDao == null) {
+      gameDao = new DatabaseGameDao(firestoreDb);
+      event.getServletContext().setAttribute("gameDao", gameDao);
+    }
   }
 
   private Firestore initializeFirestore() {
