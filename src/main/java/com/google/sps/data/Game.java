@@ -7,15 +7,15 @@ public class Game {
 
   private String creator;
   private String title;
-  List<Question> questions;
+  private int numberOfQuestions;
 
   public Game () {
   }
 
-  public Game(String creator, String title, List<Question> questions) {
+  public Game(String creator, String title, int numberOfQuestions) {
     this.title = title;  
     this.creator = creator;  
-    this.questions = questions;
+    this.numberOfQuestions = numberOfQuestions;
   }
 
   public String getTitle() {
@@ -27,22 +27,19 @@ public class Game {
   }
 
   public String getCreator() {
-    return this.title;  
+    return this.creator;  
   }
 
   public void setCreator(String creator) {
     this.creator = creator;  
   }
 
-  public List<Question> getQuestions() {
-    return this.questions;
+  public int getNumberOfQuestions() {
+    return this.numberOfQuestions;
   }
 
-  public void setQuestions(List<Question> questions) {
-    this.questions = questions;
+  public void setNumberOfQuestions(int numberOfQuestions) {
+    this.numberOfQuestions = numberOfQuestions;
   }
 
-  public void addQuestion(Question question) {
-    this.questions.add(question);
-  }
 }
