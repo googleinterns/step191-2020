@@ -58,6 +58,26 @@ public class NewGameServlet extends HttpServlet {
 
     Game currentGame = Game.builder().title(request.getParameter("title")).creator(request.getParameter("uid")).questions(questions).build();
     
+     Firestore db = (Firestore) this.getServletContext().getAttribute("firestoreDb");
+
+    // Temporal adding
+    Map<String, Object> data = new HashMap<>();
+    data.put("title", request.getParameter("title"));
+    data.put("creator", request.getParameter("uid"));
+    data.put("numberOfQuestions", 2);
+    ApiFuture<DocumentReference> addedDocRef = db.collection("games").add(data);
+    try{
+        CollectionReference messageRef = db.collection("games").document(addedDocRef.get().getId()).collection("questions");
+        for(Question q : questions){
+            Map<String, Object> questionsMap = new HashMap<>();
+            questionsMap.put("question", request.getParameter("question"));
+            messageRef.add(questionsMap);
+        }
+    } catch(Exception e){
+        System.out.println(e);
+    }
+
+
 
     System.out.println(correct.toString());
     System.out.println(wrong.toString());
