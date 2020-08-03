@@ -18,8 +18,6 @@ import com.google.sps.data.Member;
 @WebServlet("/joinGameInstance")
 public class JoinGameInstanceServlet extends HttpServlet {
   
-  private static Logger log = Logger.getLogger(JoinGameInstanceServlet.class.getName());
-
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
     // Generate room key
@@ -31,13 +29,14 @@ public class JoinGameInstanceServlet extends HttpServlet {
         return;
     }
 
+    // we should do this with a firebase Auth Token
     String uId = "aroquev";
     GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
-    GameInstance newRoom = dao.getGameInstance(roomId);
+    GameInstance joinedGameInstance = dao.getGameInstance(roomId);
 
-    if(newRoom != null){
-        newRoom.addMember(new Member(uId));
-        dao.updateGameInstance(newRoom);
+    if(joinedGameInstance != null){
+        joinedGameInstance.addMember(new Member(uId));
+        dao.updateGameInstance(joinedGameInstance);
         response.getWriter().println(uId + " added");
     } else {
         response.setStatus(404);
