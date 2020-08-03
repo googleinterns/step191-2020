@@ -51,8 +51,10 @@ function getActiveGameInstanceId(user) {
 function queryActiveGameInstanceDocument(gameInstanceId) {
   db.collection("gameInstance").doc(gameInstanceId).get().then(function(doc) {
     if (doc.exists) {
+      // If this point is reached, a GameInstance extists
       addGameInstanceIdToUI(gameInstanceId);
       buildActiveGameInstanceUI(doc.data());
+      initUIButtons(gameInstanceId);
     } else {
         // doc.data() will be undefined in this case
       console.log("No such document!");
@@ -110,10 +112,24 @@ function initGameInstanceListener() {
 
 function updateGameInfo(activeQuestionNumber) {
   const activeQuestionNumberElement = document.getElementById('jsActiveQuestionNumber');
-  activeQuestionNumberElement.innerText = "This is question #" + (activeQuestionNumber + 1);
+  activeQuestionNumberElement.innerText = "Students are seeing question #" + (activeQuestionNumber + 1);
   
   const activeQuestionTextElement = document.getElementById('jsActiveQuestionText');
   activeQuestionTextElement.innerText = 'The question is: \"' + game.questions[activeQuestionNumber].question + '\"'
+}
+
+function initUIButtons(gameInstanceId) {
+  const startGameInstanceButtonElement = document.getElementById('startGameInstanceButton');
+  startGameInstanceButtonElement.addEventListener('click', () => {
+    console.log("Hi");
+    // fetch('/newGameInstance', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Accept': 'application/json',
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify({idToken: idToken, gameId: gameId})
+  });
 }
 
 initAuthStateObserver();
