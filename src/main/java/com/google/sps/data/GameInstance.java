@@ -9,7 +9,7 @@ public class GameInstance {
   private boolean isActive;
   private String creator;
   private String gameId;
-  private String currentQuestion;
+  private int currentQuestion;
   private boolean currentQuestionActive;
   private List<Member> members;
 
@@ -56,11 +56,11 @@ public class GameInstance {
     this.gameId = gameId;
   }
 
-  public String getCurrentQuestion() {
+  public int getCurrentQuestion() {
     return this.currentQuestion;
   }
 
-  public void setCurrentQuestion(String currentQuestion) {
+  public void setCurrentQuestion(int currentQuestion) {
     this.currentQuestion = currentQuestion;
   }
 
