@@ -5,6 +5,10 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.io.IOException;
 
 import javax.servlet.ServletContextEvent;
@@ -25,15 +29,31 @@ public class QuizzyContextListener implements ServletContextListener {
     // This function is called when the application starts and will safely set a few required
     // context attributes such as the RealtimeDao
 
+    FirebaseApp firebase = initializeFirebase();
     Firestore firestoreDb = initializeFirestore();
 
-    GameInstanceDao roomDao = (GameInstanceDao) event.getServletContext().getAttribute("gameInstanceDao");
-    if (roomDao == null) {
-      roomDao = new DatabaseGameInstanceDao(firestoreDb);
-      event.getServletContext().setAttribute("gameInstanceDao", roomDao);
-      
-    }
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebase);
 
+    GameInstanceDao gameInstanceDao = (GameInstanceDao) event.getServletContext().getAttribute("gameInstanceDao");
+    if (gameInstanceDao == null) {
+      gameInstanceDao = new DatabaseGameInstanceDao(firestoreDb, firebaseAuth);
+      event.getServletContext().setAttribute("gameInstanceDao", gameInstanceDao);
+    }
+  }
+
+  private FirebaseApp initializeFirebase() {
+    FirebaseApp firebase = null;
+    FirebaseOptions options;
+    try {
+      options = new FirebaseOptions.Builder()
+      .setProjectId("quizzy-step-2020")
+      .setCredentials(GoogleCredentials.getApplicationDefault())
+      .build();
+      firebase = FirebaseApp.initializeApp(options);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return firebase;
   }
 
   private Firestore initializeFirestore() {
