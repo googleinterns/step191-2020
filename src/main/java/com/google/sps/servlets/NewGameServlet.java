@@ -48,24 +48,18 @@ public class NewGameServlet extends HttpServlet {
       
         
     // Creates classes for answers, questions and games so when Game Dao is implemented you just pass a Game class.
-    
-    Answer correct = Answer.builder().title(request.getParameter("correct-answer")).correct(true).build();
-    Answer wrong = Answer.builder().title(request.getParameter("wrong-answer")).correct(false).build();
-    
+    Answer correct = new Answer(request.getParameter("correct-answer"), true);
+    Answer wrong = new Answer(request.getParameter("wrong-answer"), true);
     List<Answer> answers = Arrays.asList(correct, wrong);
 
-    Question question = Question.builder().title(request.getParameter("question")).answers(answers).build();
-
+    Question question = new Question(request.getParameter("question"), answers);
     List<Question> questions = Arrays.asList(question);
 
     Game currentGame = Game.builder().title(request.getParameter("title")).creator(request.getParameter("uid")).questions(questions).build();
     
     GameDao dao = (GameDao) this.getServletContext().getAttribute("gameDao");
     dao.createNewGame(currentGame);
-    System.out.println(correct.toString());
-    System.out.println(wrong.toString());
-    System.out.println(question.toString());
-    System.out.println(currentGame.toString());
+
     response.sendRedirect("/create-game.html");
   }
 }

@@ -17,9 +17,12 @@ import com.google.cloud.firestore.SetOptions;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firestore.v1.StructuredQuery.CollectionSelector;
+import java.io.IOException;
 
 import com.google.sps.data.Member;
 import com.google.sps.data.Game;
+import com.google.sps.data.Question;
+import java.util.List;
 
 public class DatabaseGameDao implements GameDao {
 
@@ -32,50 +35,21 @@ public class DatabaseGameDao implements GameDao {
   
   @Override
   public boolean createNewGame(Game newGame) {
-
     DocumentReference newGameRef = firestoreDb.collection("games").document();
 
-    // //Create Game
-    // String userId = newGame.creator(); //User id from auth
-    // GameInstance newGameInstance = new GameInstance();
-    // newGameInstance.setCreator(userId);
-    // newGameInstance.setGameId(gameId);
+    List<Question> questions = newGame.questions();
 
+    newGameRef.set(newGame.gameData());
 
-    // Prepare data to be inserted
-    Map<String, Object> gameData = new HashMap<>();
-        gameData.put("creator", newGame.creator());
-        gameData.put("title", newGame.title());
-
-    //Post to db
-    newGameRef.set(gameData);
-    
+    try {
+      CollectionReference questionRef = newGameRef.collection("questions");
+      for (Question q : questions) {
+        questionRef.add(q);
+      }
+    } catch (Exception e) {
+      System.out.println(e);
+    }
 
     return true;
   }
-
-
-  @Override
-  public void getGame(String uId) {
-    // DocumentReference docRef = firestoreDb.collection("gameInstance").document(uId);
-    // ApiFuture<DocumentSnapshot> future = docRef.get();
-    // GameInstance gameInstance = new GameInstance();
-    // try {
-    //     DocumentSnapshot document = future.get();
-    //     gameInstance = document.toObject(GameInstance.class);
-
-    //     //Id is not a field in the db document so we add it manually
-    //     gameInstance.setId(document.getId());
-
-    // } catch(Exception e) {
-    //     System.out.println(e);
-    // }
-    // return gameInstance;
-  }
-
-  @Override
-  public void updateGame(Game update) {
-    // ApiFuture<WriteResult> writeResult = firestoreDb.collection("gameInstance").document(update.getId()).set(update, SetOptions.merge());
-  }
-
 }
