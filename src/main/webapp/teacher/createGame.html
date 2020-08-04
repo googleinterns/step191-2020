@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="eng">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a new game</title>
+
+    <!-- Nice styling from Material Design Lite -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+
+    <link rel="stylesheet" href="../styles/main.css">
+  </head>
+  <body >
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+      
+      <!-- Header section containing logo -->
+      <header class="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
+        <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
+          <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
+            <h3>Create New Game</h3>
+          </div>
+          <div id="user-container">
+            <div hidden id="user-pic"></div>
+            <div hidden id="user-name"></div>
+            <button hidden id="sign-out" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+              Sign-out
+            </button>
+            <button id="sign-in" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+              <i class="material-icons">account_circle</i>Sign-in with Google
+            </button>
+          </div>
+        </div>
+      </header>
+      
+      <form method="POST" action="/newGame">
+        <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header" id="questionsSection">
+          <div class="mdl-layout__drawer" id="drawer">
+            <span class="mdl-layout-title">Questions</span>
+            <nav class="mdl-navigation">
+              <a class="mdl-navigation__link mdl-navigation__link--current"  onclick="hideAllExcept('question0')" id="jsSelectQ0"><b>1</b> Multiple Choice</a>
+              <a class="mdl-navigation__link"  onclick="hideAllExcept('question1')" id="jsSelectQ1"><b>2</b> True or False</a>
+              <a class="mdl-navigation__link"  onclick="hideAllExcept('question2')" id="jsSelectQ2"><b>3</b> Multiple Choice</a>
+              <a class="mdl-navigation__link"  onclick="hideAllExcept('question3')" id="jsSelectQ3"><b>4</b> True or False</a>
+              <a class="mdl-navigation__link"  onclick="hideAllExcept('question4')" id="jsSelectQ4"><b>5</b> Multiple Choice</a>
+              <!-- Colored raised button -->
+<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+  New Question
+</button>
+            </nav>
+            
+          </div>
+          <!-- ------------ FIRST QUESTION ----------- -->
+          <main class="mdl-layout__content questionSection" id="question0" >
+            <div class="page-content">
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--3-col"></div>
+                <div class="mdl-cell mdl-cell--6-col">
+                    <h3>Multiple Choice</h3>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                      <input class="mdl-textfield__input" type="text" id="game-question0" name="question0title"> <label class="mdl-textfield__label" for="game-question">Question Title</label>
+                    </div>
+                </div>
+                <div class="mdl-cell mdl-cell--3-col"></div>
+              </div>
+
+              <!-- The first line -->
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--1-col"></div>
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- First answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question0answer0"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 1</label>
+                  </div>
+
+                  <!-- Check if it's correct -->
+                  <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question0checkbox0">
+                    <input type="checkbox" id="question0checkbox0" class="mdl-checkbox__input" name="question0correct0">
+                    <span class="mdl-checkbox__label">Correct</span>
+                  </label>
+                </div>
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- Second answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question0answer1"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 2</label>
+                  </div>
+
+                  <!-- Check if it's correct -->
+                  <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question0checkbox1">
+                    <input type="checkbox" id="question0checkbox1" class="mdl-checkbox__input" name="question0correct1">
+                    <span class="mdl-checkbox__label">Correct</span>
+                  </label>
+                </div>
+                <div class="mdl-cell mdl-cell--1-col"></div>
+              </div>
+              <!-- The second line -->
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--1-col"></div>
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- Third answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question0answer2"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 3 (Optional)</label>
+                  </div>
+
+                  <!-- Check if it's correct -->
+                  <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question0checkbox2">
+                    <input type="checkbox" id="question0checkbox2" class="mdl-checkbox__input" name="question0correct2">
+                    <span class="mdl-checkbox__label">Correct</span>
+                  </label>
+                </div>
+
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- Fourth answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question0answer3"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 4 (Optional)</label>
+                  </div>
+
+                  <!-- Check if it's correct -->
+                  <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question0checkbox3">
+                    <input type="checkbox" id="question0checkbox3" class="mdl-checkbox__input" name="question0correct3">
+                    <span class="mdl-checkbox__label">Correct</span>
+                  </label>
+                </div>
+                <div class="mdl-cell mdl-cell--1-col"></div>
+              </div>
+              <!-- BUTTONS BELOW -->
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--1-col"></div>
+                <div class="mdl-cell mdl-cell--3-col">
+                  <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="hideAllExcept('question0')" type="button" disabled> Previous </button>
+                </div>
+                <div class="mdl-cell mdl-cell--4-col"></div>
+                <div class="mdl-cell mdl-cell--3-col">
+                  <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="hideAllExcept('question1')" type="button" > Next </button>
+                </div>
+                <div class="mdl-cell mdl-cell--1-col"></div>
+              </div>
+            </div>
+          </main>
+
+          <!-- ------------ SECOND QUESTION ----------- -->
+          <main class="mdl-layout__content questionSection" id="question1" hidden>
+            <div class="page-content">
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--3-col"></div>
+                <div class="mdl-cell mdl-cell--6-col">
+                    <h3>True or False</h3>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                      <input class="mdl-textfield__input" type="text" id="game-question0" name="question1title"> <label class="mdl-textfield__label" for="game-question">Question Title</label>
+                    </div>
+                </div>
+                <div class="mdl-cell mdl-cell--3-col"></div>
+              </div>
+
+              <!-- The first line -->
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--1-col"></div>
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- First answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question1answer0"> <label class="mdl-textfield__label" for="game-correct-answer">True</label>
+                  </div>
+                </div>
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- Second answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question1answer1"> <label class="mdl-textfield__label" for="game-correct-answer">False</label>
+                  </div>
+
+                </div>
+                <div class="mdl-cell mdl-cell--1-col"></div>
+              </div>
+
+              <!-- BUTTONS BELOW -->
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--1-col"></div>
+                <div class="mdl-cell mdl-cell--3-col">
+                  <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="hideAllExcept('question0')" type="button" > Previous </button>
+                </div>
+                <div class="mdl-cell mdl-cell--4-col"></div>
+                <div class="mdl-cell mdl-cell--3-col">
+                  <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="hideAllExcept('question2')" type="button" > Next </button>
+                </div>
+                <div class="mdl-cell mdl-cell--1-col"></div>
+              </div>
+            </div>
+          </main>
+
+          <!-- ------------ THIRD QUESTION ----------- -->
+          <main class="mdl-layout__content questionSection" id="question2" hidden>
+            <div class="page-content">
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--3-col"></div>
+                <div class="mdl-cell mdl-cell--6-col">
+                    <h3>Multiple Choice</h3>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                      <input class="mdl-textfield__input" type="text" id="game-question0" name="question2title"> <label class="mdl-textfield__label" for="game-question">Question Title</label>
+                    </div>
+                </div>
+                <div class="mdl-cell mdl-cell--3-col"></div>
+              </div>
+
+              <!-- The first line -->
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--1-col"></div>
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- First answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question2answer0"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 1</label>
+                  </div>
+
+                  <!-- Check if it's correct -->
+                  <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question2checkbox0">
+                    <input type="checkbox" id="question2checkbox0" class="mdl-checkbox__input" name="question2correct0">
+                    <span class="mdl-checkbox__label">Correct</span>
+                  </label>
+                </div>
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- Second answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question2answer1"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 2</label>
+                  </div>
+
+                  <!-- Check if it's correct -->
+                  <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question2checkbox1">
+                    <input type="checkbox" id="question2checkbox1" class="mdl-checkbox__input" name="question2correct1">
+                    <span class="mdl-checkbox__label">Correct</span>
+                  </label>
+                </div>
+                <div class="mdl-cell mdl-cell--1-col"></div>
+              </div>
+              <!-- The second line -->
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--1-col"></div>
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- Third answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question2answer2"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 3 (Optional)</label>
+                  </div>
+
+                  <!-- Check if it's correct -->
+                  <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question2checkbox2">
+                    <input type="checkbox" id="question2checkbox2" class="mdl-checkbox__input" name="question2correct2">
+                    <span class="mdl-checkbox__label">Correct</span>
+                  </label>
+                </div>
+
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- Fourth answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question2answer3"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 4 (Optional)</label>
+                  </div>
+
+                  <!-- Check if it's correct -->
+                  <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question2checkbox3">
+                    <input type="checkbox" id="question2checkbox3" class="mdl-checkbox__input" name="question2correct3">
+                    <span class="mdl-checkbox__label">Correct</span>
+                  </label>
+                </div>
+                <div class="mdl-cell mdl-cell--1-col"></div>
+              </div>
+
+              <!-- BUTTONS BELOW -->
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--1-col"></div>
+                <div class="mdl-cell mdl-cell--3-col">
+                  <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="hideAllExcept('question1')" type="button"> Previous </button>
+                </div>
+                <div class="mdl-cell mdl-cell--4-col"></div>
+                <div class="mdl-cell mdl-cell--3-col">
+                  <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="hideAllExcept('question3')" type="button" > Next </button>
+                </div>
+                <div class="mdl-cell mdl-cell--1-col"></div>
+              </div>
+            </div>
+          </main>
+
+          <!-- ------------ FOURTH QUESTION ----------- -->
+          <main class="mdl-layout__content questionSection" id="question3" hidden>
+            <div class="page-content">
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--3-col"></div>
+                <div class="mdl-cell mdl-cell--6-col">
+                    <h3>True or False</h3>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                      <input class="mdl-textfield__input" type="text" id="game-question0" name="question3title"> <label class="mdl-textfield__label" for="game-question">Question Title</label>
+                    </div>
+                </div>
+                <div class="mdl-cell mdl-cell--3-col"></div>
+              </div>
+
+              <!-- The first line -->
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--1-col"></div>
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- First answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question3answer0"> <label class="mdl-textfield__label" for="game-correct-answer">True</label>
+                  </div>
+                </div>
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- Second answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question3answer1"> <label class="mdl-textfield__label" for="game-correct-answer">False</label>
+                  </div>
+                </div>
+                <div class="mdl-cell mdl-cell--1-col"></div>
+              </div>
+
+              <!-- BUTTONS BELOW -->
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--1-col"></div>
+                <div class="mdl-cell mdl-cell--3-col">
+                  <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="hideAllExcept('question2')" type="button" > Previous </button>
+                </div>
+                <div class="mdl-cell mdl-cell--4-col"></div>
+                <div class="mdl-cell mdl-cell--3-col">
+                  <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="hideAllExcept('question4')" type="button" > Next </button>
+                </div>
+                <div class="mdl-cell mdl-cell--1-col"></div>
+              </div>
+            </div>
+          </main>
+
+          <!-- ------------ FIFTH QUESTION ----------- -->
+          <main class="mdl-layout__content questionSection" id="question4" hidden>
+            <div class="page-content">
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--3-col"></div>
+                <div class="mdl-cell mdl-cell--6-col">
+                    <h3>Multiple Choice</h3>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                      <input class="mdl-textfield__input" type="text" id="game-question0" name="question4title"> <label class="mdl-textfield__label" for="game-question">Question Title</label>
+                    </div>
+                </div>
+                <div class="mdl-cell mdl-cell--3-col"></div>
+              </div>
+
+              <!-- The first line -->
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--1-col"></div>
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- First answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question4answer0"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 1</label>
+                  </div>
+
+                  <!-- Check if it's correct -->
+                  <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question4checkbox0">
+                    <input type="checkbox" id="question4checkbox0" class="mdl-checkbox__input" name="question4correct0">
+                    <span class="mdl-checkbox__label">Correct</span>
+                  </label>
+                </div>
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- Second answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question4answer1"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 2</label>
+                  </div>
+
+                  <!-- Check if it's correct -->
+                  <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question4checkbox1">
+                    <input type="checkbox" id="question4checkbox1" class="mdl-checkbox__input" name="question4correct1">
+                    <span class="mdl-checkbox__label">Correct</span>
+                  </label>
+                </div>
+                <div class="mdl-cell mdl-cell--1-col"></div>
+              </div>
+              <!-- The second line -->
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--1-col"></div>
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- Third answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question4answer2"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 3 (Optional)</label>
+                  </div>
+
+                  <!-- Check if it's correct -->
+                  <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question4checkbox2">
+                    <input type="checkbox" id="question4checkbox2" class="mdl-checkbox__input" name="question4correct2">
+                    <span class="mdl-checkbox__label">Correct</span>
+                  </label>
+                </div>
+
+                <div class="mdl-cell mdl-cell--5-col">
+                  <!-- Fourth answer -->
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question4answer3"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 4 (Optional)</label>
+                  </div>
+
+                  <!-- Check if it's correct -->
+                  <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question4checkbox3" name="question4correct3">
+                    <input type="checkbox" id="question4checkbox3" class="mdl-checkbox__input" name="question4correct3">
+                    <span class="mdl-checkbox__label">Correct</span>
+                  </label>
+                </div>
+                <div class="mdl-cell mdl-cell--1-col"></div>
+              </div>
+
+              <!-- BUTTONS BELOW -->
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--1-col"></div>
+                <div class="mdl-cell mdl-cell--3-col">
+                  <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="hideAllExcept('question3')" type="button"> Previous </button>
+                </div>
+                <div class="mdl-cell mdl-cell--4-col"></div>
+                <div class="mdl-cell mdl-cell--3-col">
+                  <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="hideAllExcept('question4')" type="button" disabled> Next </button>
+                </div>
+                <div class="mdl-cell mdl-cell--1-col"></div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </form>
+    </div>
+
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-performance.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-firestore.js"></script>
+  
+    <script src="../scripts/main.js"></script>
+    <script src="../scripts/auth.js"></script>
+    <script src="../scripts/createGame.js"></script>
+  </body>
+</html>
