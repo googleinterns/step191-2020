@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.Arrays;
+import java.util.ArrayList;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,24 +47,66 @@ public class NewGameServlet extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response) 
     throws IOException {
       
-        
-    // Creates classes for answers, questions and games so when Game Dao is implemented you just pass a Game class.
-    Answer correct = new Answer(request.getParameter("correct-answer"), true);
-    Answer wrong = new Answer(request.getParameter("wrong-answer"), true);
-    List<Answer> answers = Arrays.asList(correct, wrong);
+    // DISCLAIMER: ALL OF THE FOLLOWING STUFF IS HARD CODED FOR THE DEMO
+    List<Question> questions = new ArrayList(Arrays.asList());
 
-    Question question = new Question(request.getParameter("question"), answers);
-    List<Question> questions = Arrays.asList(question);
 
-    Game currentGame = Game.builder().title(request.getParameter("title")).creator(request.getParameter("uid")).questions(questions).build();
-    
+    List<Answer> answers0 = new ArrayList(Arrays.asList());
+    for(int i = 0; i < 4; i++ ){    
+      if(request.getParameter("question0answer" + i) == "")
+        answers0.add(new Answer(request.getParameter("question0answer" + i), (request.getParameter("question0correct" + i) == null)));
+    }
+    questions.add(new Question(request.getParameter("question0title"), answers0));
+
+
+    List<Answer> answers1 = new ArrayList(Arrays.asList());
+    answers1.add(new Answer(request.getParameter("question1answer" + 0), true));
+    answers1.add(new Answer(request.getParameter("question1answer" + 1), false));
+    questions.add(new Question(request.getParameter("question3title"), answers1));
+
+    List<Answer> answers2 = new ArrayList(Arrays.asList());
+    for(int i = 0; i < 4; i++ ){    
+      if(request.getParameter("question2answer" + i) == "")
+        answers2.add(new Answer(request.getParameter("question2answer" + i), (request.getParameter("question2correct" + i) == null)));
+    }
+    questions.add(new Question(request.getParameter("question2title"), answers2));
+
+
+    List<Answer> answers3 = new ArrayList(Arrays.asList());
+    answers3.add(new Answer(request.getParameter("question3answer" + 0), true));
+    answers3.add(new Answer(request.getParameter("question3answer" + 1), false));
+    questions.add(new Question(request.getParameter("question3title"), answers3));
+
+    List<Answer> answers4 = new ArrayList(Arrays.asList());
+    for(int i = 0; i < 4; i++ ){    
+      if(request.getParameter("question4answer" + i) == "")
+        answers4.add(new Answer(request.getParameter("question4answer" + i), (request.getParameter("question4answer" + i) == null)));
+    }
+    questions.add(new Question(request.getParameter("question4title"), answers4));
+
+    Game currentGame = Game.builder().title("Temp").creator(request.getParameter("uid")).questions(questions).build();
+
     GameDao dao = (GameDao) this.getServletContext().getAttribute("gameDao");
     dao.createNewGame(currentGame);
 
-    System.out.println(correct.toString());
-    System.out.println(wrong.toString());
-    System.out.println(question.toString());
-    System.out.println(currentGame.toString());
+
+    // // Creates classes for answers, questions and games so when Game Dao is implemented you just pass a Game class.
+    // Answer correct = new Answer(request.getParameter("correct-answer"), true);
+    // Answer wrong = new Answer(request.getParameter("wrong-answer"), true);
+    // List<Answer> answers = Arrays.asList(correct, wrong);
+
+    // Question question0 = new Question(request.getParameter("question0title"), answers0);
+    // List<Question> questions = Arrays.asList(question);
+
+    // Game currentGame = Game.builder().title(request.getParameter("title")).creator(request.getParameter("uid")).questions(questions).build();
+    
+    // GameDao dao = (GameDao) this.getServletContext().getAttribute("gameDao");
+    // dao.createNewGame(currentGame);
+
+    // System.out.println(correct.toString());
+    // System.out.println(wrong.toString());
+    // System.out.println(question.toString());
+    // System.out.println(currentGame.toString());
     response.sendRedirect("/teacher/createGame.html");
   }
 }

@@ -43,8 +43,10 @@ public class DatabaseGameDao implements GameDao {
 
     try {
       CollectionReference questionRef = newGameRef.collection("questions");
+      int i = 0;
       for (Question q : questions) {
-        questionRef.add(q);
+        questionRef.document("question" + i).set(q);
+        i++;
       }
     } catch (Exception e) {
       System.out.println(e);
