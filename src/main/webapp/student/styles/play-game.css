@@ -11,3 +11,11 @@
 .active{
      display:block;
 }
+
+.wrongAnswer {
+    color: red
+}
+
+.rightAnswer {
+    color: green
+}

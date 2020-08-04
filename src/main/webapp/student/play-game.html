@@ -77,20 +77,21 @@
     </header>
 
     <main class="mdl-layout__content mdl-color--grey-100">
-    <div style="    
+      <div style="    
     margin: 100px auto;
     text-align: center;">
-    <h3 class="notReady" id="getReady">Get ready...</h3>
-    <div class="game" id="gameSection">
-        <div id="question" style="margin:30px;"></div>
-        <form action="" >
+        <h3 class="notReady" id="getReady">Get ready...</h3>
+        <div class="game" id="gameSection">
+          <div id="question" style="margin:30px;"></div>
+          <form action="" id="answerForm">
             <div id="answerOptions"></div>
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="margin:30px;">
-            Submit
+            <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="margin:30px;">
+              Submit
             </button>
-        </form>
+          </form>
+          <div id="answerFeedback"></div>
         </div>
-    </div>
+      </div>
 
 
       <div class="mdl-cell mdl-cell--12-col mdl-grid">
