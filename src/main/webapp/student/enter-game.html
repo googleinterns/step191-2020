@@ -17,12 +17,13 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control your Game Instance</title>
+  <title>Create Game Instance</title>
 
   <link rel="icon" type="image/png" href="../images/noogler-hat.png">
 
   <!-- Disable tap highlight on IE -->
   <meta name="msapplication-tap-highlight" content="no">
+
 
   <!-- Add to homescreen for Chrome on Android -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -48,6 +49,8 @@
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
   <link rel="stylesheet" href="../styles/main.css">
+  <link rel="stylesheet" href="styles/enter-game.css">
+
 
 </head>
 
@@ -58,7 +61,7 @@
     <header class="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
       <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
         <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
-          <h3>Control your Game</h3>
+          <h3>Enter Live Room</h3>
         </div>
         <div id="user-container">
           <div hidden id="user-pic"></div>
@@ -74,42 +77,22 @@
     </header>
 
     <main class="mdl-layout__content mdl-color--grey-100">
-      <div style="    
-    margin-left: auto;
-    margin-right: auto;
+    <div style="    
+    margin: 100px auto;
     text-align: center;">
-
-        <div id="controlPanel">
-
-          <div id="gameInfo">
-            <div id="jsGameInstanceId"></div>
-            <div id="jsGameDetails">
-              <div id="jsGameId"></div>
-              <div id="jsGameTitle"></div>
-              <div id="jsNumberOfQuestionsOfGame"></div>
-            </div>
-          </div>
-
-          <div id="questionInfo">
-            <div id="jsActiveQuestionNumber"></div>
-            <div id="jsActiveQuestionText"></div>
-          </div>
-
-          <div id="questionControls">
-            <button id="nextQuestionButton" type="button">Next question</button>
-            <br>
-            <button id="previousQuestionButton" type="button">Previous question</button>
-          </div>
-
-          <div id="startGameInstance">
-            <button id="startGameInstanceButton" type="button">Start game</button>
-            <br>
-            <button id="endGameInstanceButton" type="button">End Game</button>
-          </div>
+        <label class="mdc-text-field mdc-text-field--filled">
+            <span class="mdc-text-field__ripple"></span>
+            <input class="mdc-text-field__input" type="text" aria-labelledby="my-label-id" id="roomId">
+            <span class="mdc-floating-label" id="my-label-id">Room Id</span>
+            <span class="mdc-line-ripple"></span>
+        </label> 
+        <div style="margin-top:30px;">
+          <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" onclick="getGame()">
+            Go!
+          </button>
         </div>
-
-
-      </div>
+        <h4 class="result" id="resultRoom">Room is not active</h4>
+    </div>
 
 
       <div class="mdl-cell mdl-cell--12-col mdl-grid">
@@ -129,11 +112,11 @@
   <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-performance.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-firestore.js"></script>
-
+  <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-database.js"></script>
 
   <script src="../scripts/main.js"></script>
   <script src="../scripts/auth.js"></script>
-  <script src="../scripts/controlGameInstance.js"></script>
+  <script src="scripts/enter-game.js"></script>
 
 </body>
 
