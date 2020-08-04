@@ -1,0 +1,21 @@
+.notReady{
+    display:block;
+    color: #3a8b3a;
+}
+.ready{
+    display:none;
+}
+.game{
+    display:none;
+}
+.active{
+     display:block;
+}
+
+.wrongAnswer {
+    color: red
+}
+
+.rightAnswer {
+    color: green
+}

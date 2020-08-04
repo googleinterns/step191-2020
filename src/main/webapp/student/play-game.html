@@ -49,7 +49,7 @@
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
   <link rel="stylesheet" href="../styles/main.css">
-  <link rel="stylesheet" href="../styles/newGameInstance.css">
+  <link rel="stylesheet" href="styles/play-game.css">
 
 
 </head>
@@ -61,7 +61,7 @@
     <header class="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
       <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
         <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
-          <h3>Create New Live Room</h3>
+          <h3>Play Game</h3>
         </div>
         <div id="user-container">
           <div hidden id="user-pic"></div>
@@ -78,16 +78,19 @@
 
     <main class="mdl-layout__content mdl-color--grey-100">
       <div style="    
-    margin-left: auto;
-    margin-right: auto;
+    margin: 100px auto;
     text-align: center;">
-
-        <div id="choose-game">
-          <div id="js-game-list">
-          </div>
+        <h3 class="notReady" id="getReady">Get ready...</h3>
+        <div class="game" id="gameSection">
+          <div id="question" style="margin:30px;"></div>
+          <form action="" id="answerForm">
+            <div id="answerOptions"></div>
+            <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" style="margin:30px;">
+              Submit
+            </button>
+          </form>
+          <div id="answerFeedback"></div>
         </div>
-
-
       </div>
 
 
@@ -110,10 +113,9 @@
   <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-database.js"></script>
 
-
   <script src="../scripts/main.js"></script>
   <script src="../scripts/auth.js"></script>
-  <script src="../scripts/newGameInstance.js"></script>
+  <script src="scripts/play-game.js"></script>
 
 </body>
 
