@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-@WebServlet("/new-game")
+@WebServlet("/newGame")
 public class NewGameServlet extends HttpServlet {
 
 
@@ -63,6 +63,6 @@ public class NewGameServlet extends HttpServlet {
     System.out.println(wrong.toString());
     System.out.println(question.toString());
     System.out.println(currentGame.toString());
-    response.sendRedirect("/create-game.html");
+    response.sendRedirect("/teacher/createGame.html");
   }
 }
