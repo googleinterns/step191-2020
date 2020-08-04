@@ -1,5 +1,7 @@
 package com.google.sps.data;
 
+import java.util.HashMap;
+import java.util.Map;
 import com.google.auto.value.AutoValue;
 import com.google.sps.data.Question;
 import java.util.List;
@@ -15,6 +17,21 @@ public abstract class Game {
   public abstract String creator();
   public abstract List<Question> questions();
 
+  public Map<String, Object> gameData() {
+
+    Map<String, Object> gameData = new HashMap<>();
+        gameData.put("creator", this.creator());
+        gameData.put("title", this.title());
+        gameData.put("numberOfQuestions", this.questions().size());
+    return gameData;
+  }
+
+  public Builder toBuilder() {
+    return new AutoValue_Game.Builder()
+      .title(this.title())
+      .creator(this.creator())
+      .questions(this.questions());
+  }
 
   @AutoValue.Builder
   public abstract static class Builder {
