@@ -42,7 +42,8 @@
           <div class="mdl-layout__drawer" id="drawer">
             <span class="mdl-layout-title">Questions</span>
             <nav class="mdl-navigation">
-              <a class="mdl-navigation__link mdl-navigation__link--current"  onclick="hideAllExcept('question0')" id="jsSelectQ0"><b>1</b> Multiple Choice</a>
+              <a class="mdl-navigation__link mdl-navigation__link--current"  onclick="hideAllExcept('question-1')" id="jsSelectQ-1"> <b>Title</b> </a>
+              <a class="mdl-navigation__link"  onclick="hideAllExcept('question0')" id="jsSelectQ0"><b>1</b> Multiple Choice</a>
               <a class="mdl-navigation__link"  onclick="hideAllExcept('question1')" id="jsSelectQ1"><b>2</b> True or False</a>
               <a class="mdl-navigation__link"  onclick="hideAllExcept('question2')" id="jsSelectQ2"><b>3</b> Multiple Choice</a>
               <a class="mdl-navigation__link"  onclick="hideAllExcept('question3')" id="jsSelectQ3"><b>4</b> True or False</a>
@@ -54,8 +55,24 @@
             </nav>
             
           </div>
+          <!-- ------------ TITLE ----------- -->
+          <main class="mdl-layout__content questionSection" id="question-1" >
+            <div class="page-content">
+              <div class="mdl-grid">
+                <div class="mdl-cell mdl-cell--3-col"></div>
+                <div class="mdl-cell mdl-cell--6-col">
+                  <h3>Game Title</h3>
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="text" id="game-question0" name="gameTitle"> <label class="mdl-textfield__label" for="game-question">Title</label>
+                  </div>
+                </div>
+                <div class="mdl-cell mdl-cell--3-col"></div>
+              </div>
+            </div>
+          </main>
+
           <!-- ------------ FIRST QUESTION ----------- -->
-          <main class="mdl-layout__content questionSection" id="question0" >
+          <main class="mdl-layout__content questionSection" id="question0" hidden>
             <div class="page-content">
               <div class="mdl-grid">
                 <div class="mdl-cell mdl-cell--3-col"></div>
@@ -366,7 +383,7 @@
               <div class="mdl-cell mdl-cell--4-col">
                 <!-- Accent-colored raised button with ripple -->
                 <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-                  SEND
+                  SEND QUESTIONS
                 </button>
               </div>
               <div class="mdl-cell mdl-cell--4-col"></div>

@@ -53,8 +53,8 @@ public class NewGameServlet extends HttpServlet {
 
     List<Answer> answers0 = new ArrayList(Arrays.asList());
     for(int i = 0; i < 4; i++ ){    
-      if(request.getParameter("question0answer" + i) == "")
-        answers0.add(new Answer(request.getParameter("question0answer" + i), (request.getParameter("question0correct" + i) == null)));
+      if(request.getParameter("question0answer" + i) != "")
+        answers0.add(new Answer(request.getParameter("question0answer" + i), !(request.getParameter("question0correct" + i) == null)));
     }
     questions.add(new Question(request.getParameter("question0title"), answers0));
 
@@ -66,8 +66,8 @@ public class NewGameServlet extends HttpServlet {
 
     List<Answer> answers2 = new ArrayList(Arrays.asList());
     for(int i = 0; i < 4; i++ ){    
-      if(request.getParameter("question2answer" + i) == "")
-        answers2.add(new Answer(request.getParameter("question2answer" + i), (request.getParameter("question2correct" + i) == null)));
+      if(request.getParameter("question2answer" + i) != "")
+        answers2.add(new Answer(request.getParameter("question2answer" + i), !(request.getParameter("question2correct" + i) == null)));
     }
     questions.add(new Question(request.getParameter("question2title"), answers2));
 
@@ -79,12 +79,12 @@ public class NewGameServlet extends HttpServlet {
 
     List<Answer> answers4 = new ArrayList(Arrays.asList());
     for(int i = 0; i < 4; i++ ){    
-      if(request.getParameter("question4answer" + i) == "")
-        answers4.add(new Answer(request.getParameter("question4answer" + i), (request.getParameter("question4answer" + i) == null)));
+      if(request.getParameter("question4answer" + i) != "")
+        answers4.add(new Answer(request.getParameter("question4answer" + i), !(request.getParameter("question4answer" + i) == null)));
     }
     questions.add(new Question(request.getParameter("question4title"), answers4));
 
-    Game currentGame = Game.builder().title("Temp").creator(request.getParameter("uid")).questions(questions).build();
+    Game currentGame = Game.builder().title(request.getParameter("gameTitle")).creator(request.getParameter("uid")).questions(questions).build();
 
     GameDao dao = (GameDao) this.getServletContext().getAttribute("gameDao");
     dao.createNewGame(currentGame);
