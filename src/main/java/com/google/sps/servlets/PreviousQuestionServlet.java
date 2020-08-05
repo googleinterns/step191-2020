@@ -57,6 +57,8 @@ public class PreviousQuestionServlet extends HttpServlet {
             DocumentSnapshot document = future.get();
             newRoom.setCurrentQuestion(document.get("previousQuestion").toString());
         } catch(Exception e) {
+            response.setStatus(400);
+            response.getWriter().println("No question");
             System.out.println(e);
             return;
         }
