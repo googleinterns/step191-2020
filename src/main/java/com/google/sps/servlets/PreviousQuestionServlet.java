@@ -26,9 +26,10 @@ import com.google.sps.data.GameInstance;
 import java.util.List; 
 import java.util.ArrayList; 
 
-@WebServlet("/startGameInstance")
-public class StartGameInstanceServlet extends HttpServlet {
-
+@WebServlet("/previousQuestion")
+public class PreviousQuestionServlet extends HttpServlet {
+    private List<QueryDocumentSnapshot> questions = new ArrayList<>();
+    private int indexQuestions;
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
@@ -51,17 +52,16 @@ public class StartGameInstanceServlet extends HttpServlet {
         return;
     }
 
-        ApiFuture<DocumentSnapshot> future = db.collection("games").document(newRoom.getGameId()).get();
+        ApiFuture<DocumentSnapshot> future = db.collection("games").document(newRoom.getGameId()).collection("questions").document(newRoom.getCurrentQuestion()).get();
         try {
             DocumentSnapshot document = future.get();
-            newRoom.setCurrentQuestion(document.get("headQuestion").toString());
+            newRoom.setCurrentQuestion(document.get("previousQuestion").toString());
         } catch(Exception e) {
             System.out.println(e);
             return;
         }
 
         // Activate room
-        newRoom.setIsActive(true);
 
 
     dao.updateGameInstance(newRoom);
