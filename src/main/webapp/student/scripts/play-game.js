@@ -69,20 +69,13 @@ function createAnswersObject(answers) {
     event.preventDefault();
     const correctRadioInput = document.getElementById("correctAnswer");
     answerFeedbackElement.className = '';
-    var titleElement = document.createElement("h3")
     if (correctRadioInput.checked) {
       answerFeedbackElement.innerText = "That is correct!"
       answerFeedbackElement.classList.add('rightAnswer')
-      titleElement.className = "mdl-dialog__title mdl-color-text--green-900";
-      titleElement.innerText = "Your answer is correct!"
     } else {
       answerFeedbackElement.innerText = "Are you sure that's the correct answer?"
       answerFeedbackElement.classList.add('wrongAnswer')
-      titleElement.className = "mdl-dialog__title mdl-color-text--red-900";
-      titleElement.innerText = "Your answer is wrong :("
     }
-    document.getElementById("dialog-title").appendChild(titleElement)
-    dialog.showModal();
   });
 }
 
@@ -93,14 +86,3 @@ function setSubmitButton() {
 checkIfActive();
 
 
-  (function() {
-    'use strict';
-    var dialog = document.querySelector('#dialog');
-    if (! dialog.showModal) {
-      dialogPolyfill.registerDialog(dialog);
-    }
-    dialog.querySelector('button:not([disabled])')
-    .addEventListener('click', function() {
-      dialog.close();
-    });
-  }());

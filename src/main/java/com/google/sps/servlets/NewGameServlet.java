@@ -14,20 +14,10 @@
 
 package com.google.sps.servlets;
 
-
-import com.google.api.core.ApiFuture;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
-import com.google.cloud.firestore.WriteResult;
 import com.google.sps.data.Game;
 import com.google.sps.data.Question;
 import com.google.sps.data.Answer;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
