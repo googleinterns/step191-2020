@@ -31,7 +31,7 @@ public class EndGameInstanceServlet extends HttpServlet {
 
 
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException { 
   // Generate room key
     String roomId = request.getParameter("gameInstance");
     Firestore db = (Firestore) this.getServletContext().getAttribute("firestoreDb");

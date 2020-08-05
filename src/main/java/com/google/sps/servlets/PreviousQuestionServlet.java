@@ -28,11 +28,9 @@ import java.util.ArrayList;
 
 @WebServlet("/previousQuestion")
 public class PreviousQuestionServlet extends HttpServlet {
-    private List<QueryDocumentSnapshot> questions = new ArrayList<>();
-    private int indexQuestions;
 
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException { 
   // Generate room key
     String roomId = request.getParameter("gameInstance");
     Firestore db = (Firestore) this.getServletContext().getAttribute("firestoreDb");
@@ -62,8 +60,6 @@ public class PreviousQuestionServlet extends HttpServlet {
             System.out.println(e);
             return;
         }
-
-        // Activate room
 
 
     dao.updateGameInstance(newRoom);

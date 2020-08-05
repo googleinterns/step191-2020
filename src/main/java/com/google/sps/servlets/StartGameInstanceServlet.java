@@ -30,8 +30,8 @@ import java.util.ArrayList;
 public class StartGameInstanceServlet extends HttpServlet {
 
 
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException { 
+    @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
   // Generate room key
     String roomId = request.getParameter("gameInstance");
     Firestore db = (Firestore) this.getServletContext().getAttribute("firestoreDb");
@@ -70,8 +70,6 @@ public class StartGameInstanceServlet extends HttpServlet {
     Gson gson = new Gson();
     String json = gson.toJson(newRoom);
     response.getWriter().println(json);
-
-
   }
 
 }

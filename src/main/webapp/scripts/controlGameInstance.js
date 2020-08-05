@@ -155,16 +155,16 @@ function initUIButtons(gameInstanceId) {
   const endGameInstanceButton = document.getElementById("endGameInstanceButton");
   
   startGameInstanceButtonElement.addEventListener('click', () => {
-      fetch('/startGameInstance?gameInstance='+activeGameInstanceId);
+      fetch('/startGameInstance?gameInstance='+activeGameInstanceId, { method: 'POST' });
   });
   nextQuestionButton.addEventListener('click', () => {
-      fetch('/nextQuestion?gameInstance='+activeGameInstanceId);
+      fetch('/nextQuestion?gameInstance='+activeGameInstanceId, { method: 'POST' });
   });
   previousQuestionButton.addEventListener('click', () => {
-      fetch('/previousQuestion?gameInstance='+activeGameInstanceId);
+      fetch('/previousQuestion?gameInstance='+activeGameInstanceId, { method: 'POST' });
   });
   endGameInstanceButton.addEventListener('click', () => {
-      fetch('/endGameInstance?gameInstance='+activeGameInstanceId).then(()=>{
+      fetch('/endGameInstance?gameInstance='+activeGameInstanceId, { method: 'POST' }).then(()=>{
           window.location.href = "/teacher/controlGameInstance.html";
       });
   });
