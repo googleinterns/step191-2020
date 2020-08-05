@@ -14,26 +14,17 @@
 
 package com.google.sps.servlets;
 
-
-import com.google.api.core.ApiFuture;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
-import com.google.cloud.firestore.WriteResult;
 import com.google.sps.data.Game;
 import com.google.sps.data.Question;
 import com.google.sps.data.Answer;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
 import java.util.Arrays;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import com.google.sps.daos.GameDao;
 
 
 @WebServlet("/new-game")
@@ -46,29 +37,17 @@ public class NewGameServlet extends HttpServlet {
       
         
     // Creates classes for answers, questions and games so when Game Dao is implemented you just pass a Game class.
-    
     Answer correct = new Answer(request.getParameter("correct-answer"), true);
-    Answer wrong = new Answer(request.getParameter("wrong-answer"), false);
-    
+    Answer wrong = new Answer(request.getParameter("wrong-answer"), true);
     List<Answer> answers = Arrays.asList(correct, wrong);
 
     Question question = new Question(request.getParameter("question"), answers);
-
     List<Question> questions = Arrays.asList(question);
-    Game currentGame = new Game(request.getParameter("uid"), request.getParameter("title"), questions.size());
-    
-    Firestore db = (Firestore) this.getServletContext().getAttribute("firestoreDb");
 
-    // Temporal adding
-    ApiFuture<DocumentReference> addedDocRef = db.collection("games").add(currentGame);
-    try{
-        CollectionReference questionsRef = db.collection("games").document(addedDocRef.get().getId()).collection("questions");
-        for(Question q : questions){
-            questionsRef.add(q);
-        }
-    } catch(Exception e){
-        System.out.println(e);
-    }
+    Game currentGame = Game.builder().title(request.getParameter("title")).creator(request.getParameter("uid")).questions(questions).build();
+    
+    GameDao dao = (GameDao) this.getServletContext().getAttribute("gameDao");
+    dao.createNewGame(currentGame);
 
     response.sendRedirect("/create-game.html");
   }
