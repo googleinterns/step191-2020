@@ -1,10 +1,13 @@
 package com.google.sps.daos;
 
+import java.util.concurrent.ExecutionException;
+
 import com.google.api.core.ApiFuture;
 
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.SetOptions;
+import com.google.cloud.firestore.WriteResult;
 import com.google.cloud.firestore.DocumentSnapshot;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -46,7 +49,17 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
     newGameInstanceRef.set(newGameInstance);
 
     // Update the User's entry with game he just started
-    firestoreDb.collection("users").document(userId).update("activeGameInstanceId", newGameInstanceRef.getId());
+    ApiFuture<WriteResult> future = firestoreDb.collection("users").document(userId).update("activeGameInstanceId", newGameInstanceRef.getId());
+    // Block until room is created to continue, since it will be redirected to admin game panel
+    try {
+      future.get();
+    } catch (InterruptedException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (ExecutionException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 
 

@@ -1,0 +1,7 @@
+.result{
+    display: none;
+}
+.notActive{
+    color: #d93838;
+    display: block;
+}
