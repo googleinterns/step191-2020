@@ -10,15 +10,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.Query;
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentSnapshot;
 
 import com.google.sps.daos.GameInstanceDao;
 import com.google.sps.data.GameInstance;
@@ -34,7 +25,6 @@ public class EndGameInstanceServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException { 
   // Generate room key
     String roomId = request.getParameter("gameInstance");
-    Firestore db = (Firestore) this.getServletContext().getAttribute("firestoreDb");
 
     if(roomId==null || roomId.isEmpty()){
         response.setStatus(500);
@@ -55,11 +45,6 @@ public class EndGameInstanceServlet extends HttpServlet {
     newRoom.setCurrentQuestion(null);
 
     dao.updateGameInstance(newRoom);
-
-    //Return object
-    Gson gson = new Gson();
-    String json = gson.toJson(newRoom);
-    response.getWriter().println(json);
 
 
   }

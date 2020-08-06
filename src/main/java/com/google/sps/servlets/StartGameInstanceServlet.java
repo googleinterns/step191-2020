@@ -11,12 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.Query;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentSnapshot;
 
@@ -66,10 +60,6 @@ public class StartGameInstanceServlet extends HttpServlet {
 
     dao.updateGameInstance(newRoom);
 
-    //Return object
-    Gson gson = new Gson();
-    String json = gson.toJson(newRoom);
-    response.getWriter().println(json);
   }
 
 }
