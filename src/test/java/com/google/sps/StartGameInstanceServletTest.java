@@ -31,6 +31,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.sps.daos.GameInstanceDao;
 import com.google.sps.data.GameInstance;
+import com.google.sps.daos.GameDao;
+import com.google.sps.data.Game;
+import com.google.sps.data.Question;
 import com.google.sps.servlets.StartGameInstanceServlet;
 
 import com.google.cloud.firestore.Firestore;
@@ -47,15 +50,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.ArrayList;
+
 @RunWith(JUnit4.class)
 public final class StartGameInstanceServletTest {
 
   private GameInstanceDao mockGameInstanceDao = mock(GameInstanceDao.class);
   private ServletContext mockServletContext = mock(ServletContext.class);
-  private Firestore firestoreDb = initializeFirestore();
+  private GameDao mockGameDao = mock(GameDao.class);
   private HttpServletRequest request = mock(HttpServletRequest.class);
   private HttpServletResponse response = mock(HttpServletResponse.class);
   private String roomId = "aSpX3cmZa5PB994uEoW2";
+  private String gameId = "iBxba1vsaWT1SIqxeonJ";
   private StartGameInstanceServlet servletUnderTest;
 
   @Before
@@ -67,8 +73,8 @@ public final class StartGameInstanceServletTest {
       }
     };
     
-    when(mockServletContext.getAttribute("firestoreDb")).thenReturn(firestoreDb);
     when(mockServletContext.getAttribute("gameInstanceDao")).thenReturn(mockGameInstanceDao);
+    when(mockServletContext.getAttribute("gameDao")).thenReturn(mockGameDao);
     when(request.getParameter("gameInstance")).thenReturn(roomId);
 
   }
@@ -76,9 +82,19 @@ public final class StartGameInstanceServletTest {
   @Test
   public void doPostStartGameInstance() throws IOException {
 
+    //Simulate Game 
+    Game newGame = newGame = Game.builder()
+          .title("")
+          .creator("")
+          .headQuestion("NWUzaBz7SJEiKvQEwAkt")
+          .questions(new ArrayList<Question>())
+          .build();
+
+    when(mockGameDao.getGame(gameId)).thenReturn(newGame);
+
     //Simulate Room to be updated
     GameInstance newRoom = new GameInstance(roomId);
-    newRoom.setGameId("iBxba1vsaWT1SIqxeonJ");
+    newRoom.setGameId(gameId);
     newRoom.setCreator("UfQ5TlrtFtNJnR1ywXb8W7Hrz6y1");
     newRoom.setIsActive(true);
     newRoom.setCurrentQuestion("NWUzaBz7SJEiKvQEwAkt");
@@ -88,26 +104,9 @@ public final class StartGameInstanceServletTest {
 
     servletUnderTest.doPost(request, response);
 
+    verify(mockGameDao).getGame(gameId);
     verify(mockGameInstanceDao).getGameInstance(roomId);
     verify(mockGameInstanceDao).updateGameInstance(newRoom);
-  }
-
-  private Firestore initializeFirestore() {
-    Firestore firestoreDb = null;
-
-    try {
-      // Building options, include projectID, access credentials
-      FirestoreOptions firestoreOptions =
-      FirestoreOptions.getDefaultInstance().toBuilder()
-          .setProjectId("quizzy-step-2020")
-          .setCredentials(GoogleCredentials.getApplicationDefault())
-          .build();
-
-      firestoreDb = firestoreOptions.getService();
-    } catch(IOException ie) {
-      ie.printStackTrace();
-    }
-    return firestoreDb;    
   }
 
 }
