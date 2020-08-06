@@ -42,7 +42,8 @@ public class DatabaseUserDao implements UserDao {
     try {
       DocumentSnapshot document = future.get();
       if (!document.exists()) {
-        initUser(decodedToken);
+        initUser(userId);
+        System.out.println("Document data: " + document.getData());
       } 
     } catch (InterruptedException e) {
       // TODO Auto-generated catch block
@@ -54,13 +55,11 @@ public class DatabaseUserDao implements UserDao {
     
   }
 
-  private void initUser(FirebaseToken decodedToken) {
-    String userId = decodedToken.getUid();
-    
-
+  private void initUser(String userId) {
     Map<String, Object> docData = new HashMap<>();
     docData.put("activeGameInstanceId", "");
-
+    docData.put("userId", userId);
+    
     firestoreDb.collection("users").document(userId).set(docData);
   }
   
