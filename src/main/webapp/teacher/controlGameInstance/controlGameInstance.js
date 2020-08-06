@@ -18,19 +18,38 @@
 const db = firebase.firestore();
 let activeGameInstanceId;
 
+// Is triggered when the User logs in or logs out
+function initAuthStateObserver() {
+  firebase.auth().onAuthStateChanged(authStateObserver);
+}
+
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) { // User is signed in!
     // Everything starts working when the User logs in
-    getActiveGameInstanceId(user);
+    //getActiveGameInstanceId(user);
+    loadControlPanel(user);
   } else { // User is signed out!
     console.log("Not logged in");
   }
 }
 
-// Is triggered when the User logs in or logs out
-function initAuthStateObserver() {
-  firebase.auth().onAuthStateChanged(authStateObserver);
+async function loadControlPanel(user) {
+  // Get the Game Instance's ID in which the user is participating
+  const gameInstanceId = await getActiveGameInstanceId(user);
+
+  // Get the Active Game Instance Object from DB
+  const gameInstance = await queryActiveGameInstance(gameInstanceId);
+
+  // Add all the GameInstance's Info to UI
+  buildActiveGameInstanceUI(gameInstance, gameInstanceId);
+
+
+  // Add buttons to control the GameInstance state
+  initUIButtons(gameInstanceId);
+
+  console.log(gameInstanceId);
+  console.log(gameInstance);
 }
 
 // Queries the "Users" collection of the DB to get the activeGameInstanceId the User is participating in
@@ -38,12 +57,10 @@ function getActiveGameInstanceId(user) {
   const uid = user.uid;
 
   // Query the User's document in "Users" collection
-  db.collection("users").doc(uid).get().then(function(doc) {
+  return db.collection("users").doc(uid).get().then(function(doc) {
     if (doc.exists) {
       // Get the activeGameInstance's ID in which the User is participating
-      activeGameInstanceId = doc.data().activeGameInstanceId;
-      // Query the info of that GameInstance from the "GameInstance" collections
-      queryActiveGameInstanceDocument(activeGameInstanceId);
+      return doc.data().activeGameInstanceId;
     } else {
         // doc.data() will be undefined in this case
       console.log("No such document!");
@@ -53,17 +70,11 @@ function getActiveGameInstanceId(user) {
   });
 }
 
-// Gets the gameInstance entity from DB
-function queryActiveGameInstanceDocument(gameInstanceId) {
-  db.collection("gameInstance").doc(gameInstanceId).get().then(function(doc) {
+// Gets the gameInstance entity from the "GameInstance" collections of DB
+function queryActiveGameInstance(gameInstanceId) {
+  return db.collection("gameInstance").doc(gameInstanceId).get().then(function(doc) {
     if (doc.exists) {
-      // The GameInstance exists, so now populate all info about it
-
-      // Add all the GameInstance's Info to UI
-      buildActiveGameInstanceUI(doc.data(), gameInstanceId);
-      
-      // Add buttons to control the GameInstance state
-      initUIButtons(gameInstanceId);
+      return doc.data();
     } else {
         // doc.data() will be undefined in this case
       console.log("No such document!");
