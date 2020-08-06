@@ -15,7 +15,9 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentSnapshot;
 
 import com.google.sps.daos.GameInstanceDao;
+import com.google.sps.daos.GameDao;
 import com.google.sps.data.GameInstance;
+import com.google.sps.data.Game;
 
 import java.util.List; 
 import java.util.ArrayList; 
@@ -28,7 +30,6 @@ public class StartGameInstanceServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
   // Generate room key
     String roomId = request.getParameter("gameInstance");
-    Firestore db = (Firestore) this.getServletContext().getAttribute("firestoreDb");
 
     if(roomId==null || roomId.isEmpty()){
         response.setStatus(500);
@@ -37,6 +38,7 @@ public class StartGameInstanceServlet extends HttpServlet {
     }
 
     GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
+    GameDao gameDao = (GameDao) this.getServletContext().getAttribute("gameDao");
     GameInstance newRoom = dao.getGameInstance(roomId);
         
     if(newRoom == null){
@@ -44,16 +46,8 @@ public class StartGameInstanceServlet extends HttpServlet {
         response.getWriter().println("Error, not found.");
         return;
     }
-
-        ApiFuture<DocumentSnapshot> future = db.collection("games").document(newRoom.getGameId()).get();
-        try {
-            DocumentSnapshot document = future.get();
-            newRoom.setCurrentQuestion(document.get("headQuestion").toString());
-        } catch(Exception e) {
-            System.out.println(e);
-            return;
-        }
-
+        Game actualGame = gameDao.getGame(newRoom.getGameId());
+        newRoom.setCurrentQuestion(actualGame.headQuestion());
         // Activate room
         newRoom.setIsActive(true);
 
