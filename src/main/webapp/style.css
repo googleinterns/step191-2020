@@ -7,3 +7,25 @@
 #greeting-container {
   margin-top: 20px;
 }
+
+.spaced a {
+  margin-bottom: 15px;
+}
+
+#newGame a {
+  font-size: 35px;
+}
+
+#controlGame a{
+  color: brown;
+}
+
+#designGame a {
+  color: green;
+}
+
+#joinGame a {
+  font-size: 35px;
+  color: red;
+}
+

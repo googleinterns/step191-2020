@@ -17,7 +17,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Counter</title>
+  <title>Quizzy</title>
 
   <link rel="icon" type="image/png" href="images/noogler-hat.png">
 
@@ -48,6 +48,7 @@
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
   <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="style.css">
 
 
 </head>
@@ -59,7 +60,7 @@
     <header class="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
       <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
         <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
-          <h3>Counter</h3>
+          <h3>Quizzy</h3>
         </div>
         <div id="user-container">
           <div hidden id="user-pic"></div>
@@ -80,12 +81,28 @@
     margin-right: auto;
     text-align: center;">
 
-        <h1 id="counter"></h1>
-        <form id="counter-form" action="#">
-          <button id="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-            Vote
-          </button>
-        </form>
+      <div id="teachers">
+        <h1>Teachers</h1>
+        <div id="newGame" class="spaced">
+          <a href="teacher/newGameInstance/newGameInstance.html">Click here to start a game!</a>
+        </div>
+        
+        <div id="controlGame" class="spaced">
+          <a href="teacher/controlGameInstance/controlGameInstance.html">Or click here if you want to resume a game you had in progress</a>
+        </div>
+
+        <div id="designGame" class="spaced">
+          <a href="teacher/createGame.html">New here? Click here to design your own game!</a>
+        </div>
+        
+      </div>
+        
+      <div id="students">
+        <h1>Students</h1>
+        <div id="joinGame" class="spaced">
+          <a href="student/enter-game.html">Click here to join a game!</a>
+        </div>
+      </div>
 
       </div>
 
@@ -109,8 +126,8 @@
   <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-database.js"></script>
 
-  <script src="scripts/auth.js"></script>
   <script src="scripts/main.js"></script>
+  <script src="scripts/auth.js"></script>
 </body>
 
 </html>
