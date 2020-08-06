@@ -55,6 +55,10 @@ function getUserId() {
 // Triggers when the auth state change for instance when the user signs-in or signs-out.
 function authStateObserver(user) {
   if (user) { // User is signed in!
+
+    // Verify if it is registered in Firestore DB
+    verifyUserInFirestore();
+
     // Get the signed-in user's profile pic and name.
     var profilePicUrl = getProfilePicUrl();
     var userName = getUserName();
@@ -80,6 +84,26 @@ function authStateObserver(user) {
     // Show sign-in button.
     signInButtonElement.removeAttribute('hidden');
   }
+}
+
+// Verify if user exists in the DB records
+function verifyUserInFirestore() {
+  firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function(idToken) {
+    // Send token to your backend via HTTPS
+    // ...
+
+    fetch('/verifyUserInFirestore', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({idToken: idToken})
+    });
+
+  }).catch(function(error) {
+    // Handle error
+  });
 }
 
 // Adds a size to Google Profile pics URLs.
