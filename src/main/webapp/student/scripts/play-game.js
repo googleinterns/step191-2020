@@ -77,13 +77,15 @@ function initGameInstanceListener(gameInstanceId) {
       // Init submit button
       initSubmitButton(gameInstanceId);
     } 
-    if (gameInstanceUpdate.isActive && gameInstanceUpdate.currentQuestion != currentQuestionId) {
+    if (gameInstanceUpdate.isActive && (gameInstanceUpdate.currentQuestion != currentQuestionId)) {
+      // The question displayed must be changed
       updateCurrentQuestion(gameInstanceUpdate.gameId, gameInstanceUpdate.currentQuestion);
     }
     
   });
 }
 
+// Add event listener to the submit button
 function initSubmitButton(gameInstanceId) {
   const submitButtonElement = document.getElementById('submitButton');
   submitButtonElement.addEventListener('click', () => {
@@ -131,7 +133,6 @@ function addAnswers(currentQuestionDocRef) {
   .get()
   .then(function(querySnapshot) {
     querySnapshot.forEach(function(doc) {
-      console.log(doc.data());
       addAnswerToUI(doc);
     });
   })
@@ -162,86 +163,4 @@ function addAnswerToUI(answerDoc) {
   radioForm.appendChild(document.createElement("br"));
 }
 
-function checkIfActive() {
-  db.collection('gameInstance').doc(roomId).onSnapshot(function (doc) {
-    if (doc.data().isActive && !active) {
-      var readyHeading = document.getElementById("getReady");
-      var game = document.getElementById("gameSection");
-      readyHeading.classList.toggle("ready");
-      game.classList.toggle("active");
-      active = true;
-      listenGameInstance();
-    }
-  })
-}
-
-function listenGameInstance() {
-  db.collection('gameInstance').doc(roomId).onSnapshot(function (doc) {
-    getQuestion(doc.data().gameId, doc.data().currentQuestion);
-  })
-}
-
-function getQuestion(gameId, questionId) {
-  const games = db.collection('games').doc(gameId);
-  games.collection('questions').doc(questionId).get().then(function (doc) {
-    if (doc.exists) {
-      createQuestionObject(doc.data().title);
-      createAnswersObject(doc.data().answers);
-    }
-  })
-}
-
-
-
-function createAnswersObject(answers) {
-  console.log(answers);
-  const radioForm = document.getElementById("answerOptions");
-  document.getElementById("answerOptions").innerHTML = "";
-  for (var i = 0; i < answers.length; i++) {
-    const input = document.createElement("input");
-    input.setAttribute("type", "radio");
-    input.setAttribute("name", "answer");
-    input.setAttribute("value", answers[i].title); // should be ID tho
-    input.addEventListener("click", () => {
-      console.log("hi mom");
-    });
-    const label = document.createElement("input");
-    radioForm.appendChild(input);
-    radioForm.append(answers[i].title);
-    radioForm.appendChild(document.createElement("br"));
-  }
-  // for (var i = 0; i < answers.length; i++) {
-  //   var input = document.createElement("input");
-  //   input.setAttribute("type", "radio");
-  //   input.setAttribute("name", "answer");
-  //   input.setAttribute("value", answers[i].title);
-  //   if (answers[i].correct) {
-  //     input.id = "correctAnswer"
-  //   }
-  //   radioForm.appendChild(input);
-  //   radioForm.append(answers[i].title);
-  //   radioForm.appendChild(document.createElement("br"));
-  // }
-
-  const answerFeedbackElement = document.getElementById("answerFeedback");
-  answerFeedbackElement.innerHTML = '';
-  answerFeedbackElement.className = '';
-
-
-  const answerFormElement = document.getElementById('answerForm');
-  answerFormElement.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const correctRadioInput = document.getElementById("correctAnswer");
-    answerFeedbackElement.className = '';
-    if (correctRadioInput.checked) {
-      answerFeedbackElement.innerText = "That is correct!"
-      answerFeedbackElement.classList.add('rightAnswer')
-    } else {
-      answerFeedbackElement.innerText = "Are you sure that's the correct answer?"
-      answerFeedbackElement.classList.add('wrongAnswer')
-    }
-  });
-}
-
-//checkIfActive();
 initAuthStateObserver();
