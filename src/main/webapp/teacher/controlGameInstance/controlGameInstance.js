@@ -139,10 +139,13 @@ function addGameIdToUI(gameId) {
 function initGameInstanceListener(gameInstanceId) {
   db.collection('gameInstance').doc(gameInstanceId).onSnapshot(function(doc) {
     // If this is triggered it's because the GameInstance's activeQuestion changed
+    // OR someone joined
     const gameInstanceUpdate = doc.data();
 
     // TODO: this should be initiated once the game is started, not before...
     updateCurrentQuestion(gameInstanceUpdate.gameId, gameInstanceUpdate.currentQuestion);
+
+    updateNumberOfMembersUI(gameInstanceUpdate.numberOfMembers);
   });
 }
 
@@ -164,6 +167,11 @@ function queryCurrentQuestion(gameId, currentQuestionId) {
       return doc.data()
     }
   });
+}
+
+function updateNumberOfMembersUI(numberOfMembers) {
+  const numberOfMembersElement = document.getElementById("jsNumberOfStudents");
+  numberOfMembersElement.innerText = "There are " + numberOfMembers + " students registered in your room.";
 }
 
 // Inits the control buttons for the teacher to control the game
