@@ -1,4 +1,18 @@
-
+/**
+ * Copyright 2018 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 'use strict';
 
 const db = firebase.firestore();
@@ -7,6 +21,8 @@ const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const roomId = urlParams.get('room');
 var active = false;
+
+let selectedQuestion = null;
 
 function checkIfActive() {
   db.collection('gameInstance').doc(roomId).onSnapshot(function (doc) {
@@ -33,7 +49,6 @@ function getQuestion(gameId, questionId) {
     if (doc.exists) {
       createQuestionObject(doc.data().title);
       createAnswersObject(doc.data().answers);
-      setSubmitButton(doc.data().answers);
     }
   })
 }
@@ -43,21 +58,34 @@ function createQuestionObject(title) {
 }
 
 function createAnswersObject(answers) {
+  console.log(answers);
   const radioForm = document.getElementById("answerOptions");
   document.getElementById("answerOptions").innerHTML = "";
-  console.log(radioForm)
   for (var i = 0; i < answers.length; i++) {
-    var input = document.createElement("input");
+    const input = document.createElement("input");
     input.setAttribute("type", "radio");
     input.setAttribute("name", "answer");
-    input.setAttribute("value", answers[i].title);
-    if (answers[i].correct) {
-      input.id = "correctAnswer"
-    }
+    input.setAttribute("value", answers[i].title); // should be ID tho
+    input.addEventListener("click", () => {
+      console.log("hi mom");
+    });
+    const label = document.createElement("input");
     radioForm.appendChild(input);
     radioForm.append(answers[i].title);
     radioForm.appendChild(document.createElement("br"));
   }
+  // for (var i = 0; i < answers.length; i++) {
+  //   var input = document.createElement("input");
+  //   input.setAttribute("type", "radio");
+  //   input.setAttribute("name", "answer");
+  //   input.setAttribute("value", answers[i].title);
+  //   if (answers[i].correct) {
+  //     input.id = "correctAnswer"
+  //   }
+  //   radioForm.appendChild(input);
+  //   radioForm.append(answers[i].title);
+  //   radioForm.appendChild(document.createElement("br"));
+  // }
 
   const answerFeedbackElement = document.getElementById("answerFeedback");
   answerFeedbackElement.innerHTML = '';
@@ -79,10 +107,4 @@ function createAnswersObject(answers) {
   });
 }
 
-function setSubmitButton() {
-
-}
-
 checkIfActive();
-
-
