@@ -57,7 +57,7 @@ function selectGame(gameId) {
       },
       body: JSON.stringify({idToken: idToken, gameId: gameId})
     }).then(() => {
-      window.location.replace(window.location.origin + "/teacher/controlGameInstance.html");
+      window.location.replace(window.location.origin + "/teacher/controlGameInstance/controlGameInstance.html");
     });
 
   }).catch(function(error) {
