@@ -17,6 +17,7 @@ package com.google.sps;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.ArgumentCaptor;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -48,6 +49,7 @@ import org.springframework.mock.web.DelegatingServletInputStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.Assert;
 import org.junit.runners.JUnit4;
 
 import java.util.ArrayList;
@@ -72,7 +74,8 @@ public final class StartGameInstanceServletTest {
         return mockServletContext;
       }
     };
-    
+
+
     when(mockServletContext.getAttribute("gameInstanceDao")).thenReturn(mockGameInstanceDao);
     when(mockServletContext.getAttribute("gameDao")).thenReturn(mockGameDao);
     when(request.getParameter("gameInstance")).thenReturn(roomId);
@@ -82,11 +85,14 @@ public final class StartGameInstanceServletTest {
   @Test
   public void doPostStartGameInstance() throws IOException {
 
+    ArgumentCaptor<GameInstance> varArgs = ArgumentCaptor.forClass(GameInstance.class);
+    String questionId = "NWUzaBz7SJEiKvQEwAkt";
+    
     //Simulate Game 
     Game newGame = newGame = Game.builder()
           .title("")
           .creator("")
-          .headQuestion("NWUzaBz7SJEiKvQEwAkt")
+          .headQuestion(questionId)
           .questions(new ArrayList<Question>())
           .build();
 
@@ -95,9 +101,6 @@ public final class StartGameInstanceServletTest {
     //Simulate Room to be updated
     GameInstance newRoom = new GameInstance(roomId);
     newRoom.setGameId(gameId);
-    newRoom.setCreator("UfQ5TlrtFtNJnR1ywXb8W7Hrz6y1");
-    newRoom.setIsActive(true);
-    newRoom.setCurrentQuestion("NWUzaBz7SJEiKvQEwAkt");
 
     //Return mock room 
     when(mockGameInstanceDao.getGameInstance(roomId)).thenReturn(newRoom);
@@ -106,7 +109,10 @@ public final class StartGameInstanceServletTest {
 
     verify(mockGameDao).getGame(gameId);
     verify(mockGameInstanceDao).getGameInstance(roomId);
-    verify(mockGameInstanceDao).updateGameInstance(newRoom);
+    verify(mockGameInstanceDao).updateGameInstance(varArgs.capture());
+    Assert.assertEquals(true, newRoom.getIsActive());
+    Assert.assertEquals(questionId, newRoom.getCurrentQuestion());
+
   }
 
 }
