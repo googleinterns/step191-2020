@@ -16,13 +16,151 @@
 'use strict';
 
 const db = firebase.firestore();
+let active = false;
+let currentQuestionId = null;
+let selectedAnswerId = null;
 
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
-const roomId = urlParams.get('room');
-var active = false;
+// Is triggered when the User logs in or logs out
+function initAuthStateObserver() {
+  firebase.auth().onAuthStateChanged(authStateObserver);
+}
 
-let selectedQuestion = null;
+// Triggers when the auth state change for instance when the user signs-in or signs-out.
+function authStateObserver(user) {
+  if (user) { // User is signed in!
+    // Everything starts working when the User logs in
+    loadGamePanel(user)
+  } else { // User is signed out!
+    console.log("Not logged in");
+  }
+}
+
+// Load all the information 
+async function loadGamePanel(user) {
+  // Get the Game Instance's ID in which the user is participating
+  const gameInstanceId = await getActiveGameInstanceId(user);
+
+  // Start listening to the GameInstance
+  initGameInstanceListener(gameInstanceId);
+}
+
+// Queries the "Users" collection of the DB to get the activeGameInstanceId the User is participating in
+// Returns the gameInstanceId string
+function getActiveGameInstanceId(user) {
+  const uid = user.uid;
+
+  // Query the User's document in "Users" collection
+  return db.collection("users").doc(uid).get().then(function(doc) {
+    if (doc.exists) {
+      // Get the activeGameInstance's ID in which the User is participating
+      return doc.data().activeGameInstanceId;
+    } else {
+        // doc.data() will be undefined in this case
+      console.log("No such document!");
+    }
+  }).catch(function(error) {
+      console.log("Error getting document:", error);
+  });
+}
+
+// Listen to the GameInstance in Firestore DB and update when it changes
+function initGameInstanceListener(gameInstanceId) {
+  db.collection('gameInstance').doc(gameInstanceId).onSnapshot(function(doc) {
+    const gameInstanceUpdate = doc.data();
+    if (!active && gameInstanceUpdate.isActive) {
+      const readyHeadingElement = document.getElementById("getReady");
+      const gameElement = document.getElementById("gameSection");
+      readyHeadingElement.classList.toggle("ready");
+      gameElement.classList.toggle("active");
+      active = true;
+      
+      // Init submit button
+      initSubmitButton(gameInstanceId);
+    } 
+    if (gameInstanceUpdate.isActive && gameInstanceUpdate.currentQuestion != currentQuestionId) {
+      updateCurrentQuestion(gameInstanceUpdate.gameId, gameInstanceUpdate.currentQuestion);
+    }
+    
+  });
+}
+
+function initSubmitButton(gameInstanceId) {
+  const submitButtonElement = document.getElementById('submitButton');
+  submitButtonElement.addEventListener('click', () => {
+    console.log("HI MOOOOM");
+    console.log(selectedAnswerId);
+    console.log(currentQuestionId);
+  });
+}
+
+// Update the question that has changed
+async function updateCurrentQuestion(gameId, questionId) {
+  currentQuestionId = questionId;
+
+  let currentQuestionDocRef = db.collection('games').doc(gameId).collection('questions').doc(questionId);
+
+  const currentQuestion = await queryCurrentQuestion(currentQuestionDocRef);
+
+  // Add the question title to the UI
+  createQuestionObject(currentQuestion.title);
+
+  // Get answers to the question
+  addAnswers(currentQuestionDocRef);
+}
+
+// Query and return the current question from the Game it belongs to
+function queryCurrentQuestion(currentQuestionDocRef) {
+  return currentQuestionDocRef.get().then(function(doc) {
+    if (doc.exists) {
+      return doc.data();
+    }
+  });
+}
+
+// Add the question title to the UI
+function createQuestionObject(title) {
+  document.getElementById("question").innerText = title;
+}
+
+// Get and add answers that correspond to the questionId
+function addAnswers(currentQuestionDocRef) {
+
+  document.getElementById("answerOptions").innerHTML = "";
+
+  currentQuestionDocRef.collection('answers')
+  .get()
+  .then(function(querySnapshot) {
+    querySnapshot.forEach(function(doc) {
+      console.log(doc.data());
+      addAnswerToUI(doc);
+    });
+  })
+  .catch(function(error) {
+    console.log("Error retrieving answers");
+  });
+}
+
+function addAnswerToUI(answerDoc) {
+  const radioForm = document.getElementById("answerOptions");
+  
+  const inputElement = document.createElement("input");
+  inputElement.setAttribute("type", "radio");
+  inputElement.setAttribute("name", "answer");
+  inputElement.setAttribute("id", answerDoc.id);
+  inputElement.setAttribute("value", answerDoc.id);
+
+  inputElement.addEventListener('click', () => {
+    selectedAnswerId = answerDoc.id;
+  });
+
+  const labelElement = document.createElement("label");
+  labelElement.setAttribute("for", answerDoc.id);
+  labelElement.innerText = answerDoc.data().title;
+
+  radioForm.appendChild(inputElement);
+  radioForm.appendChild(labelElement);
+  radioForm.appendChild(document.createElement("br"));
+}
 
 function checkIfActive() {
   db.collection('gameInstance').doc(roomId).onSnapshot(function (doc) {
@@ -53,9 +191,7 @@ function getQuestion(gameId, questionId) {
   })
 }
 
-function createQuestionObject(title) {
-  document.getElementById("question").innerText = title;
-}
+
 
 function createAnswersObject(answers) {
   console.log(answers);
@@ -107,4 +243,5 @@ function createAnswersObject(answers) {
   });
 }
 
-checkIfActive();
+//checkIfActive();
+initAuthStateObserver();
