@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.logging.Logger;
 
 import com.google.sps.daos.GameInstanceDao;
+import com.google.sps.daos.UserDao;
 import com.google.sps.data.GameInstance;
 import com.google.sps.data.Member;
 
@@ -46,6 +47,11 @@ public class JoinGameInstanceServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    JsonObject jsonObj = new Gson().fromJson(request.getReader(), JsonObject.class);
+
+    UserDao dao = (UserDao) this.getServletContext().getAttribute("userDao");
+
+    dao.joinGameInstance(jsonObj.get("idToken").getAsString(), jsonObj.get("gameInstanceId").getAsString());
   }
 
 }
