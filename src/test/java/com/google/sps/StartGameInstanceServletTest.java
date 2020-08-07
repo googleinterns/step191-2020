@@ -23,6 +23,8 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 import java.nio.charset.StandardCharsets;
 
@@ -78,13 +80,13 @@ public final class StartGameInstanceServletTest {
 
     when(mockServletContext.getAttribute("gameInstanceDao")).thenReturn(mockGameInstanceDao);
     when(mockServletContext.getAttribute("gameDao")).thenReturn(mockGameDao);
-    when(request.getParameter("gameInstance")).thenReturn(roomId);
 
   }
 
   @Test
   public void doPostStartGameInstance() throws IOException {
 
+    when(request.getParameter("gameInstance")).thenReturn(roomId);
     ArgumentCaptor<GameInstance> varArgs = ArgumentCaptor.forClass(GameInstance.class);
     String questionId = "NWUzaBz7SJEiKvQEwAkt";
     
@@ -114,5 +116,18 @@ public final class StartGameInstanceServletTest {
     Assert.assertEquals(questionId, newRoom.getCurrentQuestion());
 
   }
+  @Test
+  public void noRoomId() throws IOException {
 
+    when(request.getParameter("gameInstance")).thenReturn(null);
+    StringWriter responseWriter = new StringWriter();
+    when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
+
+    servletUnderTest.doPost(request, response);
+    String responseString = responseWriter.toString();
+
+    verify(response).setStatus(500);
+    Assert.assertEquals(responseString, "Room not specified\n");
+
+  }
 }
