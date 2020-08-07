@@ -69,7 +69,9 @@ public class DatabaseUserDao implements UserDao {
     }
 
     // Add to GameInstance's members list
-    DocumentReference userInGameInstanceDocRef = firestoreDb.collection("gameInstance").document(gameInstanceId).collection("students").document(userId);
+    DocumentReference gameInstanceDocRef = firestoreDb.collection("gameInstance").document(gameInstanceId);
+
+    DocumentReference userInGameInstanceDocRef = gameInstanceDocRef.collection("students").document(userId);
 
     ApiFuture<DocumentSnapshot> UserInGameInstanceFuture = userInGameInstanceDocRef.get();
     
@@ -77,6 +79,7 @@ public class DatabaseUserDao implements UserDao {
       DocumentSnapshot document = UserInGameInstanceFuture.get();
       if (!document.exists()) {
         registerUserInGameInstance(userInGameInstanceDocRef, userId);
+        addOneToMembersCounter(gameInstanceDocRef);
       } 
     } catch (InterruptedException e) {
       // TODO Auto-generated catch block
@@ -114,6 +117,16 @@ public class DatabaseUserDao implements UserDao {
     docData.put("points", 0);
 
     userInGameInstanceDocRef.set(docData);
+  }
+
+  private void addOneToMembersCounter(DocumentReference gameInstanceDocRef) {
+    firestoreDb.runTransaction(transaction -> {
+      // retrieve document and increment population field
+      DocumentSnapshot snapshot = transaction.get(gameInstanceDocRef).get();
+      long oldNumberOfMembers = snapshot.getLong("numberOfMembers");
+      transaction.update(gameInstanceDocRef, "numberOfMembers", oldNumberOfMembers + 1);
+      return null;
+    });
   }
   
 }
