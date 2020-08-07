@@ -39,17 +39,24 @@ public class StartGameInstanceServlet extends HttpServlet {
 
     GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
     GameDao gameDao = (GameDao) this.getServletContext().getAttribute("gameDao");
-    GameInstance newRoom = dao.getGameInstance(roomId);
-        
+
+    GameInstance newRoom = dao.getGameInstance(roomId);       
     if(newRoom == null){
         response.setStatus(404);
-        response.getWriter().println("Error, not found.");
+        response.getWriter().println("Error, game instance not found.");
         return;
     }
-        Game actualGame = gameDao.getGame(newRoom.getGameId());
-        newRoom.setCurrentQuestion(actualGame.headQuestion());
-        // Activate room
-        newRoom.setIsActive(true);
+    
+    Game actualGame = gameDao.getGame(newRoom.getGameId());
+    if(actualGame == null){
+        response.setStatus(404);
+        response.getWriter().println("Error, game not found.");
+        return;
+    }
+
+    newRoom.setCurrentQuestion(actualGame.headQuestion());
+    // Activate room
+    newRoom.setIsActive(true);
 
 
     dao.updateGameInstance(newRoom);
