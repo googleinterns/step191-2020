@@ -93,7 +93,7 @@ function initGameInstanceListener(gameInstanceId) {
       active = true;
       
       // Init submit button
-      initSubmitButton(gameInstanceId);
+      initSubmitButton(gameInstanceId, gameInstanceUpdate.gameId);
     } 
     if (gameInstanceUpdate.isActive && (gameInstanceUpdate.currentQuestion != currentQuestionId)) {
       // The question displayed must be changed
@@ -104,7 +104,7 @@ function initGameInstanceListener(gameInstanceId) {
 }
 
 // Add event listener to the submit button
-function initSubmitButton(gameInstanceId) {
+function initSubmitButton(gameInstanceId, gameId) {
   const submitButtonElement = document.getElementById('submitButton');
   submitButtonElement.addEventListener('click', () => {
 
@@ -120,7 +120,8 @@ function initSubmitButton(gameInstanceId) {
         },
         body: JSON.stringify({
           idToken: idToken,
-          gameInstnceId: gameInstanceId, 
+          gameInstanceId: gameInstanceId, 
+          gameId: gameId,
           questionId: currentQuestionId,
           answerId: selectedAnswerId
         })
