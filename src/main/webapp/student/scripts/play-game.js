@@ -107,9 +107,31 @@ function initGameInstanceListener(gameInstanceId) {
 function initSubmitButton(gameInstanceId) {
   const submitButtonElement = document.getElementById('submitButton');
   submitButtonElement.addEventListener('click', () => {
-    console.log("HI MOOOOM");
-    console.log(selectedAnswerId);
-    console.log(currentQuestionId);
+
+    firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function(idToken) {
+      // Send token to your backend via HTTPS
+      // ...
+  
+      fetch('/answer', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          idToken: idToken,
+          gameInstnceId: gameInstanceId, 
+          questionId: currentQuestionId,
+          answerId: selectedAnswerId
+        })
+      }).then(() => {
+        console.log("Question sent!")
+      });
+  
+    }).catch(function(error) {
+      // Handle error
+    });
+
   });
 }
 
