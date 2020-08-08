@@ -42,6 +42,22 @@ async function loadGamePanel(user) {
 
   // Start listening to the GameInstance
   initGameInstanceListener(gameInstanceId);
+
+  // Listen to points in GameInstance
+  initPointsListener(gameInstanceId, user);
+}
+
+function initPointsListener(gameInstanceId, user) {
+  db.collection("gameInstance").doc(gameInstanceId).collection("students").doc(user.uid)
+  .onSnapshot(function(doc) {
+    const studentInGameInstaneUpdate = doc.data();
+    updatePointsInUI(studentInGameInstaneUpdate.points);
+  });
+}
+
+function updatePointsInUI(points) {
+  const pointsElement = document.getElementById('jsPoints');
+  pointsElement.innerText = 'Your points: ' + points;
 }
 
 // Queries the "Users" collection of the DB to get the activeGameInstanceId the User is participating in
