@@ -47,6 +47,7 @@ async function loadGamePanel(user) {
   initPointsListener(gameInstanceId, user);
 }
 
+// Inits listener to User's points in Firestore DB
 function initPointsListener(gameInstanceId, user) {
   db.collection("gameInstance").doc(gameInstanceId).collection("students").doc(user.uid)
   .onSnapshot(function(doc) {
@@ -55,6 +56,7 @@ function initPointsListener(gameInstanceId, user) {
   });
 }
 
+// Updates the User's points in UI
 function updatePointsInUI(points) {
   const pointsElement = document.getElementById('jsPoints');
   pointsElement.innerText = 'Your points: ' + points;
