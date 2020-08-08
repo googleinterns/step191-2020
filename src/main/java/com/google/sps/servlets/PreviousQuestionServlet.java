@@ -15,21 +15,19 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentSnapshot;
 
 import com.google.sps.daos.GameInstanceDao;
-import com.google.sps.daos.GameDao;
 import com.google.sps.data.GameInstance;
-import com.google.sps.data.Game;
 
 import java.util.List; 
 import java.util.ArrayList; 
 
-@WebServlet("/startGameInstance")
-public class StartGameInstanceServlet extends HttpServlet {
+@WebServlet("/previousQuestion")
+public class PreviousQuestionServlet extends HttpServlet {
 
-
-    @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException { 
   // Generate room key
     String roomId = request.getParameter("gameInstance");
+    Firestore db = (Firestore) this.getServletContext().getAttribute("firestoreDb");
 
     if(roomId==null || roomId.isEmpty()){
         response.setStatus(500);
@@ -38,25 +36,24 @@ public class StartGameInstanceServlet extends HttpServlet {
     }
 
     GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
-    GameDao gameDao = (GameDao) this.getServletContext().getAttribute("gameDao");
-
-    GameInstance newRoom = dao.getGameInstance(roomId);       
+    GameInstance newRoom = dao.getGameInstance(roomId);
+        
     if(newRoom == null){
         response.setStatus(404);
-        response.getWriter().println("Error, game instance not found.");
-        return;
-    }
-    
-    Game actualGame = gameDao.getGame(newRoom.getGameId());
-    if(actualGame == null){
-        response.setStatus(404);
-        response.getWriter().println("Error, game not found.");
+        response.getWriter().println("Error, not found.");
         return;
     }
 
-    newRoom.setCurrentQuestion(actualGame.headQuestion());
-    // Activate room
-    newRoom.setIsActive(true);
+        ApiFuture<DocumentSnapshot> future = db.collection("games").document(newRoom.getGameId()).collection("questions").document(newRoom.getCurrentQuestion()).get();
+        try {
+            DocumentSnapshot document = future.get();
+            newRoom.setCurrentQuestion(document.get("previousQuestion").toString());
+        } catch(Exception e) {
+            response.setStatus(400);
+            response.getWriter().println("No question");
+            System.out.println(e);
+            return;
+        }
 
 
     dao.updateGameInstance(newRoom);
