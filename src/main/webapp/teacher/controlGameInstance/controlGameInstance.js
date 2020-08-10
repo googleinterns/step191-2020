@@ -34,8 +34,12 @@ function authStateObserver(user) {
 
 async function loadControlPanel(user) {
   // Get the Game Instance's ID in which the user is participating
-  const gameInstanceId = await getActiveGameInstanceId(user);
-
+  let gameInstanceId = getGameInstanceIdFromQueryParams();
+  
+  if (gameInstanceId == null) {
+    gameInstanceId = await getActiveGameInstanceId(user);
+  }
+  
   // Get the Active Game Instance Object from DB
   const gameInstance = await queryActiveGameInstance(gameInstanceId);
 
@@ -49,9 +53,15 @@ async function loadControlPanel(user) {
   initUIControlButtons(gameInstanceId);
 }
 
+function getGameInstanceIdFromQueryParams() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('gameInstanceId');
+}
+
 // Queries the "Users" collection of the DB to get the activeGameInstanceId the User is participating in
 // Returns the gameInstanceId string
 function getActiveGameInstanceId(user) {
+  console.log('Got gameInstanceId from Firestore');
   const uid = user.uid;
 
   // Query the User's document in "Users" collection
