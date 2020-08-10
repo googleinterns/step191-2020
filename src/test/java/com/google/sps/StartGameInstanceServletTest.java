@@ -83,9 +83,6 @@ public final class StartGameInstanceServletTest {
     };
     when(mockServletContext.getAttribute("gameInstanceDao")).thenReturn(mockGameInstanceDao);
     when(mockServletContext.getAttribute("gameDao")).thenReturn(mockGameDao);
-    //Simulate Room to be updated
-    newRoom = new GameInstance(roomId);
-    newRoom.setGameId(gameId);
 
     responseWriter = new StringWriter();
     when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
