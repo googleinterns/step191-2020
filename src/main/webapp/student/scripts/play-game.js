@@ -43,20 +43,17 @@ function createQuestionObject(title) {
 }
 
 function createAnswersObject(answers) {
-  const radioForm = document.getElementById("answerOptions");
-  document.getElementById("answerOptions").innerHTML = "";
-  console.log(radioForm)
-  for (var i = 0; i < answers.length; i++) {
-    var input = document.createElement("input");
-    input.setAttribute("type", "radio");
-    input.setAttribute("name", "answer");
-    input.setAttribute("value", answers[i].title);
-    if (answers[i].correct) {
-      input.id = "correctAnswer"
-    }
-    radioForm.appendChild(input);
-    radioForm.append(answers[i].title);
-    radioForm.appendChild(document.createElement("br"));
+    var quiz = document.getElementById("quiz");
+    quiz.innerHTML = "";
+    var multipleDiv = document.createElement("div");
+    multipleDiv.classList.add("multiple-choice");
+  for (var i = 1; i <= answers.length; i++) {
+      createAnswer(quiz, multipleDiv, answers[i-1].title, i);
+      if(i%2 == 0) {
+        quiz.appendChild(multipleDiv);  
+        multipleDiv = document.createElement("div");
+        multipleDiv.classList.add("multiple-choice");
+      }
   }
 
   const answerFeedbackElement = document.getElementById("answerFeedback");
@@ -77,6 +74,23 @@ function createAnswersObject(answers) {
       answerFeedbackElement.classList.add('wrongAnswer')
     }
   });
+}
+
+function createAnswer(quiz, multipleDiv, answerTitle, i){
+      const boxDiv = document.createElement("div");
+      boxDiv.classList.add("demo-card-square");
+      boxDiv.classList.add("mdl-card");
+      boxDiv.classList.add("mdl-shadow--2dp");
+      const titleDiv = document.createElement("div");
+      titleDiv.classList.add("mdl-card__title");
+      titleDiv.classList.add("mdl-card--expand")
+      titleDiv.setAttribute("id", "card-"+(i-1));
+      const title = document.createElement("h2");
+      title.classList.add("mdl-card__title-text");
+      title.innerText = answerTitle;
+      titleDiv.appendChild(title);
+      boxDiv.appendChild(titleDiv);
+      multipleDiv.appendChild(boxDiv);
 }
 
 function setSubmitButton() {
