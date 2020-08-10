@@ -26,7 +26,6 @@ function initAuthStateObserver() {
 function authStateObserver(user) {
   if (user) { // User is signed in!
     // Everything starts working when the User logs in
-    //getActiveGameInstanceId(user);
     loadControlPanel(user);
   } else { // User is signed out!
     console.log("Not logged in");
@@ -44,7 +43,7 @@ async function loadControlPanel(user) {
   const game = await queryGameDetails(gameInstance.gameId);
 
   // Add all the GameInstance's Info to UI
-  buildActiveGameInstanceUI(gameInstanceId, gameInstance, game);
+  buildActiveGameInstanceUI({ gameInstanceId, gameInstance, game });
 
   // Add buttons to control the GameInstance state
   initUIControlButtons(gameInstanceId);
@@ -98,7 +97,7 @@ function queryGameDetails(gameId) {
 }
 
 // Build the UI elements with all the info of the GameInstance
-function buildActiveGameInstanceUI(gameInstanceId, gameInstance, game) {
+function buildActiveGameInstanceUI({ gameInstanceId, gameInstance, game} = {}) {
   // Add the GameInstance's ID to UI
   addGameInstanceIdToUI(gameInstanceId);
 
@@ -142,13 +141,13 @@ function initGameInstanceListener(gameInstanceId) {
     const gameInstanceUpdate = doc.data();
 
     // TODO: this should be initiated once the game is started, not before...
-    updateCurrentQuestion(gameInstanceUpdate.gameId, gameInstanceUpdate.currentQuestion);
+    updateCurrentQuestion({ gameId: gameInstanceUpdate.gameId, currentQuestionId: gameInstanceUpdate.currentQuestion });
   });
 }
 
 // Updates the panel showing which questions students are seeing
-async function updateCurrentQuestion(gameId, currentQuestionId) {
-  const currentQuestion = await queryCurrentQuestion(gameId, currentQuestionId);
+async function updateCurrentQuestion({ gameId, currentQuestionId }) {
+  const currentQuestion = await queryCurrentQuestion({ gameId, currentQuestionId });
 
   const activeQuestionTextElement = document.getElementById('jsActiveQuestionText');
   activeQuestionTextElement.innerText = 'The question is: \"' + currentQuestion.title + '\"';
@@ -158,7 +157,7 @@ async function updateCurrentQuestion(gameId, currentQuestionId) {
 }
 
 // Queries and returns the currentQuestion object
-function queryCurrentQuestion(gameId, currentQuestionId) {
+function queryCurrentQuestion({ gameId, currentQuestionId }) {
   return db.collection('games').doc(gameId).collection('questions').doc(currentQuestionId).get().then(function(doc) {
     if (doc.exists) {
       return doc.data()
@@ -174,16 +173,16 @@ function initUIControlButtons(gameInstanceId) {
   const endGameInstanceButton = document.getElementById("endGameInstanceButton");
   
   startGameInstanceButtonElement.addEventListener('click', () => {
-      fetch('/startGameInstance?gameInstance='+activeGameInstanceId, { method: 'POST' });
+      fetch('/startGameInstance?gameInstance='+gameInstanceId, { method: 'POST' });
   });
   nextQuestionButton.addEventListener('click', () => {
-      fetch('/nextQuestion?gameInstance='+activeGameInstanceId, { method: 'POST' });
+      fetch('/nextQuestion?gameInstance='+gameInstanceId, { method: 'POST' });
   });
   previousQuestionButton.addEventListener('click', () => {
-      fetch('/previousQuestion?gameInstance='+activeGameInstanceId, { method: 'POST' });
+      fetch('/previousQuestion?gameInstance='+gameInstanceId, { method: 'POST' });
   });
   endGameInstanceButton.addEventListener('click', () => {
-      fetch('/endGameInstance?gameInstance='+activeGameInstanceId, { method: 'POST' }).then(()=>{
+      fetch('/endGameInstance?gameInstance='+gameInstanceId, { method: 'POST' }).then(()=>{
           window.location.href = "/teacher/controlGameInstance.html";
       });
   });
