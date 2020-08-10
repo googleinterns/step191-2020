@@ -8,8 +8,8 @@
   margin-top: 20px;
 }
 
-.spaced a {
-  margin-bottom: 15px;
+.spaced {
+  margin: 30px auto;
 }
 
 #newGame a {
