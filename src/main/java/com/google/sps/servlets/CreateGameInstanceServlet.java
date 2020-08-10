@@ -21,7 +21,22 @@ public class CreateGameInstanceServlet extends HttpServlet {
 
     GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
 
-    dao.createNewGameInstance(jsonObj.get("idToken").getAsString(), jsonObj.get("gameId").getAsString());
+    String newGameInstanceId = dao.createNewGameInstance(jsonObj.get("idToken").getAsString(), jsonObj.get("gameId").getAsString());
+
+    // Convert the newGameInstanceId to JSON
+    String json = convertToJson(newGameInstanceId);
+    // Send the JSON as response
+    response.setContentType("application/json;");
+    response.getWriter().println(json);
+  }
+
+  /**
+   * Convert to JSON using Gson
+   */
+  private String convertToJson(String newGameInstanceId) {
+    Gson gson = new Gson();
+    String json = gson.toJson(newGameInstanceId);
+    return json;
   }
 
 }
