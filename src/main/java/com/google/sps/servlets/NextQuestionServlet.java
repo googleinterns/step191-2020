@@ -47,7 +47,7 @@ public class NextQuestionServlet extends HttpServlet {
         return;
     }
     
-    String nextQuestionId = gameDao.getNextQuestionId(newRoom.getGameId(), newRoom.getCurrentQuestion());
+    String nextQuestionId = gameDao.getQuestionId("nextQuestion", newRoom.getGameId(), newRoom.getCurrentQuestion());
     if(nextQuestionId == null || nextQuestionId.isEmpty()){
         response.setStatus(404);
         response.getWriter().println("Error, there's no more questions");
