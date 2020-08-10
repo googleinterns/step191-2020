@@ -59,7 +59,7 @@ function joinGameInstance(gameInstanceId) {
       },
       body: JSON.stringify({idToken: idToken, gameInstanceId: gameInstanceId})
     }).then(() => {
-      window.location.href = "/teacher/controlGameInstance/controlGameInstance.html?gameInstanceId=" + gameInstanceId;
+      window.location.href = "/student/play-game.html?gameInstanceId=" + gameInstanceId;
     });
   }).catch(function(error) {
     // Handle error
