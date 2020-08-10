@@ -19,14 +19,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.ArgumentCaptor;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.PrintWriter;
-
-import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -38,15 +33,6 @@ import com.google.sps.daos.GameDao;
 import com.google.sps.data.Game;
 import com.google.sps.data.Question;
 import com.google.sps.servlets.StartGameInstanceServlet;
-
-import com.google.cloud.firestore.Firestore;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.FirestoreOptions;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.auth.FirebaseAuth;
-
-import org.springframework.mock.web.DelegatingServletInputStream;
 
 import org.junit.Before;
 import org.junit.Test;
