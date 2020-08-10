@@ -45,13 +45,13 @@ public class PreviousQuestionServlet extends HttpServlet {
         return;
     }
     
-    String nextQuestionId = gameDao.getQuestionId("previousQuestion", newRoom.getGameId(), newRoom.getCurrentQuestion());
-    if(nextQuestionId == null || nextQuestionId.isEmpty()){
+    String previousQuestionId = gameDao.getQuestionId("previousQuestion", newRoom.getGameId(), newRoom.getCurrentQuestion());
+    if(previousQuestionId == null || previousQuestionId.isEmpty()){
         response.setStatus(404);
         response.getWriter().println("Error, there's no previous question");
         return;        
     }
-    newRoom.setCurrentQuestion(nextQuestionId);
+    newRoom.setCurrentQuestion(previousQuestionId);
 
     dao.updateGameInstance(newRoom);
 
