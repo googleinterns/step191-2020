@@ -37,7 +37,7 @@ import com.google.sps.data.GameInstance;
 import com.google.sps.daos.GameDao;
 import com.google.sps.data.Game;
 import com.google.sps.data.Question;
-import com.google.sps.servlets.StartGameInstanceServlet;
+import com.google.sps.servlets.NextQuestionServlet;
 
 import com.google.cloud.firestore.Firestore;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -58,7 +58,7 @@ import org.hamcrest.CoreMatchers;
 import java.util.ArrayList;
 
 @RunWith(JUnit4.class)
-public final class StartGameInstanceServletTest {
+public final class NextQuestionServletTest {
 
   private GameInstanceDao mockGameInstanceDao = mock(GameInstanceDao.class);
   private ServletContext mockServletContext = mock(ServletContext.class);
@@ -68,14 +68,14 @@ public final class StartGameInstanceServletTest {
   private String roomId = "aSpX3cmZa5PB994uEoW2";
   private String gameId = "iBxba1vsaWT1SIqxeonJ";
   private String questionId = "NWUzaBz7SJEiKvQEwAkt";
-  private StartGameInstanceServlet servletUnderTest;
+  private NextQuestionServlet servletUnderTest;
   private GameInstance newRoom;
   private StringWriter responseWriter;
 
 
   @Before
   public void setUp() throws Exception {
-    servletUnderTest = new StartGameInstanceServlet() {
+    servletUnderTest = new NextQuestionServlet() {
       @Override
       public ServletContext getServletContext() {
         return mockServletContext;
@@ -90,34 +90,26 @@ public final class StartGameInstanceServletTest {
     //Simulate Room to be updated
     newRoom = new GameInstance(roomId);
     newRoom.setGameId(gameId);
-
+    newRoom.setCurrentQuestion(questionId);
   }
 
   @Test
   public void doPostStartGameInstance() throws IOException {
-
+    String nextQuestionId = "mU0dPEQtV0AKwrotOAYk";
     when(request.getParameter("gameInstance")).thenReturn(roomId);
     ArgumentCaptor<GameInstance> varArgs = ArgumentCaptor.forClass(GameInstance.class);
 
     //Return mock room 
     when(mockGameInstanceDao.getGameInstance(roomId)).thenReturn(newRoom);
 
-    //Return mock game
-    Game newGame = Game.builder()
-          .title("")
-          .creator("")
-          .headQuestion(questionId)
-          .questions(new ArrayList<Question>())
-          .build();
-    when(mockGameDao.getGame(gameId)).thenReturn(newGame);
+    when(mockGameDao.getNextQuestionId(gameId, questionId)).thenReturn(nextQuestionId);
 
     servletUnderTest.doPost(request, response);
 
-    verify(mockGameDao).getGame(gameId);
+    verify(mockGameDao).getNextQuestionId(gameId, questionId);
     verify(mockGameInstanceDao).getGameInstance(roomId);
     verify(mockGameInstanceDao).updateGameInstance(varArgs.capture());
-    Assert.assertEquals(true, newRoom.getIsActive());
-    Assert.assertEquals(questionId, newRoom.getCurrentQuestion());
+    Assert.assertEquals(nextQuestionId, newRoom.getCurrentQuestion());
 
   }
 
@@ -149,19 +141,20 @@ public final class StartGameInstanceServletTest {
   }
 
   @Test
-  public void noGameFound() throws IOException {
-
+  public void noMoreQuestions() throws IOException {
+    String nextQuestionId = "mU0dPEQtV0AKwrotOAYk";
     when(request.getParameter("gameInstance")).thenReturn(roomId);
+
+    newRoom.setCurrentQuestion(nextQuestionId);
     when(mockGameInstanceDao.getGameInstance(roomId)).thenReturn(newRoom);
 
-    //Return mock game
-    when(mockGameDao.getGame(gameId)).thenReturn(null);
+    when(mockGameDao.getNextQuestionId(nextQuestionId, questionId)).thenReturn("");
 
     servletUnderTest.doPost(request, response);
     String responseString = responseWriter.toString();
 
     verify(response).setStatus(404);
-    Assert.assertThat(responseString, CoreMatchers.containsString("Error, game not found."));
+    Assert.assertThat(responseString, CoreMatchers.containsString("Error, there's no more questions"));
 
   }
 }
