@@ -38,13 +38,24 @@ function authStateObserver(user) {
 // Load all the information 
 async function loadGamePanel(user) {
   // Get the Game Instance's ID in which the user is participating
-  const gameInstanceId = await getActiveGameInstanceId(user);
+  let gameInstanceId = getGameInstanceIdFromQueryParams();
+  
+  if (gameInstanceId == null) {
+    gameInstanceId = await getActiveGameInstanceId(user);
+  }
 
   // Start listening to the GameInstance
   initGameInstanceListener(gameInstanceId);
 
   // Listen to points in GameInstance
   initPointsListener(gameInstanceId, user);
+}
+
+// Gets the gameInstanceId from the query string if there is
+// If not, it returns null
+function getGameInstanceIdFromQueryParams() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('gameInstanceId');
 }
 
 // Inits listener to User's points in Firestore DB
