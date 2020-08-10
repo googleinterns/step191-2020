@@ -43,7 +43,6 @@ public class DatabaseUserDao implements UserDao {
       DocumentSnapshot document = future.get();
       if (!document.exists()) {
         initUser(userId);
-        System.out.println("Document data: " + document.getData());
       } 
     } catch (InterruptedException e) {
       // TODO Auto-generated catch block
