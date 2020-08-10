@@ -60,10 +60,15 @@ function getActiveGameInstanceId(user) {
       // Get the activeGameInstance's ID in which the User is participating
       return doc.data().activeGameInstanceId;
     } else {
+      throw 'User not registered in a GameInstance'
         // doc.data() will be undefined in this case
       console.log("No such document!");
     }
   }).catch(function(error) {
+      if (error == 'User not registered in a GameInstance') {
+        // Do stuff because user is not registered
+        console.log('Go register in a game first!');
+      }
       console.log("Error getting document:", error);
   });
 }
