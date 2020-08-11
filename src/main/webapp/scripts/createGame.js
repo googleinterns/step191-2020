@@ -106,7 +106,7 @@ function titleGrid(title) {
 }
 
 function multipleChoiceGrid(num) {
-  var answersStr = "";
+  var answersStr = '<input name="isMP" value=true hidden>';
   for (var i = 0; i < 4; i += 2) {
     answersStr += `
     <!-- The first line -->
@@ -148,27 +148,99 @@ function multipleChoiceGrid(num) {
 function trueOrFalseGrid(num) {
   const answersHtml = `
   <!-- The first line -->
+  <input name="isMP" value=false hidden>
   <div class="mdl-grid">
     <div class="mdl-cell mdl-cell--1-col"></div>
     <div class="mdl-cell mdl-cell--5-col">
       <!-- First answer -->
       <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-        <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="true"> <label class="mdl-textfield__label" > True </label>
+        <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="answer0"> <label class="mdl-textfield__label" > True </label>
       </div>
+      <input hidden type="checkbox" id="question` + num + `checkbox0" class="mdl-checkbox__input" name="correct0" checked>
 
     </div>
 
     <div class="mdl-cell mdl-cell--5-col">
       <!-- Second answer -->
       <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-        <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="false"> <label class="mdl-textfield__label" > False</label>
+        <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="answer1"> <label class="mdl-textfield__label" > False</label>
       </div>
+      <input hidden type="checkbox" id="question` + num + `checkbox1" class="mdl-checkbox__input" name="correct1">
+
     </div>
     <div class="mdl-cell mdl-cell--1-col"></div>
+    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="answer2" hidden>
+    <input hidden name="correct2">
+    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="answer3" hidden> 
+    <input hidden name="correct3">
   </div>
 
   `
   const elem = document.createElement("div");
   elem.innerHTML = answersHtml;
   return elem;
+}
+
+function sendQuestions() {
+  let title = document.getElementsByName("gameTitle")[0].value;
+  const questionTitles = document.getElementsByName("questionTitle");
+  const questionType = document.getElementsByName("isMP");
+  const answer0 = document.getElementsByName("answer0");
+  const answer1 = document.getElementsByName("answer1");
+  const answer2 = document.getElementsByName("answer2");
+  const answer3 = document.getElementsByName("answer3");
+
+  const correct0 = document.getElementsByName("correct0");
+  const correct1 = document.getElementsByName("correct1");
+  const correct2 = document.getElementsByName("correct2");
+  const correct3 = document.getElementsByName("correct3");
+  var questions = [];
+
+  for (var i = 0; i < questionTitles.length; i++) {
+    if(questionType[i].value == "true") {
+      answers = [
+        {
+          correct : correct0[i].checked,
+          title : answer0[i].value
+        },
+        {
+          correct : correct1[i].checked,
+          title : answer1[i].value
+        },
+        {
+          correct : correct2[i].checked,
+          title : answer2[i].value
+        },
+        {
+          correct : correct3[i].checked,
+          title : answer3[i].value
+        }
+      ]
+    } else {
+      answers = [
+        {
+          correct : true,
+          title : answer0[i].value
+        },
+        {
+          correct : false,
+          title : answer1[i].value
+        }
+      ]
+    }
+    var question = {
+      title : questionTitles[i].value,
+      isMp : (questionType[i].value === "true"),
+      answers : answers
+    };
+    questions.push(question);
+  }
+  gameJSON = {
+    title : title,
+    questions : questions,
+    creator : getUserId()
+  }
+  var postParams = new URLSearchParams();
+  postParams.append("game", JSON.stringify(gameJSON));
+  fetch("/newGame", {method: "POST", body: postParams})
 }
