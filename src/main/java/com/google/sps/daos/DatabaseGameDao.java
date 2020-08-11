@@ -83,4 +83,17 @@ public class DatabaseGameDao implements GameDao {
       }
       return newGame;
     }
+
+@Override
+    public String getNextQuestionId(String gameId, String currentQuestionId) {
+      ApiFuture<DocumentSnapshot> future = firestoreDb.collection("games").document(gameId).collection("questions").document(currentQuestionId).get();
+        try {
+            DocumentSnapshot document = future.get();
+            return document.get("nextQuestion").toString();
+        } catch(Exception e) {
+            System.out.println(e);
+            return "";
+        }
+
+    }
 }
