@@ -76,7 +76,9 @@ public final class NextQuestionServletTest {
   }
 
   @Test
+
   public void doPostNextQuestion() throws IOException {
+
     String nextQuestionId = "mU0dPEQtV0AKwrotOAYk";
     when(request.getParameter("gameInstance")).thenReturn(roomId);
     ArgumentCaptor<GameInstance> varArgs = ArgumentCaptor.forClass(GameInstance.class);

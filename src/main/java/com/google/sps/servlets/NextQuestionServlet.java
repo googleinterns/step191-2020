@@ -46,8 +46,9 @@ public class NextQuestionServlet extends HttpServlet {
         response.getWriter().println("Error, game instance not found.");
         return;
     }
-    
+
     String nextQuestionId = gameDao.getQuestionId("nextQuestion", newRoom.getGameId(), newRoom.getCurrentQuestion());
+
     if(nextQuestionId == null || nextQuestionId.isEmpty()){
         response.setStatus(404);
         response.getWriter().println("Error, there's no more questions");

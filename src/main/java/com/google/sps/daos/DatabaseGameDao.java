@@ -91,6 +91,7 @@ public class DatabaseGameDao implements GameDao {
         try {
             DocumentSnapshot document = future.get();
             return document.get(question).toString();
+
         } catch(Exception e) {
             System.out.println(e);
             return "";
