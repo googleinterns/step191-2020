@@ -15,6 +15,7 @@ import com.google.gson.JsonObject;
 import com.google.sps.data.GameInstance;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -55,13 +56,22 @@ public class AnswerQuestionServlet extends HttpServlet {
 
     String correctAnswerId = getCorrectAnswer(questionId, questionDocRef);
 
-    if (answerId.equals(correctAnswerId)) {
-      System.out.println("The answer is correct");
+    boolean isAnswerCorrect = answerId.equals(correctAnswerId);
 
+    DocumentReference answerInStudentDocRef = gameInstanceDocRef.collection("students").document(userId).collection("questions").document(questionId);
+
+    // Store the answer in the user's profile if it does not exist
+    boolean answerNotExists = registerAnswerInStudentAnswers(answerInStudentDocRef, isAnswerCorrect);
+
+    if (isAnswerCorrect && answerNotExists) {
+      System.out.println("The answer is correct, adding points");
       addPoints(userId, gameInstanceDocRef, firestoreDb);
     } else {
-      System.out.println("The answer is incorrect");
+      System.out.println("The answer is incorrect or it had already been answered");
     }
+
+    
+    
 
     // GameInstanceDao dao = (GameInstanceDao)
     // this.getServletContext().getAttribute("gameInstanceDao");
@@ -151,6 +161,29 @@ public class AnswerQuestionServlet extends HttpServlet {
       return null;
     });
 
+  }
+
+  // Returns true if answer had not been aswered yet, else returns false
+  private boolean registerAnswerInStudentAnswers(DocumentReference questionDocRef, boolean isCorrect) {
+    ApiFuture<DocumentSnapshot> questionAnswerFuture = questionDocRef.get();
+
+    try {
+      DocumentSnapshot document = questionAnswerFuture.get();
+      if (!document.exists()) {
+        Map<String, Object> docData = new HashMap<>();
+        docData.put("correct", isCorrect);
+        questionDocRef.set(docData);
+        return true;
+      } 
+    } catch (InterruptedException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (ExecutionException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+    return false;
   }
 
 }
