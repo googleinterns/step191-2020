@@ -28,4 +28,8 @@ public class Answer {
   public void setCorrect(boolean correct) {
     this.correct = correct;
   } 
+
+  public String toString(){//overriding the toString() method  
+    return "{title=" + title +", correct="+ correct;  
+  }  
 }
