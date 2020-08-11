@@ -56,8 +56,8 @@ function selectGame(gameId) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({idToken: idToken, gameId: gameId})
-    }).then(() => {
-      window.location.replace(window.location.origin + "/teacher/controlGameInstance.html");
+    }).then((response) => response.json()).then((newGameInstanceId) => {
+      window.location.href = "/teacher/controlGameInstance/controlGameInstance.html?gameInstanceId=" + newGameInstanceId;
     });
 
   }).catch(function(error) {

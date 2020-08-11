@@ -1,13 +1,10 @@
 package com.google.sps.daos;
 
-import java.util.concurrent.ExecutionException;
-
 import com.google.api.core.ApiFuture;
 
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.SetOptions;
-import com.google.cloud.firestore.WriteResult;
 import com.google.cloud.firestore.DocumentSnapshot;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,7 +24,7 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
   }
   
   @Override
-  public void createNewGameInstance(String idToken, String gameId) {
+  public String createNewGameInstance(String idToken, String gameId) {
     DocumentReference newGameInstanceRef = firestoreDb.collection("gameInstance").document();
 
     FirebaseToken decodedToken = null;
@@ -49,17 +46,9 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
     newGameInstanceRef.set(newGameInstance);
 
     // Update the User's entry with game he just started
-    ApiFuture<WriteResult> future = firestoreDb.collection("users").document(userId).update("activeGameInstanceId", newGameInstanceRef.getId());
-    // Block until room is created to continue, since it will be redirected to admin game panel
-    try {
-      future.get();
-    } catch (InterruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (ExecutionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    firestoreDb.collection("users").document(userId).update("activeGameInstanceId", newGameInstanceRef.getId());
+
+    return newGameInstanceRef.getId();
   }
 
 
@@ -84,6 +73,24 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
   @Override
   public void updateGameInstance(GameInstance update) {
     firestoreDb.collection("gameInstance").document(update.getId()).set(update, SetOptions.merge());
+  }
+
+  @Override
+  public boolean getAnswer(String gameInstance, String student) {
+    //To get current question  
+    GameInstance actualInstance = this.getGameInstance(gameInstance);
+    DocumentReference gameInstanceDocRef = firestoreDb.collection("gameInstance").document(gameInstance);
+    DocumentReference answerInStudentDocRef = gameInstanceDocRef.collection("students").document(student).collection("questions").document(actualInstance.getCurrentQuestion());
+    ApiFuture<DocumentSnapshot> questionAnswerFuture = answerInStudentDocRef.get();
+    try {
+      DocumentSnapshot document = questionAnswerFuture.get();
+      return Boolean.parseBoolean(document.get("correct").toString());
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    
+  return false;
   }
 
 }

@@ -16,34 +16,80 @@
 'use strict';
 
 const db = firebase.firestore();
-let activeGameInstanceId;
-
-// Triggers when the auth state change for instance when the user signs-in or signs-out.
-function authStateObserver(user) {
-  if (user) { // User is signed in!
-    // Everything starts working when the User logs in
-    getActiveGameInstanceId(user);
-  } else { // User is signed out!
-    console.log("Not logged in");
-  }
-}
 
 // Is triggered when the User logs in or logs out
 function initAuthStateObserver() {
   firebase.auth().onAuthStateChanged(authStateObserver);
 }
 
+// Triggers when the auth state change for instance when the user signs-in or signs-out.
+function authStateObserver(user) {
+  if (user) { // User is signed in!
+    // Everything starts working when the User logs in
+    loadControlPanel(user);
+  } else { // User is signed out!
+    console.log("Not logged in");
+  }
+}
+
+async function loadControlPanel(user) {
+  // Get the Game Instance's ID in which the user is participating
+  let gameInstanceId = getGameInstanceIdFromQueryParams();
+  
+  if (gameInstanceId == null) {
+    gameInstanceId = await getActiveGameInstanceId(user);
+  }
+  
+  // Get the Active Game Instance Object from DB
+  const gameInstance = await queryActiveGameInstance(gameInstanceId);
+
+  // Get the Game the GameInstance is using from DB
+  const game = await queryGameDetails(gameInstance.gameId);
+
+  // Add all the GameInstance's Info to UI
+  buildActiveGameInstanceUI({ gameInstanceId, gameInstance, game });
+
+  // Add buttons to control the GameInstance state
+  initUIControlButtons(gameInstanceId);
+}
+
+// Gets the gameInstanceId from the query string if there is
+// If not, it returns null
+function getGameInstanceIdFromQueryParams() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('gameInstanceId');
+}
+
 // Queries the "Users" collection of the DB to get the activeGameInstanceId the User is participating in
+// Returns the gameInstanceId string
 function getActiveGameInstanceId(user) {
+  console.log('Got gameInstanceId from Firestore');
   const uid = user.uid;
 
   // Query the User's document in "Users" collection
-  db.collection("users").doc(uid).get().then(function(doc) {
+  return db.collection("users").doc(uid).get().then(function(doc) {
     if (doc.exists) {
       // Get the activeGameInstance's ID in which the User is participating
-      activeGameInstanceId = doc.data().activeGameInstanceId;
-      // Query the info of that GameInstance from the "GameInstance" collections
-      queryActiveGameInstanceDocument(activeGameInstanceId);
+      return doc.data().activeGameInstanceId;
+    } else {
+      throw 'User not registered in a GameInstance'
+        // doc.data() will be undefined in this case
+      console.log("No such document!");
+    }
+  }).catch(function(error) {
+      if (error == 'User not registered in a GameInstance') {
+        // Do stuff because user is not registered
+        console.log('Go register in a game first!');
+      }
+      console.log("Error getting document:", error);
+  });
+}
+
+// Queries and returns the gameInstance object from the "GameInstance" collections of DB
+function queryActiveGameInstance(gameInstanceId) {
+  return db.collection("gameInstance").doc(gameInstanceId).get().then(function(doc) {
+    if (doc.exists) {
+      return doc.data();
     } else {
         // doc.data() will be undefined in this case
       console.log("No such document!");
@@ -53,17 +99,11 @@ function getActiveGameInstanceId(user) {
   });
 }
 
-// Gets the gameInstance entity from DB
-function queryActiveGameInstanceDocument(gameInstanceId) {
-  db.collection("gameInstance").doc(gameInstanceId).get().then(function(doc) {
+// Queries and returns the Game object from the "Games" collection of the DB
+function queryGameDetails(gameId) {
+  return db.collection("games").doc(gameId).get().then(function(doc) {
     if (doc.exists) {
-      // The GameInstance exists, so now populate all info about it
-
-      // Add all the GameInstance's Info to UI
-      buildActiveGameInstanceUI(doc.data(), gameInstanceId);
-      
-      // Add buttons to control the GameInstance state
-      initUIButtons(gameInstanceId);
+      return doc.data();
     } else {
         // doc.data() will be undefined in this case
       console.log("No such document!");
@@ -74,15 +114,15 @@ function queryActiveGameInstanceDocument(gameInstanceId) {
 }
 
 // Build the UI elements with all the info of the GameInstance
-function buildActiveGameInstanceUI(gameInstance, gameInstanceId) {
+function buildActiveGameInstanceUI({ gameInstanceId, gameInstance, game} = {}) {
   // Add the GameInstance's ID to UI
   addGameInstanceIdToUI(gameInstanceId);
 
-  // Get the game object and add it to the UI
-  queryGameDetails(gameInstance.gameId);
+  // Add the Game details to UI
+  addGameDetailsToUI(gameInstance.gameId, game);
 
   // This will listen to when anything in the GameInstance changes
-  initGameInstanceListener();
+  initGameInstanceListener(gameInstanceId);
 }
 
 // Adds the GameInstance's ID to the UI
@@ -91,23 +131,8 @@ function addGameInstanceIdToUI(gameInstanceId) {
   gameInstanceIdElement.innerText = "This gameInstance's ID is: " + gameInstanceId;
 }
 
-// Queries the Game instance from the DB and then adds it to the UI
-function queryGameDetails(gameId) {
-  db.collection("games").doc(gameId).get().then(function(doc) {
-    if (doc.exists) {
-      const game = doc.data();
-      addGameDetailsToUI(game, gameId);
-    } else {
-        // doc.data() will be undefined in this case
-      console.log("No such document!");
-    }
-  }).catch(function(error) {
-      console.log("Error getting document:", error);
-  });
-}
-
 // Adds the Game's details to the UI
-function addGameDetailsToUI(game, gameId) {
+function addGameDetailsToUI(gameId, game) {
   // Adds the Game's ID to the UI
   addGameIdToUI(gameId);
 
@@ -126,45 +151,63 @@ function addGameIdToUI(gameId) {
   gameIdElement.innerText = "The game's ID is: " + gameId;
 }
 
-function initGameInstanceListener() {
-  db.collection('gameInstance').doc(activeGameInstanceId).onSnapshot(function(doc) {
+// This listens to any change in the GameInstance Doc in Firestore DB
+function initGameInstanceListener(gameInstanceId) {
+  db.collection('gameInstance').doc(gameInstanceId).onSnapshot(function(doc) {
     // If this is triggered it's because the GameInstance's activeQuestion changed
+    // OR someone joined
     const gameInstanceUpdate = doc.data();
-    updateGameInfo(gameInstanceUpdate.currentQuestion, gameInstanceUpdate.gameId);
-    console.log(gameInstanceUpdate);
+
+    // TODO: this should be initiated once the game is started, not before...
+    updateCurrentQuestion({ gameId: gameInstanceUpdate.gameId, currentQuestionId: gameInstanceUpdate.currentQuestion });
+
+    updateNumberOfMembersUI(gameInstanceUpdate.numberOfMembers);
   });
 }
 
-async function updateGameInfo(currentQuestion, gameId) {
-    const games = db.collection('games').doc(gameId);
-    games.collection('questions').doc(currentQuestion).get().then(function(doc) {
-        if (doc.exists) {
-            const activeQuestionTextElement = document.getElementById('jsActiveQuestionText');
-            activeQuestionTextElement.innerText = 'The question is: \"' + doc.data().title + '\"';
-        }
-    })
-    const activeQuestionNumberElement = document.getElementById('jsActiveQuestionNumber');
-    activeQuestionNumberElement.innerText = "Students are seeing question #" + (currentQuestion);
+// Updates the panel showing which questions students are seeing
+async function updateCurrentQuestion({ gameId, currentQuestionId }) {
+  const currentQuestion = await queryCurrentQuestion({ gameId, currentQuestionId });
 
+  const activeQuestionTextElement = document.getElementById('jsActiveQuestionText');
+  activeQuestionTextElement.innerText = 'The question is: \"' + currentQuestion.title + '\"';
+
+  const activeQuestionNumberElement = document.getElementById('jsActiveQuestionNumber');
+  activeQuestionNumberElement.innerText = "Students are seeing question with ID: " + (currentQuestionId);
 }
 
-function initUIButtons(gameInstanceId) {
+// Queries and returns the currentQuestion object
+function queryCurrentQuestion({ gameId, currentQuestionId }) {
+  return db.collection('games').doc(gameId).collection('questions').doc(currentQuestionId).get().then(function(doc) {
+    if (doc.exists) {
+      return doc.data()
+    }
+  });
+}
+
+function updateNumberOfMembersUI(numberOfMembers) {
+  const numberOfMembersElement = document.getElementById("jsNumberOfStudents");
+  numberOfMembersElement.innerText = "There are " + numberOfMembers + " students registered in your room.";
+}
+
+// Inits the control buttons for the teacher to control the game
+function initUIControlButtons(gameInstanceId) {
   const startGameInstanceButtonElement = document.getElementById('startGameInstanceButton');
   const nextQuestionButton = document.getElementById("nextQuestionButton");
   const previousQuestionButton = document.getElementById("previousQuestionButton");
   const endGameInstanceButton = document.getElementById("endGameInstanceButton");
   
   startGameInstanceButtonElement.addEventListener('click', () => {
-      fetch('/startGameInstance?gameInstance='+activeGameInstanceId, { method: 'POST' });
+      fetch('/startGameInstance?gameInstance='+gameInstanceId, { method: 'POST' });
   });
   nextQuestionButton.addEventListener('click', () => {
-      fetch('/nextQuestion?gameInstance='+activeGameInstanceId, { method: 'POST' });
+      fetch('/nextQuestion?gameInstance='+gameInstanceId, { method: 'POST' });
   });
   previousQuestionButton.addEventListener('click', () => {
-      fetch('/previousQuestion?gameInstance='+activeGameInstanceId, { method: 'POST' });
+      fetch('/previousQuestion?gameInstance='+gameInstanceId, { method: 'POST' });
   });
   endGameInstanceButton.addEventListener('click', () => {
-      fetch('/endGameInstance?gameInstance='+activeGameInstanceId, { method: 'POST' }).then(()=>{
+      fetch('/endGameInstance?gameInstance='+gameInstanceId, { method: 'POST' }).then(()=>{
           window.location.href = "/teacher/controlGameInstance.html";
       });
   });

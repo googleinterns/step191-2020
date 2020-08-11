@@ -14,6 +14,10 @@
 
 package com.google.sps;
 
+import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
+import static com.google.common.truth.Truth8.assertThat;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,8 +25,9 @@ import static org.mockito.Mockito.when;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringReader;
-
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletContext;
@@ -50,6 +55,8 @@ public final class CreateGameInstanceServletTest {
 
   private CreateGameInstanceServlet servletUnderTest;
 
+  private StringWriter responseWriter;
+
   @Before
   public void setUp() throws Exception {
     servletUnderTest = new CreateGameInstanceServlet() {
@@ -60,6 +67,10 @@ public final class CreateGameInstanceServletTest {
     };
 
     when(mockServletContext.getAttribute("gameInstanceDao")).thenReturn(mockGameInstanceDao);
+    when(mockGameInstanceDao.createNewGameInstance("asdfqwerty","222")).thenReturn("qwertyuiop");
+
+    responseWriter = new StringWriter();
+    when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
   }
 
   @Test
@@ -76,7 +87,12 @@ public final class CreateGameInstanceServletTest {
     when(request.getCharacterEncoding()).thenReturn("UTF-8");
 
     servletUnderTest.doPost(request, response);
+
+    String responseString = responseWriter.toString();
+
     verify(mockGameInstanceDao).createNewGameInstance("asdfqwerty", "222");
+    
+    assertThat(responseString).contains("qwertyuiop");
   }
   
 }
