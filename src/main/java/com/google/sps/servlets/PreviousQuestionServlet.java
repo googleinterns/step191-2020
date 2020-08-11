@@ -16,6 +16,7 @@ import com.google.cloud.firestore.DocumentSnapshot;
 
 import com.google.sps.daos.GameInstanceDao;
 import com.google.sps.data.GameInstance;
+import com.google.sps.daos.GameDao;
 
 import java.util.List; 
 import java.util.ArrayList; 
@@ -27,7 +28,6 @@ public class PreviousQuestionServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException { 
   // Generate room key
     String roomId = request.getParameter("gameInstance");
-    Firestore db = (Firestore) this.getServletContext().getAttribute("firestoreDb");
 
     if(roomId==null || roomId.isEmpty()){
         response.setStatus(500);
@@ -36,26 +36,23 @@ public class PreviousQuestionServlet extends HttpServlet {
     }
 
     GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
-    GameInstance newRoom = dao.getGameInstance(roomId);
-        
+    GameDao gameDao = (GameDao) this.getServletContext().getAttribute("gameDao");
+
+    GameInstance newRoom = dao.getGameInstance(roomId);       
     if(newRoom == null){
         response.setStatus(404);
-        response.getWriter().println("Error, not found.");
+        response.getWriter().println("Error, game instance not found.");
         return;
     }
-
-        ApiFuture<DocumentSnapshot> future = db.collection("games").document(newRoom.getGameId()).collection("questions").document(newRoom.getCurrentQuestion()).get();
-        try {
-            DocumentSnapshot document = future.get();
-            newRoom.setCurrentQuestion(document.get("previousQuestion").toString());
-        } catch(Exception e) {
-            response.setStatus(400);
-            response.getWriter().println("No question");
-            System.out.println(e);
-            return;
-        }
-
-
+    
+    String previousQuestionId = gameDao.getQuestionId("previousQuestion", newRoom.getGameId(), newRoom.getCurrentQuestion());
+    if(previousQuestionId == null || previousQuestionId.isEmpty()){
+        response.setStatus(404);
+        response.getWriter().println("Error, there's no previous question");
+        return;        
+    }
+    newRoom.setCurrentQuestion(previousQuestionId);
+    newRoom.setCurrentQuestionActive(false);
     dao.updateGameInstance(newRoom);
 
   }

@@ -29,10 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.sps.daos.GameInstanceDao;
 import com.google.sps.data.GameInstance;
-import com.google.sps.daos.GameDao;
-import com.google.sps.data.Game;
-import com.google.sps.data.Question;
-import com.google.sps.servlets.StartGameInstanceServlet;
+import com.google.sps.servlets.EndGameInstanceServlet;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -41,46 +38,41 @@ import org.junit.Assert;
 import org.junit.runners.JUnit4;
 import org.hamcrest.CoreMatchers;
 
-import java.util.ArrayList;
 
 @RunWith(JUnit4.class)
-public final class StartGameInstanceServletTest {
+public final class EndGameInstanceServletTest {
 
   private GameInstanceDao mockGameInstanceDao = mock(GameInstanceDao.class);
   private ServletContext mockServletContext = mock(ServletContext.class);
-  private GameDao mockGameDao = mock(GameDao.class);
   private HttpServletRequest request = mock(HttpServletRequest.class);
   private HttpServletResponse response = mock(HttpServletResponse.class);
   private String roomId = "aSpX3cmZa5PB994uEoW2";
   private String gameId = "iBxba1vsaWT1SIqxeonJ";
-  private String questionId = "NWUzaBz7SJEiKvQEwAkt";
-  private StartGameInstanceServlet servletUnderTest;
+  private EndGameInstanceServlet servletUnderTest;
   private GameInstance newRoom;
   private StringWriter responseWriter;
 
 
   @Before
   public void setUp() throws Exception {
-    servletUnderTest = new StartGameInstanceServlet() {
+    servletUnderTest = new EndGameInstanceServlet() {
       @Override
       public ServletContext getServletContext() {
         return mockServletContext;
       }
     };
     when(mockServletContext.getAttribute("gameInstanceDao")).thenReturn(mockGameInstanceDao);
-    when(mockServletContext.getAttribute("gameDao")).thenReturn(mockGameDao);
 
     responseWriter = new StringWriter();
     when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
 
     //Simulate Room to be updated
     newRoom = new GameInstance(roomId);
-    newRoom.setGameId(gameId);
 
   }
 
   @Test
-  public void doPostStartGameInstance() throws IOException {
+  public void doPostEndGameInstance() throws IOException {
 
     when(request.getParameter("gameInstance")).thenReturn(roomId);
     ArgumentCaptor<GameInstance> varArgs = ArgumentCaptor.forClass(GameInstance.class);
@@ -88,22 +80,12 @@ public final class StartGameInstanceServletTest {
     //Return mock room 
     when(mockGameInstanceDao.getGameInstance(roomId)).thenReturn(newRoom);
 
-    //Return mock game
-    Game newGame = Game.builder()
-          .title("")
-          .creator("")
-          .headQuestion(questionId)
-          .questions(new ArrayList<Question>())
-          .build();
-    when(mockGameDao.getGame(gameId)).thenReturn(newGame);
-
     servletUnderTest.doPost(request, response);
 
-    verify(mockGameDao).getGame(gameId);
     verify(mockGameInstanceDao).getGameInstance(roomId);
     verify(mockGameInstanceDao).updateGameInstance(varArgs.capture());
-    Assert.assertEquals(true, newRoom.getIsActive());
-    Assert.assertEquals(questionId, newRoom.getCurrentQuestion());
+    Assert.assertEquals(false, newRoom.getIsActive());
+    Assert.assertEquals(null, newRoom.getCurrentQuestion());
 
   }
 
@@ -134,20 +116,4 @@ public final class StartGameInstanceServletTest {
 
   }
 
-  @Test
-  public void noGameFound() throws IOException {
-
-    when(request.getParameter("gameInstance")).thenReturn(roomId);
-    when(mockGameInstanceDao.getGameInstance(roomId)).thenReturn(newRoom);
-
-    //Return mock game
-    when(mockGameDao.getGame(gameId)).thenReturn(null);
-
-    servletUnderTest.doPost(request, response);
-    String responseString = responseWriter.toString();
-
-    verify(response).setStatus(404);
-    Assert.assertThat(responseString, CoreMatchers.containsString("Error, game not found."));
-
-  }
 }

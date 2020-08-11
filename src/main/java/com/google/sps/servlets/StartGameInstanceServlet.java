@@ -55,6 +55,8 @@ public class StartGameInstanceServlet extends HttpServlet {
     }
 
     newRoom.setCurrentQuestion(actualGame.headQuestion());
+    newRoom.setCurrentQuestionActive(true);
+
     // Activate room
     newRoom.setIsActive(true);
 

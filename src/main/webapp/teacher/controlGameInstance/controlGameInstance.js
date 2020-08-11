@@ -146,16 +146,25 @@ function initGameInstanceListener(gameInstanceId) {
     const gameInstanceUpdate = doc.data();
 
     // TODO: this should be initiated once the game is started, not before...
-    updateCurrentQuestion({ gameId: gameInstanceUpdate.gameId, currentQuestionId: gameInstanceUpdate.currentQuestion });
+    updateCurrentQuestion({ gameId: gameInstanceUpdate.gameId, currentQuestionId: gameInstanceUpdate.currentQuestion, isCurrentQuestionActive: gameInstanceUpdate.currentQuestionActive });
   });
 }
 
 // Updates the panel showing which questions students are seeing
-async function updateCurrentQuestion({ gameId, currentQuestionId }) {
+async function updateCurrentQuestion({ gameId, currentQuestionId, isCurrentQuestionActive } = {}) {
   const currentQuestion = await queryCurrentQuestion({ gameId, currentQuestionId });
 
   const activeQuestionTextElement = document.getElementById('jsActiveQuestionText');
   activeQuestionTextElement.innerText = 'The question is: \"' + currentQuestion.title + '\"';
+
+  const canStudentsAnswerElement = document.getElementById("jsCanStudentsAnswer");
+  console.log(isCurrentQuestionActive);
+  if (isCurrentQuestionActive){
+    canStudentsAnswerElement.innerText = "STUDENTS CAN ANSWER NOW";
+  } else {
+    canStudentsAnswerElement.innerText = "Students can't answer yet";      
+  };
+
 
   const activeQuestionNumberElement = document.getElementById('jsActiveQuestionNumber');
   activeQuestionNumberElement.innerText = "Students are seeing question with ID: " + (currentQuestionId);
@@ -176,6 +185,7 @@ function initUIControlButtons(gameInstanceId) {
   const nextQuestionButton = document.getElementById("nextQuestionButton");
   const previousQuestionButton = document.getElementById("previousQuestionButton");
   const endGameInstanceButton = document.getElementById("endGameInstanceButton");
+  const endQuestionButton = document.getElementById("endQuestionButton");
   
   startGameInstanceButtonElement.addEventListener('click', () => {
       fetch('/startGameInstance?gameInstance='+gameInstanceId, { method: 'POST' });
@@ -190,6 +200,12 @@ function initUIControlButtons(gameInstanceId) {
       fetch('/endGameInstance?gameInstance='+gameInstanceId, { method: 'POST' }).then(()=>{
           window.location.href = "/teacher/controlGameInstance.html";
       });
+  });
+  startQuestionButton.addEventListener('click', () => {
+      fetch('/controlQuestion?gameInstance='+gameInstanceId+'&action=start', { method: 'POST' });
+  });
+  endQuestionButton.addEventListener('click', () => {
+      fetch('/controlQuestion?gameInstance='+gameInstanceId+'&action=end', { method: 'POST' });
   });
 }
 
