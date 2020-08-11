@@ -79,7 +79,7 @@ function buildActiveGameInstanceUI(gameInstance, gameInstanceId) {
   addGameInstanceIdToUI(gameInstanceId);
 
   // Get the game object and add it to the UI
-  queryGameDetails(gameInstance.gameId);
+  queryGameDetails(gameInstance.gameId, gameInstance.currentQuestionActive);
 
   // This will listen to when anything in the GameInstance changes
   initGameInstanceListener();
@@ -92,11 +92,11 @@ function addGameInstanceIdToUI(gameInstanceId) {
 }
 
 // Queries the Game instance from the DB and then adds it to the UI
-function queryGameDetails(gameId) {
+function queryGameDetails(gameId, currentQuestionActive) {
   db.collection("games").doc(gameId).get().then(function(doc) {
     if (doc.exists) {
       const game = doc.data();
-      addGameDetailsToUI(game, gameId);
+      addGameDetailsToUI(game, gameId, currentQuestionActive);
     } else {
         // doc.data() will be undefined in this case
       console.log("No such document!");
@@ -107,13 +107,21 @@ function queryGameDetails(gameId) {
 }
 
 // Adds the Game's details to the UI
-function addGameDetailsToUI(game, gameId) {
+function addGameDetailsToUI(game, gameId, currentQuestionActive) {
   // Adds the Game's ID to the UI
   addGameIdToUI(gameId);
 
   // Add the Game Title
   const gameTitleElement = document.getElementById("jsGameTitle");
   gameTitleElement.innerText = "The game's title is: " + game.title;
+
+  const CanStudentsAnswer = document.getElementById("jsCanStudentsAnswer");
+  console.log(currentQuestionActive);
+  if(currentQuestionActive){
+    CanStudentsAnswer.innerText = "STUDENTS CAN ANSWER NOW";
+  } else {
+    CanStudentsAnswer.innerText = "Students can't answer yet";      
+  }
 
   // Add the Number of Questions
   const numberOfQuestionsOfGameElement = document.getElementById('jsNumberOfQuestionsOfGame');
@@ -130,17 +138,25 @@ function initGameInstanceListener() {
   db.collection('gameInstance').doc(activeGameInstanceId).onSnapshot(function(doc) {
     // If this is triggered it's because the GameInstance's activeQuestion changed
     const gameInstanceUpdate = doc.data();
-    updateGameInfo(gameInstanceUpdate.currentQuestion, gameInstanceUpdate.gameId);
+    updateGameInfo(gameInstanceUpdate.currentQuestionActive , gameInstanceUpdate.currentQuestion, gameInstanceUpdate.gameId);
     console.log(gameInstanceUpdate);
   });
 }
 
-async function updateGameInfo(currentQuestion, gameId) {
+async function updateGameInfo(currentQuestionActive, currentQuestion, gameId) {
     const games = db.collection('games').doc(gameId);
     games.collection('questions').doc(currentQuestion).get().then(function(doc) {
         if (doc.exists) {
             const activeQuestionTextElement = document.getElementById('jsActiveQuestionText');
             activeQuestionTextElement.innerText = 'The question is: \"' + doc.data().title + '\"';
+
+            const CanStudentsAnswer = document.getElementById("jsCanStudentsAnswer");
+            console.log(currentQuestionActive);
+            if(currentQuestionActive){
+                CanStudentsAnswer.innerText = "STUDENTS CAN ANSWER NOW";
+            } else {
+                CanStudentsAnswer.innerText = "Students can't answer yet";      
+            };
         }
     })
     const activeQuestionNumberElement = document.getElementById('jsActiveQuestionNumber');
