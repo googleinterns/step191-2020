@@ -23,7 +23,7 @@ public class DatabaseUserDao implements UserDao {
   }
 
   @Override
-  public void verifyUserInFirestore(String idToken) {
+  public void createIfNotExists(String idToken) {
     FirebaseToken decodedToken = null;
     String userId = null;
 

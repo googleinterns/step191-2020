@@ -20,7 +20,7 @@ public class UserServlet extends HttpServlet {
 
     UserDao dao = (UserDao) this.getServletContext().getAttribute("userDao");
 
-    dao.verifyUserInFirestore(jsonObj.get("idToken").getAsString());
+    dao.createIfNotExists(jsonObj.get("idToken").getAsString());
   }
 
 }

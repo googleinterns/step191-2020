@@ -1,5 +1,5 @@
 package com.google.sps.daos;
 
 public interface UserDao {
-  public void verifyUserInFirestore(String idToken);
+  public void createIfNotExists(String idToken);
 }
