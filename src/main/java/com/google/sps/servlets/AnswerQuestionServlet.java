@@ -54,6 +54,7 @@ public class AnswerQuestionServlet extends HttpServlet {
     DocumentReference questionDocRef = firestoreDb.collection("games").document(gameId).collection("questions")
         .document(questionId);
 
+
     String correctAnswerId = getCorrectAnswer(questionId, questionDocRef);
 
     boolean isAnswerCorrect = answerId.equals(correctAnswerId);
@@ -63,12 +64,30 @@ public class AnswerQuestionServlet extends HttpServlet {
     // Store the answer in the user's profile if it does not exist
     boolean answerNotExists = registerAnswerInStudentAnswers(answerInStudentDocRef, isAnswerCorrect);
 
-    if (isAnswerCorrect && answerNotExists) {
-      System.out.println("The answer is correct, adding points");
-      addPoints(userId, gameInstanceDocRef, firestoreDb);
+    if (answerNotExists) {
+      if (isAnswerCorrect) {
+        System.out.println("The answer is correct, adding points");
+        addPoints(userId, gameInstanceDocRef, firestoreDb);
+      } else {
+        System.out.println("The answer is incorrect");
+      }
+
+      DocumentReference questionInGameInstanceDocRef = gameInstanceDocRef.collection("questions").document(questionId);
+
+      // register the the question's general answer statistics
+      updateGeneralQuestionStats(questionInGameInstanceDocRef, isAnswerCorrect, firestoreDb);
+
+      // update the answer's statistics in the answer document in the question document
+      DocumentReference answerDocRef = questionInGameInstanceDocRef.collection("answers").document(answerId);
+      updateAnswerInQuestionStats(answerDocRef, isAnswerCorrect, firestoreDb);
+
+      System.out.println("running supposedly");
+
     } else {
-      System.out.println("The answer is incorrect or it had already been answered");
+      System.out.println("Answer had already been answered");
     }
+
+   
 
     
     
@@ -184,6 +203,35 @@ public class AnswerQuestionServlet extends HttpServlet {
     }
 
     return false;
+  }
+
+  private void updateGeneralQuestionStats(DocumentReference questionDocRef, boolean isAnswerCorrect, Firestore firestoreDb) {
+    firestoreDb.runTransaction(transaction -> {
+      // retrieve document and increment population field
+      DocumentSnapshot snapshot = transaction.get(questionDocRef).get();
+      long oldNumberOfAnswers = snapshot.getLong("numberAnswered");
+      transaction.update(questionDocRef, "numberAnswered", oldNumberOfAnswers + 1);
+
+      if (isAnswerCorrect) {
+        long oldNumberOfCorrectAnswers = snapshot.getLong("numberCorrect");
+        transaction.update(questionDocRef, "numberCorrect", oldNumberOfCorrectAnswers + 1);
+      } else {
+        long oldNumberOfWrongAnswers = snapshot.getLong("numberWrong");
+        transaction.update(questionDocRef, "numberWrong", oldNumberOfWrongAnswers + 1);
+      }
+      
+      return null;
+    });
+  }
+
+  private void updateAnswerInQuestionStats(DocumentReference answerDocRef, boolean isAnswerCorrect, Firestore firestoreDb) {
+    firestoreDb.runTransaction(transaction -> {
+      // retrieve document and increment population field
+      DocumentSnapshot snapshot = transaction.get(answerDocRef).get();
+      long oldNumberAnswers = snapshot.getLong("numberAnswers");
+      transaction.update(answerDocRef, "numberAnswers", oldNumberAnswers + 1);
+      return null;
+    });
   }
 
 }
