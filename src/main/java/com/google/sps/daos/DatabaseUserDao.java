@@ -8,7 +8,6 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
@@ -90,17 +89,7 @@ public class DatabaseUserDao implements UserDao {
     }
 
     // Add the active GameInstance to the User's entry in "Users" collection
-    ApiFuture<WriteResult> userActiveGameInstanceFuture = firestoreDb.collection("users").document(userId).update("activeGameInstanceId", gameInstanceId);
-    // Block until room is created to continue, since it will be redirected to admin game panel
-    try {
-      userActiveGameInstanceFuture.get();
-    } catch (InterruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (ExecutionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    firestoreDb.collection("users").document(userId).update("activeGameInstanceId", gameInstanceId);
 
   }
 

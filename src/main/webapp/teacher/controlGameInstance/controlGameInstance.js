@@ -53,6 +53,8 @@ async function loadControlPanel(user) {
   initUIControlButtons(gameInstanceId);
 }
 
+// Gets the gameInstanceId from the query string if there is
+// If not, it returns null
 function getGameInstanceIdFromQueryParams() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('gameInstanceId');
