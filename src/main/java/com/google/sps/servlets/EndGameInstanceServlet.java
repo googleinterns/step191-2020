@@ -43,7 +43,7 @@ public class EndGameInstanceServlet extends HttpServlet {
 
     newRoom.setIsActive(false);
     newRoom.setCurrentQuestion(null);
-
+    newRoom.setCurrentQuestionActive(false);
     dao.updateGameInstance(newRoom);
 
 

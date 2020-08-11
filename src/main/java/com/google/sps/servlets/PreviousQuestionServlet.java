@@ -52,7 +52,7 @@ public class PreviousQuestionServlet extends HttpServlet {
         return;        
     }
     newRoom.setCurrentQuestion(previousQuestionId);
-
+    newRoom.setCurrentQuestionActive(false);
     dao.updateGameInstance(newRoom);
 
   }
