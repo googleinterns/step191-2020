@@ -37,13 +37,13 @@ public class EndGameInstanceServlet extends HttpServlet {
         
     if(newRoom == null){
         response.setStatus(404);
-        response.getWriter().println("Error, not found.");
+        response.getWriter().println("Error, game instance not found.");
         return;
     }
 
     newRoom.setIsActive(false);
     newRoom.setCurrentQuestion(null);
-
+    newRoom.setCurrentQuestionActive(false);
     dao.updateGameInstance(newRoom);
 
 
