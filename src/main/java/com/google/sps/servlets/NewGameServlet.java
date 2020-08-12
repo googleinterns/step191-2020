@@ -80,7 +80,7 @@ public class NewGameServlet extends HttpServlet {
     }
 
     // We create the game object
-    Game currentGame = Game.builder().title(gameTitle).creator(gameCreator).questions(questions).build(); 
+    Game currentGame = Game.builder().title(gameTitle).creator(gameCreator).questions(questions).headQuestion(questions.get(0).getId()).build(); 
     
 
     GameDao dao = (GameDao) this.getServletContext().getAttribute("gameDao");
