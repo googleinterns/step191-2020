@@ -8,7 +8,7 @@ import java.util.Map;
 public class Question {
 
   private String title;
-  private boolean isMP;
+  private boolean isMC;
   List<Answer> answers;
   private String id;
   private String prevId;
@@ -17,10 +17,10 @@ public class Question {
   public Question () {
   }
 
-  public Question(String title, List<Answer> answers, boolean isMP) {
+  public Question(String title, List<Answer> answers, boolean isMC) {
     this.title = title;
     this.answers = answers;
-    this.isMP = isMP;
+    this.isMC = isMC;
     this.id = "null";
     this.prevId = "null";
     this.nextId = "null";
@@ -72,18 +72,18 @@ public class Question {
     this.answers.add(answer);
   }
 
-  public boolean getIsMP() {
-    return this.isMP;
+  public boolean getIsMC() {
+    return this.isMC;
   }
     
-  public void setIsMP(boolean isMP) {
-    this.isMP = isMP;
+  public void setIsMC(boolean isMC) {
+    this.isMC = isMC;
   }
 
   public Map<String, Object> questionData() {
     Map<String, Object> questionData = new HashMap<>();
     questionData.put("title", this.getTitle());
-    questionData.put("isMp", this.getIsMP());
+    questionData.put("isMC", this.getIsMC());
     questionData.put("previousQuestion", this.getPrevId());
     questionData.put("nextQuestion", this.getNextId());
     return questionData;

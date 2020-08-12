@@ -17,15 +17,14 @@ function showClickHandler() {
   
 // Hides all of the questions except for the 'n' question 
 function hideAllExcept(n) {
-  // Get the size of the entire form
-  size = document.getElementById("createGameForm").children.length;
+  // Get the size of the number of questions (it's -2 because you remove the title form and we start from 0)
+  size = document.getElementById("createGameForm").children.length - 2;
 
   // It goes throught each question form and selector, then it decides if the current index
   // it's the same as 'n' it'll show it
-  for(i = -1; i <  size-1; i++) {
+  for(i = -1; i <  size; i++) {
     var currentQuestion = document.getElementById("question" + (i));
     var currentSelector = document.getElementById("jsSelectQ" + (i));
-    currentSelector.className = "mdl-navigation__link"
     if(n == i) {
       currentQuestion.removeAttribute("hidden");
       currentSelector.className = "mdl-navigation__link mdl-navigation__link--current";
@@ -42,7 +41,9 @@ function addNewQuestion(isMC) {
   var header = isMC ? "Multiple Choice" : "True or False";
 
   let formElement = document.getElementById("createGameForm");
-  let num = formElement.children.length -2; // This is the index for the next question
+
+  // Get the size of the number of questions (it's -2 because you remove the title form and we start from 0)
+  let num = formElement.children.length -2;
 
   // Append to the form element a new question that it's created with this function is called
   formElement.appendChild(questionElement(num, header, isMC));
@@ -106,7 +107,7 @@ function titleGrid(title) {
 }
 
 function multipleChoiceGrid(num) {
-  var answersStr = '<input name="isMP" value=true hidden>';
+  var answersStr = '<input name="isMC" value=true hidden>';
   for (var i = 0; i < 4; i += 2) {
     answersStr += `
     <!-- The first line -->
@@ -148,7 +149,7 @@ function multipleChoiceGrid(num) {
 function trueOrFalseGrid(num) {
   const answersHtml = `
   <!-- The first line -->
-  <input name="isMP" value=false hidden>
+  <input name="isMC" value=false hidden>
   <div class="mdl-grid">
     <div class="mdl-cell mdl-cell--1-col"></div>
     <div class="mdl-cell mdl-cell--5-col">
@@ -184,7 +185,7 @@ function trueOrFalseGrid(num) {
 function sendQuestions() {
   let title = document.getElementsByName("gameTitle")[0].value;
   const questionTitles = document.getElementsByName("questionTitle");
-  const questionType = document.getElementsByName("isMP");
+  const questionType = document.getElementsByName("isMC");
   const answer0 = document.getElementsByName("answer0");
   const answer1 = document.getElementsByName("answer1");
   const answer2 = document.getElementsByName("answer2");
@@ -230,7 +231,7 @@ function sendQuestions() {
     }
     var question = {
       title : questionTitles[i].value,
-      isMp : (questionType[i].value === "true"),
+      isMC : (questionType[i].value === "true"),
       answers : answers
     };
     questions.push(question);

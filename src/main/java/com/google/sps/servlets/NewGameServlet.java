@@ -58,7 +58,7 @@ public class NewGameServlet extends HttpServlet {
 
       // We retrieve the attributes from the question
       String questionTitle = questionJsonObj.get("title").getAsString();
-      boolean isMp = questionJsonObj.get("isMp").getAsBoolean();
+      boolean isMC = questionJsonObj.get("isMC").getAsBoolean();
 
       List<Answer> answers = new ArrayList(Arrays.asList()); // Here we will store the answers as objects
 
@@ -76,7 +76,7 @@ public class NewGameServlet extends HttpServlet {
         answers.add(new Answer(answerTitle, isCorrect));
       }
       // We create a new question object with the attributes that we recovered and the answers, then we add the object to the list
-      questions.add(new Question(questionTitle, answers, isMp));
+      questions.add(new Question(questionTitle, answers, isMC));
     }
 
     // We create the game object
