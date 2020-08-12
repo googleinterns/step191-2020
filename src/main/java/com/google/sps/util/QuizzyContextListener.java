@@ -59,6 +59,7 @@ public class QuizzyContextListener implements ServletContextListener {
 
     event.getServletContext().setAttribute("firebaseAuth", firebaseAuth);
     event.getServletContext().setAttribute("firestoreDb", firestoreDb);
+
   }
 
 

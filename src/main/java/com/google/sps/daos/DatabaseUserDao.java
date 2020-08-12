@@ -23,7 +23,9 @@ public class DatabaseUserDao implements UserDao {
   }
 
   @Override
-  public void verifyUserInFirestore(String idToken) {
+
+  public void createIfNotExists(String idToken) {
+
     FirebaseToken decodedToken = null;
     String userId = null;
 
@@ -93,6 +95,7 @@ public class DatabaseUserDao implements UserDao {
 
   }
 
+
   private void initUser(String userId) {
     Map<String, Object> docData = new HashMap<>();
     docData.put("activeGameInstanceId", "");
@@ -100,6 +103,7 @@ public class DatabaseUserDao implements UserDao {
     
     firestoreDb.collection("users").document(userId).set(docData);
   }
+
 
   private void registerUserInGameInstance(DocumentReference userInGameInstanceDocRef, String userId) {
     Map<String, Object> docData = new HashMap<>();
@@ -117,5 +121,6 @@ public class DatabaseUserDao implements UserDao {
       return null;
     });
   }
+
   
 }

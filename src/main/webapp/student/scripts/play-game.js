@@ -143,8 +143,6 @@ function initSubmitButton(gameInstanceId, gameId) {
     }).catch(function(error) {
       // Handle error
     });
-
-
   });
 }
 
@@ -203,8 +201,26 @@ function createAnswersObject(currentQuestionDocRef) {
     .catch(function(error) {
         console.log("Error retrieving answers");
     });
-
 }
+
+function createAnswer(quiz, multipleDiv, answerTitle, i){
+      const boxDiv = document.createElement("div");
+      boxDiv.classList.add("demo-card-square");
+      boxDiv.classList.add("mdl-card");
+      boxDiv.classList.add("mdl-shadow--2dp");
+      const titleDiv = document.createElement("div");
+      titleDiv.classList.add("mdl-card__title");
+      titleDiv.classList.add("mdl-card--expand")
+      titleDiv.setAttribute("id", "card-"+(i-1));
+      const title = document.createElement("h2");
+      title.classList.add("mdl-card__title-text");
+      title.innerText = answerTitle;
+      titleDiv.appendChild(title);
+      boxDiv.appendChild(titleDiv);
+      multipleDiv.appendChild(boxDiv);
+}
+
+
 
 function createAnswer(quiz, multipleDiv, doc, i){
       const boxDiv = document.createElement("div");

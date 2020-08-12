@@ -19,14 +19,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.ArgumentCaptor;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.PrintWriter;
-
-import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -35,18 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.sps.daos.GameInstanceDao;
 import com.google.sps.data.GameInstance;
 import com.google.sps.daos.GameDao;
-import com.google.sps.data.Game;
-import com.google.sps.data.Question;
+
 import com.google.sps.servlets.NextQuestionServlet;
-
-import com.google.cloud.firestore.Firestore;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.FirestoreOptions;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.auth.FirebaseAuth;
-
-import org.springframework.mock.web.DelegatingServletInputStream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,8 +39,6 @@ import org.junit.runner.RunWith;
 import org.junit.Assert;
 import org.junit.runners.JUnit4;
 import org.hamcrest.CoreMatchers;
-
-import java.util.ArrayList;
 
 @RunWith(JUnit4.class)
 public final class NextQuestionServletTest {
@@ -94,7 +77,8 @@ public final class NextQuestionServletTest {
   }
 
   @Test
-  public void doPostStartGameInstance() throws IOException {
+  public void doPostNextQuestion() throws IOException {
+
     String nextQuestionId = "mU0dPEQtV0AKwrotOAYk";
     when(request.getParameter("gameInstance")).thenReturn(roomId);
     ArgumentCaptor<GameInstance> varArgs = ArgumentCaptor.forClass(GameInstance.class);
@@ -102,11 +86,11 @@ public final class NextQuestionServletTest {
     //Return mock room 
     when(mockGameInstanceDao.getGameInstance(roomId)).thenReturn(newRoom);
 
-    when(mockGameDao.getNextQuestionId(gameId, questionId)).thenReturn(nextQuestionId);
+    when(mockGameDao.getQuestionId("nextQuestion", gameId, questionId)).thenReturn(nextQuestionId);
 
     servletUnderTest.doPost(request, response);
 
-    verify(mockGameDao).getNextQuestionId(gameId, questionId);
+    verify(mockGameDao).getQuestionId("nextQuestion", gameId, questionId);
     verify(mockGameInstanceDao).getGameInstance(roomId);
     verify(mockGameInstanceDao).updateGameInstance(varArgs.capture());
     Assert.assertEquals(nextQuestionId, newRoom.getCurrentQuestion());
@@ -147,8 +131,7 @@ public final class NextQuestionServletTest {
 
     newRoom.setCurrentQuestion(nextQuestionId);
     when(mockGameInstanceDao.getGameInstance(roomId)).thenReturn(newRoom);
-
-    when(mockGameDao.getNextQuestionId(nextQuestionId, questionId)).thenReturn("");
+    when(mockGameDao.getQuestionId("nextQuestion", gameId, nextQuestionId)).thenReturn("");
 
     servletUnderTest.doPost(request, response);
     String responseString = responseWriter.toString();

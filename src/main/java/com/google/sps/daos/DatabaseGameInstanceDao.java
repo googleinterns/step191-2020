@@ -41,6 +41,7 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
     GameInstance newGameInstance = new GameInstance();
     newGameInstance.setCreator(userId);
     newGameInstance.setGameId(gameId);
+    newGameInstance.setNumberOfMembers(0);
 
     //Post to db
     newGameInstanceRef.set(newGameInstance);
