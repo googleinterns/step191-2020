@@ -35,7 +35,21 @@ public class AnswerQuestionServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
     String gameInstance = request.getParameter("gameInstance");
-    String student = request.getParameter("student");
+    if(gameInstance==null || gameInstance.isEmpty()){
+        response.setStatus(500);
+        response.getWriter().println("Room not specified");
+        return;
+    }
+
+    String token = request.getParameter("student");
+    if(token==null || token.isEmpty()){
+        response.setStatus(500);
+        response.getWriter().println("Room not specified");
+        return;
+    }
+
+    //Get student id 
+    String student = getUserId(token);
 
     GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
     //ToDo: Check if !currentQuestionActive
@@ -76,10 +90,16 @@ public class AnswerQuestionServlet extends HttpServlet {
     DocumentReference questionDocRef = firestoreDb.collection("games").document(gameId).collection("questions")
         .document(questionId);
 
+    boolean isAnswerCorrect;
 
-    String correctAnswerId = getCorrectAnswer(questionId, questionDocRef);
-
-    boolean isAnswerCorrect = answerId.equals(correctAnswerId);
+    //If there was no answer it's wrong
+    if(answerId == null || answerId.isEmpty()){
+        System.out.println("STUDENT DIDN'T ANSWER");
+        isAnswerCorrect = false;
+    } else {
+        String correctAnswerId = getCorrectAnswer(questionId, questionDocRef);
+        isAnswerCorrect = answerId.equals(correctAnswerId);
+    }
 
     DocumentReference answerInStudentDocRef = gameInstanceDocRef.collection("students").document(userId).collection("questions").document(questionId);
 
@@ -98,10 +118,11 @@ public class AnswerQuestionServlet extends HttpServlet {
 
       // register the the question's general answer statistics
       updateGeneralQuestionStats(questionInGameInstanceDocRef, isAnswerCorrect, firestoreDb);
-
+      if(answerId != null && !answerId.isEmpty()){
       // update the answer's statistics in the answer document in the question document
       DocumentReference answerDocRef = questionInGameInstanceDocRef.collection("answers").document(answerId);
       updateAnswerInQuestionStats(answerDocRef, isAnswerCorrect, firestoreDb);
+      }
 
       System.out.println("running supposedly");
 
