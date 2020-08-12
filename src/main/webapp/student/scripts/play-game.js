@@ -18,7 +18,13 @@
 const db = firebase.firestore();
 let active = false;
 let currentQuestionId = null;
-let selectedAnswerId = null;
+let selectedAnswerId = "";
+let currentQuestionActive = false;
+let gameInstanceId = getGameInstanceIdFromQueryParams();
+const resultObject = document.getElementById("result");
+let submited = false;
+let isCorrect = null;
+let studentId = null;
 
 // Is triggered when the User logs in or logs out
 function initAuthStateObserver() {
@@ -29,6 +35,7 @@ function initAuthStateObserver() {
 function authStateObserver(user) {
   if (user) { // User is signed in!
     // Everything starts working when the User logs in
+    studentId = user;
     loadGamePanel(user)
   } else { // User is signed out!
     console.log("Not logged in");
@@ -38,7 +45,6 @@ function authStateObserver(user) {
 // Load all the information 
 async function loadGamePanel(user) {
   // Get the Game Instance's ID in which the user is participating
-  let gameInstanceId = getGameInstanceIdFromQueryParams();
   
   if (gameInstanceId == null) {
     gameInstanceId = await getActiveGameInstanceId(user);
@@ -47,8 +53,6 @@ async function loadGamePanel(user) {
   // Start listening to the GameInstance
   initGameInstanceListener(gameInstanceId);
 
-  // Listen to points in GameInstance
-  initPointsListener(gameInstanceId, user);
 }
 
 // Gets the gameInstanceId from the query string if there is
@@ -58,10 +62,19 @@ function getGameInstanceIdFromQueryParams() {
   return urlParams.get('gameInstanceId');
 }
 
+function resetDOM() {
+  selectedAnswerId = "";
+  submited = false;
+  document.getElementById("result").innerText = '';
+  if(isCorrect != null) {
+  resultObject.classList.toggle(isCorrect.toString());
+  }
+  isCorrect = null;
+}
+
 // Inits listener to User's points in Firestore DB
-function initPointsListener(gameInstanceId, user) {
-  db.collection("gameInstance").doc(gameInstanceId).collection("students").doc(user.uid)
-  .onSnapshot(function(doc) {
+function updatePoints() {
+  db.collection("gameInstance").doc(gameInstanceId).collection("students").doc(studentId.uid).get().then(function(doc) {
     const studentInGameInstaneUpdate = doc.data();
     updatePointsInUI(studentInGameInstaneUpdate.points);
   });
@@ -106,9 +119,9 @@ function initGameInstanceListener(gameInstanceId) {
       // Init submit button
       initSubmitButton(gameInstanceId, gameInstanceUpdate.gameId);
     } 
-    if (gameInstanceUpdate.isActive && (gameInstanceUpdate.currentQuestion != currentQuestionId)) {
+    if (gameInstanceUpdate.isActive && (gameInstanceUpdate.currentQuestion != currentQuestionId || gameInstanceUpdate.currentQuestionActive != currentQuestionActive)) {
       // The question displayed must be changed
-      updateCurrentQuestion(gameInstanceUpdate.gameId, gameInstanceUpdate.currentQuestion);
+      updateCurrentQuestion(gameInstanceUpdate.gameId, gameInstanceUpdate.currentQuestion, gameInstanceUpdate.currentQuestionActive);
     }
     
   });
@@ -118,7 +131,7 @@ function initGameInstanceListener(gameInstanceId) {
 function initSubmitButton(gameInstanceId, gameId) {
   const submitButtonElement = document.getElementById('submitButton');
   submitButtonElement.addEventListener('click', () => {
-
+    submited = true;
     firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function(idToken) {
       // Send token to your backend via HTTPS
       // ...
@@ -138,6 +151,7 @@ function initSubmitButton(gameInstanceId, gameId) {
         })
       }).then(() => {
         console.log("Question sent!")
+        showAnswers();
       });
   
     }).catch(function(error) {
@@ -147,15 +161,32 @@ function initSubmitButton(gameInstanceId, gameId) {
 }
 
 // Update the question that has changed
-async function updateCurrentQuestion(gameId, questionId) {
+async function updateCurrentQuestion(gameId, questionId, isCurrentQuestionActive) {
   currentQuestionId = questionId;
+  currentQuestionActive = isCurrentQuestionActive
 
   let currentQuestionDocRef = db.collection('games').doc(gameId).collection('questions').doc(questionId);
-
   const currentQuestion = await queryCurrentQuestion(currentQuestionDocRef);
 
   // Add the question title to the UI
   createQuestionObject(currentQuestion.title);
+
+  //Reset Selection
+  resetDOM();
+
+  if(!currentQuestionActive){
+      document.getElementById("jsIsActive").innerText = "Isn't active";
+      if(!submited){
+        document.getElementById("submitButton").click();
+      } else {
+          showAnswers();
+      }
+      return;
+  }
+
+  document.getElementById("jsIsActive").innerText = 'Is active';
+
+
 
   // Get answers to the question
   createAnswersObject(currentQuestionDocRef);
@@ -230,7 +261,7 @@ function createAnswer(quiz, multipleDiv, doc, i){
       const titleDiv = document.createElement("div");
       titleDiv.setAttribute("id", doc.id);
       boxDiv.addEventListener('click', ()=>{
-          if(doc.id != selectedAnswerId && selectedAnswerId != null ){
+          if(doc.id != selectedAnswerId && selectedAnswerId != "" && selectedAnswerId != null){
             document.getElementById(selectedAnswerId).classList.toggle("selected");
           }
           selectedAnswerId = doc.id;
@@ -245,6 +276,27 @@ function createAnswer(quiz, multipleDiv, doc, i){
       titleDiv.appendChild(title);
       boxDiv.appendChild(titleDiv);
       multipleDiv.appendChild(boxDiv);
+}
+
+function showAnswers(){
+      document.getElementById("quiz").innerHTML = '';
+      if(currentQuestionActive){
+        document.getElementById("result").innerText = 'Wait for question to end...';
+      } else {
+        firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(async function(idToken) {
+        const infoJson = await fetch('/answer?gameInstance='+gameInstanceId+'&student='+idToken);
+        const info = await infoJson.json(); 
+        isCorrect = info.correct;
+        resultObject.classList.toggle(isCorrect.toString());
+        if(isCorrect) {
+            resultObject.innerText = 'Correct!';
+        } else {
+            resultObject.innerText = 'Incorrect :(';
+        }
+
+        updatePoints();
+        });
+      }
 }
 
 
