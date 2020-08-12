@@ -17,6 +17,8 @@
 
 const db = firebase.firestore();
 
+let unsubscribeCurrentActiveQuestionInGameInstance = null;
+
 // Is triggered when the User logs in or logs out
 function initAuthStateObserver() {
   firebase.auth().onAuthStateChanged(authStateObserver);
@@ -51,6 +53,45 @@ async function loadControlPanel(user) {
 
   // Add buttons to control the GameInstance state
   initUIControlButtons(gameInstanceId);
+
+  buildQuestionHistory(gameInstanceId);
+}
+
+// Probably should do this following the Linked List
+function buildQuestionHistory(gameInstanceId) {
+  const questionInGameInstanceCollectionRef = db.collection('gameInstance').doc(gameInstanceId).collection('questions');
+  questionInGameInstanceCollectionRef.get().then(function(querySnapshot) {
+    querySnapshot.forEach(function(doc) {
+      // doc.data() is never undefined for query doc snapshots
+      const questionId = doc.id
+      addQuestionToHistoryUI(doc.data(), questionId);
+      console.log(doc.id, " => ", doc.data());
+
+      addQuestionAnswersToHistoryUI(questionId, questionInGameInstanceCollectionRef);
+    });
+  });
+}
+
+function addQuestionToHistoryUI(question, questionId) {
+  const questionStatsDivElement = document.getElementById('jsQuestionStats');
+  
+  const singleQuestionStatDivElement = document.createElement('div');
+  singleQuestionStatDivElement.id = 'stats-' + questionId
+
+  const questionTitle = document.createElement('div');
+  questionTitle.innerText = 'Question title: ' + question.title;
+  singleQuestionStatDivElement.appendChild(questionTitle);
+
+  questionStatsDivElement.appendChild(singleQuestionStatDivElement);
+}
+
+function addQuestionAnswersToHistoryUI(questionId, questionsCollectionRef) {
+  const answersCollectionRef = questionsCollectionRef.doc(questionId).collection('answers');
+  answersCollectionRef.get().then(function(querySnapshot) {
+    querySnapshot.forEach(function(doc) {
+      console.log(doc.data());
+    });
+  });
 }
 
 // Gets the gameInstanceId from the query string if there is
@@ -161,6 +202,9 @@ function initGameInstanceListener(gameInstanceId) {
     // TODO: this should be initiated once the game is started, not before...
     updateCurrentQuestion({ gameId: gameInstanceUpdate.gameId, currentQuestionId: gameInstanceUpdate.currentQuestion });
 
+    // The listener to the question stats is initiated
+    initQuestionStatsListener({ gameInstanceId, currentQuestionId: gameInstanceUpdate.currentQuestion });
+
     updateNumberOfMembersUI(gameInstanceUpdate.numberOfMembers);
   });
 }
@@ -183,6 +227,28 @@ function queryCurrentQuestion({ gameId, currentQuestionId }) {
       return doc.data()
     }
   });
+}
+
+function initQuestionStatsListener({ gameInstanceId, currentQuestionId } = {}) {
+  if (unsubscribeCurrentActiveQuestionInGameInstance != null) {
+    // This is to stop listening to live changes to the previous question which is not active anymore
+    unsubscribeCurrentActiveQuestionInGameInstance();
+  }
+  unsubscribeCurrentActiveQuestionInGameInstance = db.collection('gameInstance').doc(gameInstanceId).collection('questions').doc(currentQuestionId).onSnapshot(function (doc) {
+    updateCurrentQuestionStats(doc.data());
+    console.log(doc.data());
+  });
+}
+
+function updateCurrentQuestionStats(updatedQuestionStats) {
+  const numberCurrentQuestionAnswersElement = document.getElementById('jsNumberCurrentQuestionAnswers');
+  numberCurrentQuestionAnswersElement.innerText = 'This question has been answered by ' + updatedQuestionStats.numberAnswered + ' students.';
+
+  const numberCorrectCurrentQuestionAnswersElement = document.getElementById('jsNumberCorrectCurrentQuestionAnswers');
+  numberCorrectCurrentQuestionAnswersElement.innerText = 'Number of answers correct: ' + updatedQuestionStats.numberCorrect
+
+  const numberWrongCurrentQuestionAnswersElement = document.getElementById('jsNumberWrongCurrentQuestionAnswers');
+  numberWrongCurrentQuestionAnswersElement.innerText = 'Number of answers wrong: ' + updatedQuestionStats.numberWrong
 }
 
 function updateNumberOfMembersUI(numberOfMembers) {
