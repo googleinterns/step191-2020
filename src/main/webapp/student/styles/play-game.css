@@ -19,3 +19,36 @@
 .rightAnswer {
     color: green
 }
+#quiz{
+    margin-bottom: 70px;
+}
+.demo-card-square.mdl-card {
+  width: 33%;
+  height: 320px;
+  display: inline-flex;
+  cursor: pointer;
+  margin-right: 10px;
+}
+.demo-card-square.mdl-card:hover { 
+     box-shadow: 1px 8px 20px grey;
+    -webkit-transition:  box-shadow .6s ease;
+}
+.multiple-choice{
+  margin-bottom: 10px;
+  text-align: center;
+}
+.demo-card-square > .mdl-card__title {
+  color: #fff;
+}
+#card-0 {
+  background-color: #4285F4;
+}
+#card-1{
+  background-color: #DB4437;
+}
+#card-2{
+  background-color: #F4B400;
+}
+#card-3{
+  background-color: #0F9D58;
+}
