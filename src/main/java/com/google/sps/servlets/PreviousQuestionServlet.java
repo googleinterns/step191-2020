@@ -15,19 +15,17 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentSnapshot;
 
 import com.google.sps.daos.GameInstanceDao;
-import com.google.sps.daos.GameDao;
 import com.google.sps.data.GameInstance;
-import com.google.sps.data.Game;
+import com.google.sps.daos.GameDao;
 
 import java.util.List; 
 import java.util.ArrayList; 
 
-@WebServlet("/startGameInstance")
-public class StartGameInstanceServlet extends HttpServlet {
+@WebServlet("/previousQuestion")
+public class PreviousQuestionServlet extends HttpServlet {
 
-
-    @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException { 
   // Generate room key
     String roomId = request.getParameter("gameInstance");
 
@@ -47,20 +45,14 @@ public class StartGameInstanceServlet extends HttpServlet {
         return;
     }
     
-    Game actualGame = gameDao.getGame(newRoom.getGameId());
-    if(actualGame == null){
+    String previousQuestionId = gameDao.getQuestionId("previousQuestion", newRoom.getGameId(), newRoom.getCurrentQuestion());
+    if(previousQuestionId == null || previousQuestionId.isEmpty()){
         response.setStatus(404);
-        response.getWriter().println("Error, game not found.");
-        return;
+        response.getWriter().println("Error, there's no previous question");
+        return;        
     }
-
-    newRoom.setCurrentQuestion(actualGame.headQuestion());
-    newRoom.setCurrentQuestionActive(true);
-
-    // Activate room
-    newRoom.setIsActive(true);
-
-
+    newRoom.setCurrentQuestion(previousQuestionId);
+    newRoom.setCurrentQuestionActive(false);
     dao.updateGameInstance(newRoom);
 
   }

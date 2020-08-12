@@ -15,21 +15,20 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentSnapshot;
 
 import com.google.sps.daos.GameInstanceDao;
-import com.google.sps.daos.GameDao;
 import com.google.sps.data.GameInstance;
-import com.google.sps.data.Game;
+import com.google.sps.daos.GameDao;
 
 import java.util.List; 
 import java.util.ArrayList; 
 
-@WebServlet("/startGameInstance")
-public class StartGameInstanceServlet extends HttpServlet {
+@WebServlet("/controlQuestion")
+public class ControlQuestionServlet extends HttpServlet {
 
-
-    @Override
-  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException { 
   // Generate room key
     String roomId = request.getParameter("gameInstance");
+    String action = request.getParameter("action");
 
     if(roomId==null || roomId.isEmpty()){
         response.setStatus(500);
@@ -38,28 +37,23 @@ public class StartGameInstanceServlet extends HttpServlet {
     }
 
     GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
-    GameDao gameDao = (GameDao) this.getServletContext().getAttribute("gameDao");
-
     GameInstance newRoom = dao.getGameInstance(roomId);       
     if(newRoom == null){
         response.setStatus(404);
         response.getWriter().println("Error, game instance not found.");
         return;
     }
-    
-    Game actualGame = gameDao.getGame(newRoom.getGameId());
-    if(actualGame == null){
-        response.setStatus(404);
-        response.getWriter().println("Error, game not found.");
+
+    if(action.equals("end")) {
+        newRoom.setCurrentQuestionActive(false);
+    } else if (action.equals("start")) {
+        newRoom.setCurrentQuestionActive(true);
+    }
+    else {
+        response.setStatus(500);
+        response.getWriter().println("Action not valid");
         return;
     }
-
-    newRoom.setCurrentQuestion(actualGame.headQuestion());
-    newRoom.setCurrentQuestionActive(true);
-
-    // Activate room
-    newRoom.setIsActive(true);
-
 
     dao.updateGameInstance(newRoom);
 

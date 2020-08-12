@@ -15,6 +15,7 @@ public abstract class Game {
 
   public abstract String title();
   public abstract String creator();
+  public abstract String headQuestion();
   public abstract List<Question> questions();
 
   public Map<String, Object> gameData() {
@@ -22,6 +23,7 @@ public abstract class Game {
     Map<String, Object> gameData = new HashMap<>();
         gameData.put("creator", this.creator());
         gameData.put("title", this.title());
+        gameData.put("headQuestion", this.headQuestion());
         gameData.put("numberOfQuestions", this.questions().size());
     return gameData;
   }
@@ -30,6 +32,7 @@ public abstract class Game {
     return new AutoValue_Game.Builder()
       .title(this.title())
       .creator(this.creator())
+      .headQuestion(this.headQuestion())
       .questions(this.questions());
   }
 
@@ -37,6 +40,7 @@ public abstract class Game {
   public abstract static class Builder {
     public abstract Builder title(String title);
     public abstract Builder creator(String creator);
+    public abstract Builder headQuestion(String headQuestion);
     public abstract Builder questions(List<Question> questions);
 
     public abstract Game build();
