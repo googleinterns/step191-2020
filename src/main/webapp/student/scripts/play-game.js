@@ -211,6 +211,9 @@ function createAnswer(quiz, multipleDiv, doc, i){
       boxDiv.classList.add("demo-card-square");
       boxDiv.classList.add("mdl-card");
       boxDiv.classList.add("mdl-shadow--2dp");
+      boxDiv.addEventListener('click', ()=>{
+          selectedAnswerId = doc.id;
+      })
       const titleDiv = document.createElement("div");
       titleDiv.classList.add("mdl-card__title");
       titleDiv.classList.add("mdl-card--expand")
