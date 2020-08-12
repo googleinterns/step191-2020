@@ -40,7 +40,14 @@
       <div>
         <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header" id="createGameForm">
           <div class="mdl-layout__drawer" id="drawer">
-            <span class="mdl-layout-title">Questions</span>
+            <span class="mdl-layout-title">Questions </span>
+
+            <span class="mdl-layout-title">
+              <!-- Accent-colored raised button with ripple -->
+              <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent " onclick="sendQuestions()">
+                Send Questions
+              </button>
+            </span>
             <nav class="mdl-navigation" id="drawerNav">
               <a class="mdl-navigation__link mdl-navigation__link--current"  onclick="hideAllExcept(-1)" id="jsSelectQ-1"> <b>Title</b> </a>
               <a class="mdl-navigation__link"  onclick="hideAllExcept(0)" id="jsSelectQ0"><b>1</b> Multiple Choice</a>
@@ -48,6 +55,7 @@
               <button id="showModal" onclick="showClickHandler()" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="button">
                 New Question
               </button>
+
             </nav>
             
           </div>
@@ -144,7 +152,6 @@
               </div>
             </div>
           </main>
-
         </div>
         <!-- Hidden parameter to add the user id -->
         <input type="hidden" id="user-id" name="uid">
