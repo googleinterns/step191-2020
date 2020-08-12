@@ -227,13 +227,18 @@ function createAnswer(quiz, multipleDiv, doc, i){
       boxDiv.classList.add("demo-card-square");
       boxDiv.classList.add("mdl-card");
       boxDiv.classList.add("mdl-shadow--2dp");
-      boxDiv.addEventListener('click', ()=>{
-          selectedAnswerId = doc.id;
-      })
       const titleDiv = document.createElement("div");
+      titleDiv.setAttribute("id", doc.id);
+      boxDiv.addEventListener('click', ()=>{
+          if(doc.id != selectedAnswerId && selectedAnswerId != null ){
+            document.getElementById(selectedAnswerId).classList.toggle("selected");
+          }
+          selectedAnswerId = doc.id;
+          titleDiv.classList.toggle("selected");
+      })
       titleDiv.classList.add("mdl-card__title");
-      titleDiv.classList.add("mdl-card--expand")
-      titleDiv.setAttribute("id", "card-"+(i-1));
+      titleDiv.classList.add("mdl-card--expand");
+      titleDiv.classList.add("card-"+(i-1));
       const title = document.createElement("h2");
       title.classList.add("mdl-card__title-text");
       title.innerText = doc.data().title;

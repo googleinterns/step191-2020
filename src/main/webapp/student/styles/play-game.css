@@ -40,15 +40,20 @@
 .demo-card-square > .mdl-card__title {
   color: #fff;
 }
-#card-0 {
+.card-0 {
   background-color: #4285F4;
 }
-#card-1{
+.card-1{
   background-color: #DB4437;
 }
-#card-2{
+.card-2{
   background-color: #F4B400;
 }
-#card-3{
+.card-3{
   background-color: #0F9D58;
+}
+.selected{
+    background-image: url('../assets/check.png');
+    background-repeat: no-repeat, repeat;
+    background-position: center;
 }
