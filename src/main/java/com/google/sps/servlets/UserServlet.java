@@ -21,6 +21,7 @@ public class UserServlet extends HttpServlet {
     UserDao dao = (UserDao) this.getServletContext().getAttribute("userDao");
 
     dao.createIfNotExists(jsonObj.get("idToken").getAsString());
+
   }
 
 }

@@ -23,7 +23,9 @@ public class DatabaseUserDao implements UserDao {
   }
 
   @Override
+
   public void createIfNotExists(String idToken) {
+
     FirebaseToken decodedToken = null;
     String userId = null;
 
@@ -54,6 +56,46 @@ public class DatabaseUserDao implements UserDao {
     
   }
 
+  @Override
+  public void joinGameInstance(String idToken, String gameInstanceId) {
+    FirebaseToken decodedToken = null;
+    String userId = null;
+
+    try {
+      decodedToken = firebaseAuth.verifyIdToken(idToken);
+      userId = decodedToken.getUid();
+    } catch (FirebaseAuthException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+    // Add to GameInstance's members list
+    DocumentReference gameInstanceDocRef = firestoreDb.collection("gameInstance").document(gameInstanceId);
+
+    DocumentReference userInGameInstanceDocRef = gameInstanceDocRef.collection("students").document(userId);
+
+    ApiFuture<DocumentSnapshot> UserInGameInstanceFuture = userInGameInstanceDocRef.get();
+    
+    try {
+      DocumentSnapshot document = UserInGameInstanceFuture.get();
+      if (!document.exists()) {
+        registerUserInGameInstance(userInGameInstanceDocRef, userId);
+        addOneToMembersCounter(gameInstanceDocRef);
+      } 
+    } catch (InterruptedException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (ExecutionException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+    // Add the active GameInstance to the User's entry in "Users" collection
+    firestoreDb.collection("users").document(userId).update("activeGameInstanceId", gameInstanceId);
+
+  }
+
+
   private void initUser(String userId) {
     Map<String, Object> docData = new HashMap<>();
     docData.put("activeGameInstanceId", "");
@@ -61,5 +103,24 @@ public class DatabaseUserDao implements UserDao {
     
     firestoreDb.collection("users").document(userId).set(docData);
   }
+
+
+  private void registerUserInGameInstance(DocumentReference userInGameInstanceDocRef, String userId) {
+    Map<String, Object> docData = new HashMap<>();
+    docData.put("points", 0);
+
+    userInGameInstanceDocRef.set(docData);
+  }
+
+  private void addOneToMembersCounter(DocumentReference gameInstanceDocRef) {
+    firestoreDb.runTransaction(transaction -> {
+      // retrieve document and increment population field
+      DocumentSnapshot snapshot = transaction.get(gameInstanceDocRef).get();
+      long oldNumberOfMembers = snapshot.getLong("numberOfMembers");
+      transaction.update(gameInstanceDocRef, "numberOfMembers", oldNumberOfMembers + 1);
+      return null;
+    });
+  }
+
   
 }

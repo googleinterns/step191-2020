@@ -34,8 +34,13 @@ function authStateObserver(user) {
 
 async function loadControlPanel(user) {
   // Get the Game Instance's ID in which the user is participating
-  const gameInstanceId = await getActiveGameInstanceId(user);
 
+  let gameInstanceId = getGameInstanceIdFromQueryParams();
+  
+  if (gameInstanceId == null) {
+    gameInstanceId = await getActiveGameInstanceId(user);
+  }
+  
   // Get the Active Game Instance Object from DB
   const gameInstance = await queryActiveGameInstance(gameInstanceId);
 
@@ -49,9 +54,17 @@ async function loadControlPanel(user) {
   initUIControlButtons(gameInstanceId);
 }
 
+// Gets the gameInstanceId from the query string if there is
+// If not, it returns null
+function getGameInstanceIdFromQueryParams() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('gameInstanceId');
+}
+
 // Queries the "Users" collection of the DB to get the activeGameInstanceId the User is participating in
 // Returns the gameInstanceId string
 function getActiveGameInstanceId(user) {
+  console.log('Got gameInstanceId from Firestore');
   const uid = user.uid;
 
   // Query the User's document in "Users" collection
@@ -143,14 +156,20 @@ function addGameIdToUI(gameId) {
 function initGameInstanceListener(gameInstanceId) {
   db.collection('gameInstance').doc(gameInstanceId).onSnapshot(function(doc) {
     // If this is triggered it's because the GameInstance's activeQuestion changed
+    // OR someone joined
     const gameInstanceUpdate = doc.data();
 
     // TODO: this should be initiated once the game is started, not before...
+
     updateCurrentQuestion({ gameId: gameInstanceUpdate.gameId, currentQuestionId: gameInstanceUpdate.currentQuestion, isCurrentQuestionActive: gameInstanceUpdate.currentQuestionActive });
+
+    updateNumberOfMembersUI(gameInstanceUpdate.numberOfMembers);
+
   });
 }
 
 // Updates the panel showing which questions students are seeing
+
 async function updateCurrentQuestion({ gameId, currentQuestionId, isCurrentQuestionActive } = {}) {
   const currentQuestion = await queryCurrentQuestion({ gameId, currentQuestionId });
 
@@ -165,10 +184,16 @@ async function updateCurrentQuestion({ gameId, currentQuestionId, isCurrentQuest
     canStudentsAnswerElement.innerText = "Students can't answer yet";      
   };
 
-
   const activeQuestionNumberElement = document.getElementById('jsActiveQuestionNumber');
   activeQuestionNumberElement.innerText = "Students are seeing question with ID: " + (currentQuestionId);
 }
+
+
+function updateNumberOfMembersUI(numberOfMembers) {
+  const numberOfMembersElement = document.getElementById("jsNumberOfStudents");
+  numberOfMembersElement.innerText = "There are " + numberOfMembers + " students registered in your room.";
+}
+
 
 // Queries and returns the currentQuestion object
 function queryCurrentQuestion({ gameId, currentQuestionId }) {

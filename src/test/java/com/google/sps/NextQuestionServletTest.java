@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.sps.daos.GameInstanceDao;
 import com.google.sps.data.GameInstance;
 import com.google.sps.daos.GameDao;
+
 import com.google.sps.servlets.NextQuestionServlet;
 
 import org.junit.Before;
@@ -76,7 +77,6 @@ public final class NextQuestionServletTest {
   }
 
   @Test
-
   public void doPostNextQuestion() throws IOException {
 
     String nextQuestionId = "mU0dPEQtV0AKwrotOAYk";
@@ -131,7 +131,6 @@ public final class NextQuestionServletTest {
 
     newRoom.setCurrentQuestion(nextQuestionId);
     when(mockGameInstanceDao.getGameInstance(roomId)).thenReturn(newRoom);
-
     when(mockGameDao.getQuestionId("nextQuestion", gameId, nextQuestionId)).thenReturn("");
 
     servletUnderTest.doPost(request, response);

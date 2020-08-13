@@ -11,6 +11,7 @@ public class GameInstance {
   private String gameId;
   private String currentQuestion;
   private boolean currentQuestionActive;
+  private int numberOfMembers;
   private List<Member> members;
 
   public GameInstance() {
@@ -38,6 +39,14 @@ public class GameInstance {
 
   public void setIsActive(boolean isActive) {
     this.isActive = isActive;
+  }
+  
+  public int getNumberOfMembers() {
+    return this.numberOfMembers;
+  }
+
+  public void setNumberOfMembers(int numberOfMembers) {
+    this.numberOfMembers = numberOfMembers;
   }
   
   public String getCreator() {

@@ -56,6 +56,10 @@ public class QuizzyContextListener implements ServletContextListener {
       userDao = new DatabaseUserDao(firestoreDb, firebaseAuth);
       event.getServletContext().setAttribute("userDao", userDao);
     }
+
+    event.getServletContext().setAttribute("firebaseAuth", firebaseAuth);
+    event.getServletContext().setAttribute("firestoreDb", firestoreDb);
+
   }
 
 
