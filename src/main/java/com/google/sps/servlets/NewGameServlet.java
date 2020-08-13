@@ -44,7 +44,7 @@ public class NewGameServlet extends HttpServlet {
     String gameJsonStr = request.getParameter("game");
 
     // We create the game object
-    Game currentGame = Game.createGameWithJson(gameJsonStr);
+    Game currentGame = Game.buildWithJson(gameJsonStr);
     
 
     GameDao dao = (GameDao) this.getServletContext().getAttribute("gameDao");

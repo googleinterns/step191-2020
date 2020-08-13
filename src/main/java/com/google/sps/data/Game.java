@@ -5,6 +5,12 @@ import java.util.Map;
 import com.google.auto.value.AutoValue;
 import com.google.sps.data.Question;
 import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 @AutoValue
 public abstract class Game {
@@ -28,10 +34,10 @@ public abstract class Game {
     return gameData;
   }
 
-  public Game buildWithJson(String gameJsonStr) {
+  public static Game buildWithJson(String gameJsonStr) {
     // The function recieves the JSON and converts to a JsonObject
-    String gameJsonStr = gameJsonStr;
-    JsonElement gameJsonElem = new JsonParser().parse(gameJsonStr);
+    String gameJson = gameJsonStr;
+    JsonElement gameJsonElem = new JsonParser().parse(gameJson);
     JsonObject gameJsonObj = gameJsonElem.getAsJsonObject();
 
     // We retrieve the attributes from the game
@@ -70,7 +76,7 @@ public abstract class Game {
     }
 
     // We return the game object
-  return  Game currentGame = Game.builder().title(gameTitle).creator(gameCreator).questions(questions).headQuestion(questions.get(0).getId()).build(); 
+  return Game.builder().title(gameTitle).creator(gameCreator).questions(questions).headQuestion(questions.get(0).getId()).build(); 
     
   }
 
