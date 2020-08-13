@@ -83,6 +83,21 @@ function addQuestionToHistoryUI(question, questionId) {
   questionTitle.innerText = 'Question title: ' + question.title;
   singleQuestionStatDivElement.appendChild(questionTitle);
 
+  const numberQuestionAnswersHistoryElement = document.createElement('div');
+  numberQuestionAnswersHistoryElement.id = 'stats-' + questionId + '-numberQuestionAnswers';
+  numberQuestionAnswersHistoryElement.innerText = 'Number of answers: ' + question.numberAnswered;
+  singleQuestionStatDivElement.appendChild(numberQuestionAnswersHistoryElement);
+
+  const numberCorrectQuestionAnswersHistoryElement = document.createElement('div');
+  numberCorrectQuestionAnswersHistoryElement.id = 'stats-' + questionId + '-numberCorrectQuestionAnswers';
+  numberCorrectQuestionAnswersHistoryElement.innerText = 'Number of correct anwers: ' + question.numberCorrect;
+  singleQuestionStatDivElement.appendChild(numberCorrectQuestionAnswersHistoryElement);
+
+  const numberWrongQuestionAnswersHistoryElement = document.createElement('div');
+  numberWrongQuestionAnswersHistoryElement.id = 'stats-' + questionId + '-numberWrongQuestionAnswers';
+  numberWrongQuestionAnswersHistoryElement.innerText = 'Number of wrong anwers: ' + question.numberWrong;
+  singleQuestionStatDivElement.appendChild(numberWrongQuestionAnswersHistoryElement);
+
   questionStatsDivElement.appendChild(singleQuestionStatDivElement);
 }
 
@@ -273,6 +288,8 @@ function initQuestionStatsListener({ gameInstanceId, currentQuestionId } = {}) {
 }
 
 function updateCurrentQuestionStats(updatedQuestionStats) {
+
+  // Update the question in the active panel
   const numberCurrentQuestionAnswersElement = document.getElementById('jsNumberCurrentQuestionAnswers');
   numberCurrentQuestionAnswersElement.innerText = 'This question has been answered by ' + updatedQuestionStats.numberAnswered + ' students.';
 
@@ -281,6 +298,9 @@ function updateCurrentQuestionStats(updatedQuestionStats) {
 
   const numberWrongCurrentQuestionAnswersElement = document.getElementById('jsNumberWrongCurrentQuestionAnswers');
   numberWrongCurrentQuestionAnswersElement.innerText = 'Number of answers wrong: ' + updatedQuestionStats.numberWrong
+
+  // Update the question in the history panel
+
 }
 
 function updateNumberOfMembersUI(numberOfMembers) {
