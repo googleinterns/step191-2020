@@ -18,6 +18,7 @@
 const db = firebase.firestore();
 
 let unsubscribeCurrentActiveQuestionInGameInstance = null;
+let unsubscribeCurrentActiveQuestionAnswersInGameInstance = null;
 
 // Is triggered when the User logs in or logs out
 function initAuthStateObserver() {
@@ -105,15 +106,16 @@ function buildQuestionAnswersHistory(questionId, questionsCollectionRef) {
   const answersCollectionRef = questionsCollectionRef.doc(questionId).collection('answers');
   answersCollectionRef.get().then(function(querySnapshot) {
     querySnapshot.forEach(function(doc) {
-      addQuestionAnswerToHistoryUI(questionId, doc.data());
+      addQuestionAnswerToHistoryUI(questionId, doc.id, doc.data());
     });
   });
 }
 
-function addQuestionAnswerToHistoryUI(questionId, answer) {
+function addQuestionAnswerToHistoryUI(questionId, answerId, answer) {
   const questionStatsDivElement = document.getElementById('stats-' + questionId);
-  
+  console.log("first");
   const answerInQuestionStatsDivElement = document.createElement('div');
+  answerInQuestionStatsDivElement.id = 'stats-' + questionId + '-' + answerId;
   answerInQuestionStatsDivElement.innerText = answer.title + ' with ' + answer.numberAnswers + ' answers.';
 
   if (answer.correct) {
@@ -235,13 +237,63 @@ function initGameInstanceListener(gameInstanceId) {
     // The listener to the question stats is initiated
     initQuestionStatsListener({ gameInstanceId, currentQuestionId: gameInstanceUpdate.currentQuestion });
 
+    initQuestionAnswerStatsListener(gameInstanceId, gameInstanceUpdate.currentQuestion);
+
     updateNumberOfMembersUI(gameInstanceUpdate.numberOfMembers);
 
   });
 }
 
-// Updates the panel showing which questions students are seeing
+function initQuestionAnswerStatsListener(gameInstanceId, currentQuestionId) {
 
+  if (unsubscribeCurrentActiveQuestionAnswersInGameInstance != null) {
+    unsubscribeCurrentActiveQuestionAnswersInGameInstance();
+  }
+  unsubscribeCurrentActiveQuestionAnswersInGameInstance = db.collection('gameInstance').doc(gameInstanceId).collection('questions').doc(currentQuestionId).collection('answers')
+  .onSnapshot(function(querySnapshot) {
+    clearCurrentQuestionAnswersDiv();
+    querySnapshot.forEach(function(doc) {
+      updateCurrentQuestionAnswerStats(doc.data(), doc.id);
+      updateCurrentQuestionAnswerStatsHistory(doc.data(), doc.id, currentQuestionId);
+    });
+  });
+}
+
+function updateCurrentQuestionAnswerStatsHistory(updatedAnswer, answerId, questionId) {
+  console.log("second");
+  const answerInQuestionStatsDivElement = document.getElementById('stats-' + questionId + '-' + answerId);
+  if (answerInQuestionStatsDivElement == null) {
+    // This may be executed before the node is created the first time
+    return;
+  }
+  answerInQuestionStatsDivElement.innerText = updatedAnswer.title + ' with ' + updatedAnswer.numberAnswers + ' answers.';
+
+  if (updatedAnswer.correct) {
+    answerInQuestionStatsDivElement.innerText += ' (Correct answer)';
+  }
+}
+
+function clearCurrentQuestionAnswersDiv() {
+  const currentQuestionAnswersDivElement = document.getElementById('jsCurrentQuestionAnswers');
+  currentQuestionAnswersDivElement.innerText = '';
+}
+
+function updateCurrentQuestionAnswerStats(updatedAnswer) {
+  const currentQuestionAnswersDivElement = document.getElementById('jsCurrentQuestionAnswers');
+  
+  const answerElement = document.createElement('div');
+  answerElement.innerText = updatedAnswer.title + ' with ' + updatedAnswer.numberAnswers + ' answers.';
+  
+  if (updatedAnswer.correct) {
+    answerElement.innerText += ' (Correct answer)';
+  }
+
+  currentQuestionAnswersDivElement.appendChild(answerElement);
+}
+
+
+
+// Updates the panel showing which questions students are seeing
 async function updateCurrentQuestion({ gameId, currentQuestionId, isCurrentQuestionActive } = {}) {
   const currentQuestion = await queryCurrentQuestion({ gameId, currentQuestionId });
 
@@ -283,7 +335,7 @@ function initQuestionStatsListener({ gameInstanceId, currentQuestionId } = {}) {
   }
   unsubscribeCurrentActiveQuestionInGameInstance = db.collection('gameInstance').doc(gameInstanceId).collection('questions').doc(currentQuestionId).onSnapshot(function (doc) {
     updateCurrentQuestionStats(doc.data());
-    console.log(doc.data());
+    updateCurrentQuestionStatsInHistory(doc.data(), currentQuestionId)
   });
 }
 
@@ -299,8 +351,21 @@ function updateCurrentQuestionStats(updatedQuestionStats) {
   const numberWrongCurrentQuestionAnswersElement = document.getElementById('jsNumberWrongCurrentQuestionAnswers');
   numberWrongCurrentQuestionAnswersElement.innerText = 'Number of answers wrong: ' + updatedQuestionStats.numberWrong
 
-  // Update the question in the history panel
+}
 
+function updateCurrentQuestionStatsInHistory(updatedQuestionStats, currentQuestionId) {
+  const numberQuestionAnswersHistoryElement = document.getElementById('stats-' + currentQuestionId + '-numberQuestionAnswers');
+  if (numberQuestionAnswersHistoryElement == null) {
+    // This may be executed before the node is created the first time
+    return;
+  }
+  numberQuestionAnswersHistoryElement.innerText = 'Number of answers: ' + updatedQuestionStats.numberAnswered;
+
+  const numberCorrectQuestionAnswersHistoryElement = document.getElementById('stats-' + currentQuestionId + '-numberCorrectQuestionAnswers');
+  numberCorrectQuestionAnswersHistoryElement.innerText = 'Number of correct anwers: ' + updatedQuestionStats.numberCorrect;
+
+  const numberWrongQuestionAnswersHistoryElement = document.getElementById('stats-' + currentQuestionId + '-numberWrongQuestionAnswers');
+  numberWrongQuestionAnswersHistoryElement.innerText = 'Number of wrong anwers: ' + updatedQuestionStats.numberWrong;
 }
 
 function updateNumberOfMembersUI(numberOfMembers) {
