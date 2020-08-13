@@ -67,7 +67,7 @@ function buildQuestionHistory(gameInstanceId) {
       addQuestionToHistoryUI(doc.data(), questionId);
       console.log(doc.id, " => ", doc.data());
 
-      addQuestionAnswersToHistoryUI(questionId, questionInGameInstanceCollectionRef);
+      buildQuestionAnswersHistory(questionId, questionInGameInstanceCollectionRef);
     });
   });
 }
@@ -85,13 +85,26 @@ function addQuestionToHistoryUI(question, questionId) {
   questionStatsDivElement.appendChild(singleQuestionStatDivElement);
 }
 
-function addQuestionAnswersToHistoryUI(questionId, questionsCollectionRef) {
+function buildQuestionAnswersHistory(questionId, questionsCollectionRef) {
   const answersCollectionRef = questionsCollectionRef.doc(questionId).collection('answers');
   answersCollectionRef.get().then(function(querySnapshot) {
     querySnapshot.forEach(function(doc) {
-      console.log(doc.data());
+      addQuestionAnswerToHistoryUI(questionId, doc.data());
     });
   });
+}
+
+function addQuestionAnswerToHistoryUI(questionId, answer) {
+  const questionStatsDivElement = document.getElementById('stats-' + questionId);
+  
+  const answerInQuestionStatsDivElement = document.createElement('div');
+  answerInQuestionStatsDivElement.innerText = answer.title + ' with ' + answer.numberAnswers + ' answers.';
+
+  if (answer.correct) {
+    answerInQuestionStatsDivElement.innerText += ' (Correct answer)';
+  }
+
+  questionStatsDivElement.appendChild(answerInQuestionStatsDivElement);
 }
 
 // Gets the gameInstanceId from the query string if there is
