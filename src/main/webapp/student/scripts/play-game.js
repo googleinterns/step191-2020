@@ -52,7 +52,6 @@ async function loadGamePanel(user) {
 
   // Start listening to the GameInstance
   initGameInstanceListener(gameInstanceId);
-
 }
 
 // Gets the gameInstanceId from the query string if there is
@@ -90,7 +89,6 @@ function updatePointsInUI(points) {
 // Returns the gameInstanceId string
 function getActiveGameInstanceId(user) {
   const uid = user.uid;
-
   // Query the User's document in "Users" collection
   return db.collection("users").doc(uid).get().then(function(doc) {
     if (doc.exists) {
@@ -119,6 +117,7 @@ function initGameInstanceListener(gameInstanceId) {
       // Init submit button
       initSubmitButton(gameInstanceId, gameInstanceUpdate.gameId);
     } 
+
     if (gameInstanceUpdate.isActive && (gameInstanceUpdate.currentQuestion != currentQuestionId || gameInstanceUpdate.currentQuestionActive != currentQuestionActive)) {
       // The question displayed must be changed
       updateCurrentQuestion(gameInstanceUpdate.gameId, gameInstanceUpdate.currentQuestion, gameInstanceUpdate.currentQuestionActive);
@@ -186,8 +185,6 @@ async function updateCurrentQuestion(gameId, questionId, isCurrentQuestionActive
 
   document.getElementById("jsIsActive").innerText = 'Is active';
 
-
-
   // Get answers to the question
   createAnswersObject(currentQuestionDocRef);
 }
@@ -251,8 +248,6 @@ function createAnswer(quiz, multipleDiv, answerTitle, i){
       multipleDiv.appendChild(boxDiv);
 }
 
-
-
 function createAnswer(quiz, multipleDiv, doc, i){
       const boxDiv = document.createElement("div");
       boxDiv.classList.add("demo-card-square");
@@ -297,6 +292,7 @@ function showAnswers(){
         updatePoints();
         });
       }
+
 }
 
 

@@ -35,6 +35,7 @@ public class AnswerQuestionServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
     String gameInstance = request.getParameter("gameInstance");
+
     if(gameInstance==null || gameInstance.isEmpty()){
         response.setStatus(500);
         response.getWriter().println("Room not specified");
@@ -50,6 +51,7 @@ public class AnswerQuestionServlet extends HttpServlet {
 
     //Get student id 
     String student = getUserId(token);
+
 
     GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
     //ToDo: Check if !currentQuestionActive
