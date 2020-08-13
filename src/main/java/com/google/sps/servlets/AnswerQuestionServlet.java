@@ -14,6 +14,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.sps.data.GameInstance;
 
+import com.google.sps.daos.GameInstanceDao;
+import com.google.sps.data.GameInstance;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +30,24 @@ import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/answer")
 public class AnswerQuestionServlet extends HttpServlet {
+
+  @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+    String gameInstance = request.getParameter("gameInstance");
+    String student = request.getParameter("student");
+
+    GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
+    //ToDo: Check if !currentQuestionActive
+    boolean isAnswerCorrect = dao.getAnswer(gameInstance, student);  
+
+    Map<String, Object> answerJson = new HashMap<>();
+    answerJson.put("correct", isAnswerCorrect);
+    Gson gson = new Gson();
+    response.getWriter().println(gson.toJson(answerJson));
+
+  }  
+
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     JsonObject jsonObj = new Gson().fromJson(request.getReader(), JsonObject.class);
@@ -46,7 +67,8 @@ public class AnswerQuestionServlet extends HttpServlet {
     DocumentReference gameInstanceDocRef = firestoreDb.collection("gameInstance").document(gameInstanceId);
 
     boolean isQuestionActive = isQuestionActive(questionId, gameInstanceDocRef);
-
+    
+    //ToDo: Check is currentQuestionActive (if students can answer)
     if (!isQuestionActive) {
       return;
     }

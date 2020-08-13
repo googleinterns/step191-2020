@@ -75,4 +75,22 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
     firestoreDb.collection("gameInstance").document(update.getId()).set(update, SetOptions.merge());
   }
 
+  @Override
+  public boolean getAnswer(String gameInstance, String student) {
+    //To get current question  
+    GameInstance actualInstance = this.getGameInstance(gameInstance);
+    DocumentReference gameInstanceDocRef = firestoreDb.collection("gameInstance").document(gameInstance);
+    DocumentReference answerInStudentDocRef = gameInstanceDocRef.collection("students").document(student).collection("questions").document(actualInstance.getCurrentQuestion());
+    ApiFuture<DocumentSnapshot> questionAnswerFuture = answerInStudentDocRef.get();
+    try {
+      DocumentSnapshot document = questionAnswerFuture.get();
+      return Boolean.parseBoolean(document.get("correct").toString());
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    
+  return false;
+  }
+
 }
