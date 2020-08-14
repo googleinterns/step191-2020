@@ -27,76 +27,76 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.sps.daos.DatabaseGameDao;
 import com.google.sps.daos.GameDao;
-
+import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 @WebServlet("/newGame")
 public class NewGameServlet extends HttpServlet {
 
 
   @Override
-  protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+  public void doPost(HttpServletRequest request, HttpServletResponse response) 
     throws IOException {
       
-    // DISCLAIMER: ALL OF THE FOLLOWING STUFF IS HARD CODED FOR THE DEMO
-    List<Question> questions = new ArrayList(Arrays.asList());
+    // The servlet recieves the JSON and converts to a JsonObject
+    String gameJsonStr = request.getParameter("game");
 
-
-    List<Answer> answers0 = new ArrayList(Arrays.asList());
-    for(int i = 0; i < 4; i++ ){    
-      if(request.getParameter("question0answer" + i) != "")
-        answers0.add(new Answer(request.getParameter("question0answer" + i), !(request.getParameter("question0correct" + i) == null)));
-    }
-    questions.add(new Question(request.getParameter("question0title"), answers0));
-
-
-    List<Answer> answers1 = new ArrayList(Arrays.asList());
-    answers1.add(new Answer(request.getParameter("question1answer" + 0), true));
-    answers1.add(new Answer(request.getParameter("question1answer" + 1), false));
-    questions.add(new Question(request.getParameter("question3title"), answers1));
-
-    List<Answer> answers2 = new ArrayList(Arrays.asList());
-    for(int i = 0; i < 4; i++ ){    
-      if(request.getParameter("question2answer" + i) != "")
-        answers2.add(new Answer(request.getParameter("question2answer" + i), !(request.getParameter("question2correct" + i) == null)));
-    }
-    questions.add(new Question(request.getParameter("question2title"), answers2));
-
-
-    List<Answer> answers3 = new ArrayList(Arrays.asList());
-    answers3.add(new Answer(request.getParameter("question3answer" + 0), true));
-    answers3.add(new Answer(request.getParameter("question3answer" + 1), false));
-    questions.add(new Question(request.getParameter("question3title"), answers3));
-
-    List<Answer> answers4 = new ArrayList(Arrays.asList());
-    for(int i = 0; i < 4; i++ ){    
-      if(request.getParameter("question4answer" + i) != "")
-        answers4.add(new Answer(request.getParameter("question4answer" + i), !(request.getParameter("question4answer" + i) == null)));
-    }
-    questions.add(new Question(request.getParameter("question4title"), answers4));
-
-    Game currentGame = Game.builder().title(request.getParameter("gameTitle")).creator(request.getParameter("uid")).questions(questions).build();
+    // We create the game object
+    Game currentGame = buildGameWithJson(gameJsonStr);
+    
 
     GameDao dao = (GameDao) this.getServletContext().getAttribute("gameDao");
     dao.createNewGame(currentGame);
 
-
-    // // Creates classes for answers, questions and games so when Game Dao is implemented you just pass a Game class.
-    // Answer correct = new Answer(request.getParameter("correct-answer"), true);
-    // Answer wrong = new Answer(request.getParameter("wrong-answer"), true);
-    // List<Answer> answers = Arrays.asList(correct, wrong);
-
-    // Question question0 = new Question(request.getParameter("question0title"), answers0);
-    // List<Question> questions = Arrays.asList(question);
-
-    // Game currentGame = Game.builder().title(request.getParameter("title")).creator(request.getParameter("uid")).questions(questions).build();
-    
-    // GameDao dao = (GameDao) this.getServletContext().getAttribute("gameDao");
-    // dao.createNewGame(currentGame);
-
-    // System.out.println(correct.toString());
-    // System.out.println(wrong.toString());
-    // System.out.println(question.toString());
-    // System.out.println(currentGame.toString());
     response.sendRedirect("/teacher/createGame.html");
   }
+
+  public Game buildGameWithJson(String gameJsonStr) {
+    // The function recieves the JSON and converts to a JsonObject
+    String gameJson = gameJsonStr;
+    JsonElement gameJsonElem = new JsonParser().parse(gameJson);
+    JsonObject gameJsonObj = gameJsonElem.getAsJsonObject();
+
+    // We retrieve the attributes from the game
+    String gameTitle = gameJsonObj.get("title").getAsString();
+    String gameCreator = gameJsonObj.get("creator").getAsString();
+
+    List<Question> questions = new ArrayList(Arrays.asList()); // Here we will store the questions as objects
+
+    // We get the questions as a JsonArray and then we iterate to add them to the list
+    JsonArray questionsJsonArray = (JsonArray) gameJsonObj.get("questions");
+
+    for ( int i = 0; i < questionsJsonArray.size(); i++ ) {
+      JsonObject questionJsonObj = (JsonObject) questionsJsonArray.get(i);
+
+      // We retrieve the attributes from the question
+      String questionTitle = questionJsonObj.get("title").getAsString();
+      boolean isMC = questionJsonObj.get("isMC").getAsBoolean();
+
+      List<Answer> answers = new ArrayList(Arrays.asList()); // Here we will store the answers as objects
+
+      // We get the answers as a JsonArray and then we iterate to add them to the list
+      JsonArray answersJsonArray = (JsonArray) questionJsonObj.get("answers");
+
+      for ( int j = 0; j < answersJsonArray.size(); j++ ) {
+        JsonObject answerJsonObj = (JsonObject) answersJsonArray.get(j);
+      
+        // We retrieve the attributes from the answer
+        String answerTitle = answerJsonObj.get("title").getAsString();
+        boolean isCorrect = answerJsonObj.get("correct").getAsBoolean();
+
+        // We create a new answer object with the attributes that we recovered then add the object to the list
+        answers.add(new Answer(answerTitle, isCorrect));
+      }
+      // We create a new question object with the attributes that we recovered and the answers, then we add the object to the list
+      questions.add(new Question(questionTitle, answers, isMC));
+    }
+
+    // We return the game object
+  return Game.builder().title(gameTitle).creator(gameCreator).questions(questions).headQuestion(questions.get(0).getId()).build(); 
+    
+  }
+
 }
