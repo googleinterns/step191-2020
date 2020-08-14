@@ -69,6 +69,7 @@ function resetDOM() {
   resultObject.classList.toggle(isCorrect.toString());
   }
   isCorrect = null;
+  document.getElementById("gif").setAttribute('src','')
 }
 
 // Inits listener to User's points in Firestore DB
@@ -277,26 +278,35 @@ function createAnswer(quiz, multipleDiv, doc, i){
       multipleDiv.appendChild(boxDiv);
 }
 
-function showAnswers(){
-    console.log(currentQuestionActive);
+async function showAnswers(){
       if(currentQuestionActive){
         document.getElementById("result").innerText = 'Wait for question to end...';
       } else {
+        var tag;
         firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(async function(idToken) {
         const infoJson = await fetch('/answer?gameInstance='+gameInstanceId+'&student='+idToken);
         const info = await infoJson.json(); 
         isCorrect = info.correct;
         resultObject.classList.toggle(isCorrect.toString());
         if(isCorrect) {
+            tag = "celebrate";
             resultObject.innerText = 'Correct!';
         } else {
+            tag = "disappointment";
             resultObject.innerText = 'Incorrect :(';
         }
+        getGif(tag);
         updatePoints();
         });
       }
+}
 
-
+async function getGif(tag){
+    const data = await fetch('https://api.giphy.com/v1/gifs/random?api_key=rwk4YOsjvWroRr7p4QYFtjVwtSsMtwk4&tag='+tag+'&rating=g');
+    console.log('https://api.giphy.com/v1/gifs/random?api_key=rwk4YOsjvWroRr7p4QYFtjVwtSsMtwk4&tag='+tag+'&rating=g');
+    const json = await data.json();
+    console.log(json);
+    document.getElementById("gif").setAttribute('src', json.data.fixed_height_downsampled_url);
 }
 
 function disableAnswers(){
