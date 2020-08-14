@@ -130,7 +130,6 @@ function initGameInstanceListener(gameInstanceId) {
 function initSubmitButton(gameInstanceId, gameId) {
   const submitButtonElement = document.getElementById('submitButton');
   submitButtonElement.addEventListener('click', () => {
-    submited = true;
     firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function(idToken) {
       // Send token to your backend via HTTPS
       // ...
@@ -149,8 +148,10 @@ function initSubmitButton(gameInstanceId, gameId) {
           answerId: selectedAnswerId
         })
       }).then(() => {
+        submited = true;
         console.log("Question sent!")
         showAnswers();
+        disableAnswers();
       });
   
     }).catch(function(error) {
@@ -161,7 +162,11 @@ function initSubmitButton(gameInstanceId, gameId) {
 
 // Update the question that has changed
 async function updateCurrentQuestion(gameId, questionId, isCurrentQuestionActive) {
-  currentQuestionId = questionId;
+  
+  if(currentQuestionId != questionId) {
+    resetDOM();
+    currentQuestionId = questionId;
+  }
   currentQuestionActive = isCurrentQuestionActive
 
   let currentQuestionDocRef = db.collection('games').doc(gameId).collection('questions').doc(questionId);
@@ -170,21 +175,20 @@ async function updateCurrentQuestion(gameId, questionId, isCurrentQuestionActive
   // Add the question title to the UI
   createQuestionObject(currentQuestion.title);
 
-  //Reset Selection
-  resetDOM();
-
   if(!currentQuestionActive){
-      document.getElementById("jsIsActive").innerText = "Isn't active";
       if(!submited){
+        document.getElementById('submitButton').disabled = false;
         document.getElementById("submitButton").click();
+        document.getElementById('submitButton').disabled = true;
+        document.getElementById("quiz").innerHTML='';
       } else {
-          showAnswers();
+        showAnswers();
+        disableAnswers();
       }
       return;
   }
 
-  document.getElementById("jsIsActive").innerText = 'Is active';
-
+    document.getElementById('submitButton').disabled = false;
   // Get answers to the question
   createAnswersObject(currentQuestionDocRef);
 }
@@ -247,7 +251,7 @@ function createAnswer(quiz, multipleDiv, answerTitle, i){
       boxDiv.appendChild(titleDiv);
       multipleDiv.appendChild(boxDiv);
 }
-
+const handlers = [];
 function createAnswer(quiz, multipleDiv, doc, i){
       const boxDiv = document.createElement("div");
       boxDiv.classList.add("demo-card-square");
@@ -255,7 +259,7 @@ function createAnswer(quiz, multipleDiv, doc, i){
       boxDiv.classList.add("mdl-shadow--2dp");
       const titleDiv = document.createElement("div");
       titleDiv.setAttribute("id", doc.id);
-      boxDiv.addEventListener('click', ()=>{
+      boxDiv.addEventListener('click', handlers[i-1] = () => {
           if(doc.id != selectedAnswerId && selectedAnswerId != "" && selectedAnswerId != null){
             document.getElementById(selectedAnswerId).classList.toggle("selected");
           }
@@ -274,7 +278,7 @@ function createAnswer(quiz, multipleDiv, doc, i){
 }
 
 function showAnswers(){
-      document.getElementById("quiz").innerHTML = '';
+    console.log(currentQuestionActive);
       if(currentQuestionActive){
         document.getElementById("result").innerText = 'Wait for question to end...';
       } else {
@@ -288,11 +292,22 @@ function showAnswers(){
         } else {
             resultObject.innerText = 'Incorrect :(';
         }
-
         updatePoints();
         });
       }
 
+
+}
+
+function disableAnswers(){
+    document.getElementById('submitButton').disabled = true;
+    let cards = document.querySelectorAll('.demo-card-square');
+    var j = 0;
+    cards.forEach((card) => {
+        card.removeEventListener('click', handlers[j]);
+        card.childNodes[0].classList.add("disabled");
+        j++;
+    });
 }
 
 
