@@ -384,6 +384,7 @@ function addQuestionToHistoryUI({ question, questionId } = {}) {
   // The div for this new question element
   const singleQuestionStatDivElement = document.createElement('div');
   singleQuestionStatDivElement.id = 'stats-' + questionId
+  singleQuestionStatDivElement.classList.add('questionInHistory');
 
   const questionTitle = document.createElement('div');
   questionTitle.innerText = 'Question title: ' + question.title;
