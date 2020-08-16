@@ -57,6 +57,9 @@
     background-repeat: no-repeat, repeat;
     background-position: center;
 }
+.disabled{
+   background-color: #8b939f;
+}
 .true {
     color: #0F9D58;
 }
