@@ -61,6 +61,8 @@ async function loadControlPanel(user) {
 
   // Add the questions' history to the UI
   buildQuestionHistory(gameInstanceId);
+
+  buildStudentsHistory(gameInstanceId);
 }
 
 // Gets the gameInstanceId from the query string if there is
@@ -440,6 +442,83 @@ function addQuestionAnswerToHistoryUI({ questionId, answerId, answer } = {}) {
 
   // Add the answer to its component in the DOM
   questionStatsDivElement.appendChild(answerInQuestionStatsDivElement);
+}
+
+let studentsIds = [];
+
+// This is called to build the student view initially
+// The .onSnapshot is called when someone changes anything
+function buildStudentsHistory(gameInstanceId) {
+  const studentsCollectionRef = db.collection('gameInstance').doc(gameInstanceId).collection('students');
+  studentsCollectionRef
+  .onSnapshot(function(querySnapshot) {
+    querySnapshot.docChanges().forEach(function(change) {
+      if (change.type === "added") {
+        console.log('doc added ', change.doc.data());
+        // add the listener to his answers collection
+        // also init build
+        initStudentHistory({ studentId: change.doc.id, student: change.doc.data(), studentsCollectionRef });
+      }
+      if (change.type === "modified") {
+        // just update the points of the student
+        console.log('doc modified ', change.doc.data());
+      }
+    });
+    console.log('done');
+  });
+}
+
+function initStudentHistory({ studentId, student, studentsCollectionRef } = {}) {
+  addStudentToUI({ studentId, student });
+  initStudentQuestionListener({ studentId, studentsCollectionRef });
+}
+
+function addStudentToUI({ studentId, student } = {}) {
+  const studentsStatsDivElement = document.getElementById('jsStudentStats');
+
+  const newStudentStats = document.createElement('div');
+  newStudentStats.id = 'studentStats-' + studentId;
+  newStudentStats.classList.add('studentInHistory');
+  newStudentStats.innerText = studentId + ': ' + student.points + ' points.';
+
+  studentsStatsDivElement.appendChild(newStudentStats);
+}
+
+function initStudentQuestionListener({ studentId, studentsCollectionRef } = {}) {
+  // console.log('here');
+  studentsCollectionRef.doc(studentId).collection('questions')
+  .onSnapshot(function(querySnapshot) {
+    querySnapshot.forEach(function(doc) {
+      // add answers to student stats
+      addAnswerToStudentStats({ studentId, questionId: doc.id, answer: doc.data() });
+    });
+  });
+}
+
+function addAnswerToStudentStats({ studentId, questionId, answer } = {}) {
+  const singleStudentStatsDivElement = document.getElementById('studentStats-' + studentId);
+
+  const studentAnswerDivElement = document.createElement('div');
+  
+  const questionIdDivElement = document.createElement('div');
+  questionIdDivElement.innerText = 'Question with ID ' + questionId;
+
+  const questionTitleDivElement = document.createElement('div');
+  questionTitleDivElement.innerText = answer.title;
+
+  const questionAnswerDivElement = document.createElement('div');
+
+  if (answer.correct) {
+    questionAnswerDivElement.innerText = 'Correctly answered';
+  } else {
+    questionAnswerDivElement.innerText = 'Incorrect answer, chose: ' + answer.chosen;
+  }
+  
+  studentAnswerDivElement.appendChild(questionIdDivElement);
+  studentAnswerDivElement.appendChild(questionTitleDivElement);
+  studentAnswerDivElement.appendChild(questionAnswerDivElement);
+
+  singleStudentStatsDivElement.appendChild(studentAnswerDivElement);
 }
 
 initAuthStateObserver();
