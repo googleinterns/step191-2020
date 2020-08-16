@@ -444,8 +444,6 @@ function addQuestionAnswerToHistoryUI({ questionId, answerId, answer } = {}) {
   questionStatsDivElement.appendChild(answerInQuestionStatsDivElement);
 }
 
-let studentsIds = [];
-
 // This is called to build the student view initially
 function buildStudentsHistory(gameInstanceId) {
   const studentsCollectionRef = db.collection('gameInstance').doc(gameInstanceId).collection('students');
