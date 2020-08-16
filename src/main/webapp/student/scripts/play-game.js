@@ -52,7 +52,6 @@ async function loadGamePanel(user) {
 
   // Start listening to the GameInstance
   initGameInstanceListener(gameInstanceId);
-
 }
 
 // Gets the gameInstanceId from the query string if there is
@@ -70,6 +69,7 @@ function resetDOM() {
   resultObject.classList.toggle(isCorrect.toString());
   }
   isCorrect = null;
+  document.getElementById("gif").setAttribute('src','')
 }
 
 // Inits listener to User's points in Firestore DB
@@ -90,7 +90,6 @@ function updatePointsInUI(points) {
 // Returns the gameInstanceId string
 function getActiveGameInstanceId(user) {
   const uid = user.uid;
-
   // Query the User's document in "Users" collection
   return db.collection("users").doc(uid).get().then(function(doc) {
     if (doc.exists) {
@@ -119,6 +118,7 @@ function initGameInstanceListener(gameInstanceId) {
       // Init submit button
       initSubmitButton(gameInstanceId, gameInstanceUpdate.gameId);
     } 
+
     if (gameInstanceUpdate.isActive && (gameInstanceUpdate.currentQuestion != currentQuestionId || gameInstanceUpdate.currentQuestionActive != currentQuestionActive)) {
       // The question displayed must be changed
       updateCurrentQuestion(gameInstanceUpdate.gameId, gameInstanceUpdate.currentQuestion, gameInstanceUpdate.currentQuestionActive);
@@ -131,7 +131,6 @@ function initGameInstanceListener(gameInstanceId) {
 function initSubmitButton(gameInstanceId, gameId) {
   const submitButtonElement = document.getElementById('submitButton');
   submitButtonElement.addEventListener('click', () => {
-    submited = true;
     firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function(idToken) {
       // Send token to your backend via HTTPS
       // ...
@@ -150,8 +149,10 @@ function initSubmitButton(gameInstanceId, gameId) {
           answerId: selectedAnswerId
         })
       }).then(() => {
+        submited = true;
         console.log("Question sent!")
         showAnswers();
+        disableAnswers();
       });
   
     }).catch(function(error) {
@@ -162,7 +163,11 @@ function initSubmitButton(gameInstanceId, gameId) {
 
 // Update the question that has changed
 async function updateCurrentQuestion(gameId, questionId, isCurrentQuestionActive) {
-  currentQuestionId = questionId;
+  
+  if(currentQuestionId != questionId) {
+    resetDOM();
+    currentQuestionId = questionId;
+  }
   currentQuestionActive = isCurrentQuestionActive
 
   let currentQuestionDocRef = db.collection('games').doc(gameId).collection('questions').doc(questionId);
@@ -171,23 +176,20 @@ async function updateCurrentQuestion(gameId, questionId, isCurrentQuestionActive
   // Add the question title to the UI
   createQuestionObject(currentQuestion.title);
 
-  //Reset Selection
-  resetDOM();
-
   if(!currentQuestionActive){
-      document.getElementById("jsIsActive").innerText = "Isn't active";
       if(!submited){
+        document.getElementById('submitButton').disabled = false;
         document.getElementById("submitButton").click();
+        document.getElementById('submitButton').disabled = true;
+        document.getElementById("quiz").innerHTML='';
       } else {
-          showAnswers();
+        showAnswers();
+        disableAnswers();
       }
       return;
   }
 
-  document.getElementById("jsIsActive").innerText = 'Is active';
-
-
-
+    document.getElementById('submitButton').disabled = false;
   // Get answers to the question
   createAnswersObject(currentQuestionDocRef);
 }
@@ -250,9 +252,7 @@ function createAnswer(quiz, multipleDiv, answerTitle, i){
       boxDiv.appendChild(titleDiv);
       multipleDiv.appendChild(boxDiv);
 }
-
-
-
+const handlers = [];
 function createAnswer(quiz, multipleDiv, doc, i){
       const boxDiv = document.createElement("div");
       boxDiv.classList.add("demo-card-square");
@@ -260,7 +260,7 @@ function createAnswer(quiz, multipleDiv, doc, i){
       boxDiv.classList.add("mdl-shadow--2dp");
       const titleDiv = document.createElement("div");
       titleDiv.setAttribute("id", doc.id);
-      boxDiv.addEventListener('click', ()=>{
+      boxDiv.addEventListener('click', handlers[i-1] = () => {
           if(doc.id != selectedAnswerId && selectedAnswerId != "" && selectedAnswerId != null){
             document.getElementById(selectedAnswerId).classList.toggle("selected");
           }
@@ -278,25 +278,46 @@ function createAnswer(quiz, multipleDiv, doc, i){
       multipleDiv.appendChild(boxDiv);
 }
 
-function showAnswers(){
-      document.getElementById("quiz").innerHTML = '';
+async function showAnswers(){
       if(currentQuestionActive){
         document.getElementById("result").innerText = 'Wait for question to end...';
       } else {
+        var tag;
         firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(async function(idToken) {
         const infoJson = await fetch('/answer?gameInstance='+gameInstanceId+'&student='+idToken);
         const info = await infoJson.json(); 
         isCorrect = info.correct;
         resultObject.classList.toggle(isCorrect.toString());
         if(isCorrect) {
+            tag = "celebrate";
             resultObject.innerText = 'Correct!';
         } else {
+            tag = "disappointment";
             resultObject.innerText = 'Incorrect :(';
         }
-
+        getGif(tag);
         updatePoints();
         });
       }
+}
+
+async function getGif(tag){
+    const data = await fetch('https://api.giphy.com/v1/gifs/random?api_key=rwk4YOsjvWroRr7p4QYFtjVwtSsMtwk4&tag='+tag+'&rating=g');
+    console.log('https://api.giphy.com/v1/gifs/random?api_key=rwk4YOsjvWroRr7p4QYFtjVwtSsMtwk4&tag='+tag+'&rating=g');
+    const json = await data.json();
+    console.log(json);
+    document.getElementById("gif").setAttribute('src', json.data.fixed_height_downsampled_url);
+}
+
+function disableAnswers(){
+    document.getElementById('submitButton').disabled = true;
+    let cards = document.querySelectorAll('.demo-card-square');
+    var j = 0;
+    cards.forEach((card) => {
+        card.removeEventListener('click', handlers[j]);
+        card.childNodes[0].classList.add("disabled");
+        j++;
+    });
 }
 
 
