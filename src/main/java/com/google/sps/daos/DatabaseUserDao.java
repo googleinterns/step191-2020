@@ -108,6 +108,9 @@ public class DatabaseUserDao implements UserDao {
   private void registerUserInGameInstance(DocumentReference userInGameInstanceDocRef, String userId) {
     Map<String, Object> docData = new HashMap<>();
     docData.put("points", 0);
+    docData.put("numberAnswered", 0);
+    docData.put("numberCorrect", 0);
+    docData.put("numberWrong", 0);
 
     userInGameInstanceDocRef.set(docData);
   }
