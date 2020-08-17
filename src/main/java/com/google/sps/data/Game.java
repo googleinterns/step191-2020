@@ -5,6 +5,12 @@ import java.util.Map;
 import com.google.auto.value.AutoValue;
 import com.google.sps.data.Question;
 import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 @AutoValue
 public abstract class Game {
