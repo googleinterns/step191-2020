@@ -20,6 +20,7 @@ import com.google.sps.data.GameInstance;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -102,8 +103,8 @@ public class AnswerQuestionServlet extends HttpServlet {
         System.out.println("STUDENT DIDN'T ANSWER");
         isAnswerCorrect = false;
     } else {
-        String correctAnswerId = getCorrectAnswer(questionId, questionDocRef);
-        isAnswerCorrect = answerId.equals(correctAnswerId);
+        List<String> correctAnswerId = getCorrectAnswers(questionId, questionDocRef);
+        isAnswerCorrect = correctAnswerId.contains(answerId);
     }
 
     DocumentReference answerInStudentDocRef = gameInstanceDocRef.collection("students").document(userId).collection("questions").document(questionId);
@@ -194,9 +195,9 @@ public class AnswerQuestionServlet extends HttpServlet {
   }
 
   // Right now it only takes one single correct answer
-  private String getCorrectAnswer(String questionId, DocumentReference questionDocRef) {
+  private List<String> getCorrectAnswers(String questionId, DocumentReference questionDocRef) {
 
-    String correctAnswerId = null;
+    List<String> correctAnswerId = new ArrayList<>();
 
     ApiFuture<QuerySnapshot> future = questionDocRef.collection("answers").whereEqualTo("correct", true).get();
 
@@ -204,7 +205,7 @@ public class AnswerQuestionServlet extends HttpServlet {
     try {
       documents = future.get().getDocuments();
       for (DocumentSnapshot document : documents) {
-        correctAnswerId = document.getId();
+        correctAnswerId.add(document.getId());
       }
     } catch (InterruptedException e) {
       // TODO Auto-generated catch block
@@ -213,7 +214,6 @@ public class AnswerQuestionServlet extends HttpServlet {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    
 
     return correctAnswerId;
   }
