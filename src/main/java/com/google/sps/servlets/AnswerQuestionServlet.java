@@ -45,7 +45,7 @@ public class AnswerQuestionServlet extends HttpServlet {
     String token = request.getParameter("student");
     if(token==null || token.isEmpty()){
         response.setStatus(500);
-        response.getWriter().println("Room not specified");
+        response.getWriter().println("User token not specified");
         return;
     }
 
