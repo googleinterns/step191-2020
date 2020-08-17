@@ -272,6 +272,7 @@ function createAnswer(quiz, multipleDiv, doc, i){
           selectedAnswerId = doc.id;
           titleDiv.classList.toggle("selected");
           selectedAnswerTitle = doc.data().title;
+          console.log(selectedAnswerTitle);
       })
       titleDiv.classList.add("mdl-card__title");
       titleDiv.classList.add("mdl-card--expand");

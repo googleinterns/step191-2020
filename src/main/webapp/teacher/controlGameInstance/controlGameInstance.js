@@ -219,18 +219,26 @@ function initQuestionAnswerStatsListener({ gameInstanceId, currentQuestionId } =
   if (unsubscribeCurrentActiveQuestionAnswersInGameInstance != null) {
     // This helps remove unnecesary listeners to an answers' collection
     unsubscribeCurrentActiveQuestionAnswersInGameInstance();
+
+    // Clean the answers' div
+    clearCurrentQuestionAnswersDiv();
   }
   unsubscribeCurrentActiveQuestionAnswersInGameInstance = db.collection('gameInstance').doc(gameInstanceId).collection('questions').doc(currentQuestionId).collection('answers')
   .onSnapshot(function(querySnapshot) {
-    // Clean the answers' div
-    clearCurrentQuestionAnswersDiv();
+    querySnapshot.docChanges().forEach(function(change) {
+      if (change.type === "added") {
+        // Add the answer to the active panel UI
+        addCurrentQuestionAnswerStats({ answer: change.doc.data(), answerId: change.doc.id, questionId: currentQuestionId });
+      }
 
-    querySnapshot.forEach(function(doc) {
-      // Update the current question's answers in the "Active" top panel
-      updateCurrentQuestionAnswerStats(doc.data(), doc.id);
+      if (change.type === "modified") {
+        // Update the current question's answers in the "Active" top panel
+        updateCurrentQuestionAnswerStats({ updatedAnswer: change.doc.data(), answerId: change.doc.id, questionId: currentQuestionId });
 
-      // Update the current question's answers in the history section
-      updateCurrentQuestionAnswerStatsHistory(doc.data(), doc.id, currentQuestionId);
+        // Update the current question's answers in the history section
+        updateCurrentQuestionAnswerStatsHistory({ updatedAnswer: change.doc.data(), answerId: change.doc.id, questionId: currentQuestionId });
+      }
+     
     });
   });
 }
@@ -241,18 +249,30 @@ function clearCurrentQuestionAnswersDiv() {
   currentQuestionAnswersDivElement.innerText = '';
 }
 
-// Update the current question's answer's stats in the main panel
-function updateCurrentQuestionAnswerStats(updatedAnswer) {
+// Add the answer to the active panel UI
+function addCurrentQuestionAnswerStats ({ answer, answerId, questionId } = {}) {
   const currentQuestionAnswersDivElement = document.getElementById('jsCurrentQuestionAnswers');
   
   const answerElement = document.createElement('div');
+  answerElement.id = 'currentQuestion-' + questionId + '-' + answerId;
+  answerElement.innerText = answer.title + ' with ' + answer.numberAnswers + ' answers.';
+  
+  if (answer.correct) {
+    answerElement.innerText += ' (Correct answer)';
+  }
+
+  currentQuestionAnswersDivElement.appendChild(answerElement);
+}
+
+// Update the current question's answer's stats in the main panel
+function updateCurrentQuestionAnswerStats({ updatedAnswer, answerId, questionId } = {}) {
+  const answerElement = document.getElementById('currentQuestion-' + questionId + '-' + answerId);
   answerElement.innerText = updatedAnswer.title + ' with ' + updatedAnswer.numberAnswers + ' answers.';
   
   if (updatedAnswer.correct) {
     answerElement.innerText += ' (Correct answer)';
   }
 
-  currentQuestionAnswersDivElement.appendChild(answerElement);
 }
 
 // Update a question's stats in the history section
