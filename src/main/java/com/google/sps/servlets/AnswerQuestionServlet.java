@@ -114,10 +114,11 @@ public class AnswerQuestionServlet extends HttpServlet {
     if (answerNotExists) {
       if (isAnswerCorrect) {
         System.out.println("The answer is correct, adding points");
-        updateStudentStats(isAnswerCorrect, userId, gameInstanceDocRef, firestoreDb);
       } else {
         System.out.println("The answer is incorrect");
       }
+
+      updateStudentStats(isAnswerCorrect, userId, gameInstanceDocRef, firestoreDb);
 
       DocumentReference questionInGameInstanceDocRef = gameInstanceDocRef.collection("questions").document(questionId);
 
