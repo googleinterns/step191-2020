@@ -37,11 +37,17 @@
           </div>
         </div>
       </header>
-      
-      <form method="POST" action="/newGame">
+      <div>
         <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header" id="createGameForm">
           <div class="mdl-layout__drawer" id="drawer">
-            <span class="mdl-layout-title">Questions</span>
+            <span class="mdl-layout-title">Questions </span>
+
+            <span class="mdl-layout-title">
+              <!-- Accent-colored raised button with ripple -->
+              <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent " onclick="sendQuestions()">
+                Send Questions
+              </button>
+            </span>
             <nav class="mdl-navigation" id="drawerNav">
               <a class="mdl-navigation__link mdl-navigation__link--current"  onclick="hideAllExcept(-1)" id="jsSelectQ-1"> <b>Title</b> </a>
               <a class="mdl-navigation__link"  onclick="hideAllExcept(0)" id="jsSelectQ0"><b>1</b> Multiple Choice</a>
@@ -49,6 +55,7 @@
               <button id="showModal" onclick="showClickHandler()" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="button">
                 New Question
               </button>
+
             </nav>
             
           </div>
@@ -71,12 +78,13 @@
           <!-- ------------ FIRST QUESTION ----------- -->
           <main class="mdl-layout__content questionSection" id="question0" hidden>
             <div class="page-content">
+              <input name="isMC" value=true hidden>
               <div class="mdl-grid">
                 <div class="mdl-cell mdl-cell--3-col"></div>
                 <div class="mdl-cell mdl-cell--6-col">
                     <h3>Multiple Choice</h3>
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                      <input class="mdl-textfield__input" type="text" id="game-question0" name="question0title"> <label class="mdl-textfield__label" for="game-question">Question Title</label>
+                      <input class="mdl-textfield__input" type="text" id="game-question0" name="questionTitle"> <label class="mdl-textfield__label" for="game-question">Question Title</label>
                     </div>
                 </div>
                 <div class="mdl-cell mdl-cell--3-col"></div>
@@ -88,24 +96,24 @@
                 <div class="mdl-cell mdl-cell--5-col">
                   <!-- First answer -->
                   <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question0answer0"> <label class="mdl-textfield__label" >Answer 1</label>
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="answer0"> <label class="mdl-textfield__label" >Answer 1</label>
                   </div>
 
                   <!-- Check if it's correct -->
                   <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question0checkbox0">
-                    <input type="checkbox" id="question0checkbox0" class="mdl-checkbox__input" name="question0correct0">
+                    <input type="checkbox" id="question0checkbox0" class="mdl-checkbox__input" name="correct0">
                     <span class="mdl-checkbox__label">Correct</span>
                   </label>
                 </div>
                 <div class="mdl-cell mdl-cell--5-col">
                   <!-- Second answer -->
                   <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question0answer1"> <label class="mdl-textfield__label" >Answer 2</label>
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="answer1"> <label class="mdl-textfield__label" >Answer 2</label>
                   </div>
 
                   <!-- Check if it's correct -->
                   <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question0checkbox1">
-                    <input type="checkbox" id="question0checkbox1" class="mdl-checkbox__input" name="question0correct1">
+                    <input type="checkbox" id="question0checkbox1" class="mdl-checkbox__input" name="correct1">
                     <span class="mdl-checkbox__label">Correct</span>
                   </label>
                 </div>
@@ -118,12 +126,12 @@
                 <div class="mdl-cell mdl-cell--5-col">
                   <!-- Third answer -->
                   <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question0answer2"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 3 (Optional)</label>
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="answer2"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 3 (Optional)</label>
                   </div>
 
                   <!-- Check if it's correct -->
                   <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question0checkbox2">
-                    <input type="checkbox" id="question0checkbox2" class="mdl-checkbox__input" name="question0correct2">
+                    <input type="checkbox" id="question0checkbox2" class="mdl-checkbox__input" name="correct2">
                     <span class="mdl-checkbox__label">Correct</span>
                   </label>
                 </div>
@@ -131,12 +139,12 @@
                 <div class="mdl-cell mdl-cell--5-col">
                   <!-- Fourth answer -->
                   <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="question0answer3"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 4 (Optional)</label>
+                    <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="answer3"> <label class="mdl-textfield__label" for="game-correct-answer">Answer 4 (Optional)</label>
                   </div>
 
                   <!-- Check if it's correct -->
                   <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question0checkbox3">
-                    <input type="checkbox" id="question0checkbox3" class="mdl-checkbox__input" name="question0correct3">
+                    <input type="checkbox" id="question0checkbox3" class="mdl-checkbox__input" name="correct3">
                     <span class="mdl-checkbox__label">Correct</span>
                   </label>
                 </div>
@@ -144,11 +152,10 @@
               </div>
             </div>
           </main>
-
         </div>
         <!-- Hidden parameter to add the user id -->
         <input type="hidden" id="user-id" name="uid">
-      </form>
+      </div>
     </div>
 
     
