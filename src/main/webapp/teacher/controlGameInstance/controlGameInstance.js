@@ -520,9 +520,9 @@ function addAnswerToStudentStats({ studentId, questionId, answer } = {}) {
   const questionAnswerDivElement = document.createElement('div');
 
   if (answer.correct) {
-    questionAnswerDivElement.innerText = 'Correctly answered';
+    questionAnswerDivElement.innerText = 'Correctly answered, chose: "' + answer.chosen + '"';
   } else {
-    questionAnswerDivElement.innerText = 'Incorrect answer, chose: ' + answer.chosen;
+    questionAnswerDivElement.innerText = 'Incorrect answer, chose: "' + answer.chosen + '"';
   }
   
   studentAnswerDivElement.appendChild(questionIdDivElement);
