@@ -40,12 +40,9 @@ public class DatabaseGameDao implements GameDao {
   public boolean createNewGame(Game newGame) {
     // We create the game document
     DocumentReference newGameRef = firestoreDb.collection("games").document(); 
-    newGameRef.set(newGame.gameData());
-
     try {
       CollectionReference questionRef = newGameRef.collection("questions");
 
-      List<String> questionsIds = new ArrayList(Arrays.asList()); // the question id's that will work for the "next" and "previous" attributes on the questions
       List<Question> questions = newGame.questions(); // The questions list from the game class object
 
       String prevId = "null";
@@ -81,6 +78,9 @@ public class DatabaseGameDao implements GameDao {
           answerDoc.set(a); // Sets the attributes to the answer data on the database
         }
       }
+    newGame = newGame.toBuilder().headQuestion(questions.get(0).getId()).build();
+    newGameRef.set(newGame.gameData());
+
     } catch (Exception e) {
       System.out.println(e);
     }

@@ -18,7 +18,13 @@
 const db = firebase.firestore();
 let active = false;
 let currentQuestionId = null;
-let selectedAnswerId = null;
+let selectedAnswerId = "";
+let currentQuestionActive = false;
+let gameInstanceId = getGameInstanceIdFromQueryParams();
+const resultObject = document.getElementById("result");
+let submited = false;
+let isCorrect = null;
+let studentId = null;
 
 // Is triggered when the User logs in or logs out
 function initAuthStateObserver() {
@@ -29,6 +35,7 @@ function initAuthStateObserver() {
 function authStateObserver(user) {
   if (user) { // User is signed in!
     // Everything starts working when the User logs in
+    studentId = user;
     loadGamePanel(user)
   } else { // User is signed out!
     console.log("Not logged in");
@@ -38,7 +45,6 @@ function authStateObserver(user) {
 // Load all the information 
 async function loadGamePanel(user) {
   // Get the Game Instance's ID in which the user is participating
-  let gameInstanceId = getGameInstanceIdFromQueryParams();
   
   if (gameInstanceId == null) {
     gameInstanceId = await getActiveGameInstanceId(user);
@@ -46,9 +52,6 @@ async function loadGamePanel(user) {
 
   // Start listening to the GameInstance
   initGameInstanceListener(gameInstanceId);
-
-  // Listen to points in GameInstance
-  initPointsListener(gameInstanceId, user);
 }
 
 // Gets the gameInstanceId from the query string if there is
@@ -58,10 +61,20 @@ function getGameInstanceIdFromQueryParams() {
   return urlParams.get('gameInstanceId');
 }
 
+function resetDOM() {
+  selectedAnswerId = "";
+  submited = false;
+  document.getElementById("result").innerText = '';
+  if(isCorrect != null) {
+  resultObject.classList.toggle(isCorrect.toString());
+  }
+  isCorrect = null;
+  document.getElementById("gif").setAttribute('src','')
+}
+
 // Inits listener to User's points in Firestore DB
-function initPointsListener(gameInstanceId, user) {
-  db.collection("gameInstance").doc(gameInstanceId).collection("students").doc(user.uid)
-  .onSnapshot(function(doc) {
+function updatePoints() {
+  db.collection("gameInstance").doc(gameInstanceId).collection("students").doc(studentId.uid).get().then(function(doc) {
     const studentInGameInstaneUpdate = doc.data();
     updatePointsInUI(studentInGameInstaneUpdate.points);
   });
@@ -77,7 +90,6 @@ function updatePointsInUI(points) {
 // Returns the gameInstanceId string
 function getActiveGameInstanceId(user) {
   const uid = user.uid;
-
   // Query the User's document in "Users" collection
   return db.collection("users").doc(uid).get().then(function(doc) {
     if (doc.exists) {
@@ -106,9 +118,10 @@ function initGameInstanceListener(gameInstanceId) {
       // Init submit button
       initSubmitButton(gameInstanceId, gameInstanceUpdate.gameId);
     } 
-    if (gameInstanceUpdate.isActive && (gameInstanceUpdate.currentQuestion != currentQuestionId)) {
+
+    if (gameInstanceUpdate.isActive && (gameInstanceUpdate.currentQuestion != currentQuestionId || gameInstanceUpdate.currentQuestionActive != currentQuestionActive)) {
       // The question displayed must be changed
-      updateCurrentQuestion(gameInstanceUpdate.gameId, gameInstanceUpdate.currentQuestion);
+      updateCurrentQuestion(gameInstanceUpdate.gameId, gameInstanceUpdate.currentQuestion, gameInstanceUpdate.currentQuestionActive);
     }
     
   });
@@ -118,7 +131,6 @@ function initGameInstanceListener(gameInstanceId) {
 function initSubmitButton(gameInstanceId, gameId) {
   const submitButtonElement = document.getElementById('submitButton');
   submitButtonElement.addEventListener('click', () => {
-
     firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function(idToken) {
       // Send token to your backend via HTTPS
       // ...
@@ -137,7 +149,10 @@ function initSubmitButton(gameInstanceId, gameId) {
           answerId: selectedAnswerId
         })
       }).then(() => {
+        submited = true;
         console.log("Question sent!")
+        showAnswers();
+        disableAnswers();
       });
   
     }).catch(function(error) {
@@ -147,16 +162,34 @@ function initSubmitButton(gameInstanceId, gameId) {
 }
 
 // Update the question that has changed
-async function updateCurrentQuestion(gameId, questionId) {
-  currentQuestionId = questionId;
+async function updateCurrentQuestion(gameId, questionId, isCurrentQuestionActive) {
+  
+  if(currentQuestionId != questionId) {
+    resetDOM();
+    currentQuestionId = questionId;
+  }
+  currentQuestionActive = isCurrentQuestionActive
 
   let currentQuestionDocRef = db.collection('games').doc(gameId).collection('questions').doc(questionId);
-
   const currentQuestion = await queryCurrentQuestion(currentQuestionDocRef);
 
   // Add the question title to the UI
   createQuestionObject(currentQuestion.title);
 
+  if(!currentQuestionActive){
+      if(!submited){
+        document.getElementById('submitButton').disabled = false;
+        document.getElementById("submitButton").click();
+        document.getElementById('submitButton').disabled = true;
+        document.getElementById("quiz").innerHTML='';
+      } else {
+        showAnswers();
+        disableAnswers();
+      }
+      return;
+  }
+
+    document.getElementById('submitButton').disabled = false;
   // Get answers to the question
   createAnswersObject(currentQuestionDocRef);
 }
@@ -219,27 +252,72 @@ function createAnswer(quiz, multipleDiv, answerTitle, i){
       boxDiv.appendChild(titleDiv);
       multipleDiv.appendChild(boxDiv);
 }
-
-
-
+const handlers = [];
 function createAnswer(quiz, multipleDiv, doc, i){
       const boxDiv = document.createElement("div");
       boxDiv.classList.add("demo-card-square");
       boxDiv.classList.add("mdl-card");
       boxDiv.classList.add("mdl-shadow--2dp");
-      boxDiv.addEventListener('click', ()=>{
-          selectedAnswerId = doc.id;
-      })
       const titleDiv = document.createElement("div");
+      titleDiv.setAttribute("id", doc.id);
+      boxDiv.addEventListener('click', handlers[i-1] = () => {
+          if(doc.id != selectedAnswerId && selectedAnswerId != "" && selectedAnswerId != null){
+            document.getElementById(selectedAnswerId).classList.toggle("selected");
+          }
+          selectedAnswerId = doc.id;
+          titleDiv.classList.toggle("selected");
+      })
       titleDiv.classList.add("mdl-card__title");
-      titleDiv.classList.add("mdl-card--expand")
-      titleDiv.setAttribute("id", "card-"+(i-1));
+      titleDiv.classList.add("mdl-card--expand");
+      titleDiv.classList.add("card-"+(i-1));
       const title = document.createElement("h2");
       title.classList.add("mdl-card__title-text");
       title.innerText = doc.data().title;
       titleDiv.appendChild(title);
       boxDiv.appendChild(titleDiv);
       multipleDiv.appendChild(boxDiv);
+}
+
+async function showAnswers(){
+      if(currentQuestionActive){
+        document.getElementById("result").innerText = 'Wait for question to end...';
+      } else {
+        var tag;
+        firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(async function(idToken) {
+        const infoJson = await fetch('/answer?gameInstance='+gameInstanceId+'&student='+idToken);
+        const info = await infoJson.json(); 
+        isCorrect = info.correct;
+        resultObject.classList.toggle(isCorrect.toString());
+        if(isCorrect) {
+            tag = "celebrate";
+            resultObject.innerText = 'Correct!';
+        } else {
+            tag = "disappointment";
+            resultObject.innerText = 'Incorrect :(';
+        }
+        getGif(tag);
+        updatePoints();
+        });
+      }
+}
+
+async function getGif(tag){
+    const data = await fetch('https://api.giphy.com/v1/gifs/random?api_key=rwk4YOsjvWroRr7p4QYFtjVwtSsMtwk4&tag='+tag+'&rating=g');
+    console.log('https://api.giphy.com/v1/gifs/random?api_key=rwk4YOsjvWroRr7p4QYFtjVwtSsMtwk4&tag='+tag+'&rating=g');
+    const json = await data.json();
+    console.log(json);
+    document.getElementById("gif").setAttribute('src', json.data.fixed_height_downsampled_url);
+}
+
+function disableAnswers(){
+    document.getElementById('submitButton').disabled = true;
+    let cards = document.querySelectorAll('.demo-card-square');
+    var j = 0;
+    cards.forEach((card) => {
+        card.removeEventListener('click', handlers[j]);
+        card.childNodes[0].classList.add("disabled");
+        j++;
+    });
 }
 
 
