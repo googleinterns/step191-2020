@@ -83,14 +83,32 @@
         <div id="controlPanel">
 
           <div id="gameInfo">
-            <div id="jsGameInstanceId"></div>
-            <div id="jsNumberOfStudents"></div>
             <div id="jsGameDetails">
               <div id="jsGameId"></div>
               <div id="jsGameTitle"></div>
               <div id="jsNumberOfQuestionsOfGame"></div>
             </div>
           </div>
+          <table id="gameInfo" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+            <tbody>
+              <tr>
+                <td id="jsGameInstanceIdStr"></td>
+                <td id="jsGameInstanceId"></td>
+              </tr>
+              <tr>
+                <td id="jsNumberOfStudentsStr"></td>
+                <td id="jsNumberOfStudents"></td>
+              </tr>
+
+              <tr>
+                <div id="jsGameDetails">
+                  <div id="jsGameId"></div>
+                  <div id="jsGameTitle"></div>
+                  <div id="jsNumberOfQuestionsOfGame"></div>
+                </div>
+              </tr>
+            </tbody>
+          </table>
 
           <div id="questionInfo">
             <div id="jsActiveQuestionNumber"></div>

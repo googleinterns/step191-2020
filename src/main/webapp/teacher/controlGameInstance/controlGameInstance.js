@@ -139,8 +139,12 @@ function buildActiveGameInstanceUI({ gameInstanceId, gameInstance, game} = {}) {
 
 // Adds the GameInstance's ID to the UI
 function addGameInstanceIdToUI(gameInstanceId) {
+  const gameInstanceIdStrElement = document.getElementById("jsGameInstanceIdStr");
+  gameInstanceIdStrElement.innerText = "Game Instace's Id";
+
   const gameInstanceIdElement = document.getElementById("jsGameInstanceId");
-  gameInstanceIdElement.innerText = "This gameInstance's ID is: " + gameInstanceId;
+  gameInstanceIdElement.innerText = gameInstanceId;
+
 }
 
 // Adds the Game's details to the UI
@@ -172,15 +176,15 @@ function initGameInstanceListener(gameInstanceId) {
 
     // TODO: this should be initiated once the game is started, not before...
     // Or detect when its not a change of activeQuestion so that we dont have to update everything when someone just joins
+    if (gameInstanceUpdate.isActive) {
+      updateCurrentQuestion({ gameId: gameInstanceUpdate.gameId, currentQuestionId: gameInstanceUpdate.currentQuestion, isCurrentQuestionActive: gameInstanceUpdate.currentQuestionActive });
 
-    updateCurrentQuestion({ gameId: gameInstanceUpdate.gameId, currentQuestionId: gameInstanceUpdate.currentQuestion, isCurrentQuestionActive: gameInstanceUpdate.currentQuestionActive });
+      // The listener to the question stats is initiated
+      initQuestionStatsListener({ gameInstanceId, currentQuestionId: gameInstanceUpdate.currentQuestion });
 
-    // The listener to the question stats is initiated
-    initQuestionStatsListener({ gameInstanceId, currentQuestionId: gameInstanceUpdate.currentQuestion });
-
-    // The listener to the question answers is initiated
-    initQuestionAnswerStatsListener({ gameInstanceId, currentQuestionId: gameInstanceUpdate.currentQuestion });
-
+      // The listener to the question answers is initiated
+      initQuestionAnswerStatsListener({ gameInstanceId, currentQuestionId: gameInstanceUpdate.currentQuestion });
+    }
     // Show the updated number of members in UI
     updateNumberOfMembersUI(gameInstanceUpdate.numberOfMembers);
   });
@@ -293,8 +297,12 @@ function updateCurrentQuestionAnswerStatsHistory({ updatedAnswer, answerId, ques
 
 // Update the number of students in game in UI
 function updateNumberOfMembersUI(numberOfMembers) {
+  const numberOfMembersStrElement = document.getElementById("jsNumberOfStudentsStr");
+  numberOfMembersStrElement.innerText = "Students" ;
+
   const numberOfMembersElement = document.getElementById("jsNumberOfStudents");
-  numberOfMembersElement.innerText = "There are " + numberOfMembers + " students registered in your room.";
+  numberOfMembersElement.innerText = numberOfMembers ;
+
 }
 
 // Listen to the current question's stats for any change
@@ -344,11 +352,6 @@ function updateCurrentQuestionStatsInHistory({ updatedQuestionStats, currentQues
   numberWrongQuestionAnswersHistoryElement.innerText = 'Number of wrong anwers: ' + updatedQuestionStats.numberWrong;
 }
 
-// Show the updated number of members in UI
-function updateNumberOfMembersUI(numberOfMembers) {
-  const numberOfMembersElement = document.getElementById("jsNumberOfStudents");
-  numberOfMembersElement.innerText = "There are " + numberOfMembers + " students registered in your room.";
-}
 
 // Inits the control buttons for the teacher to control the game
 function initUIControlButtons(gameInstanceId) {
