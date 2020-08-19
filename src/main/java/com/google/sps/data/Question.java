@@ -84,8 +84,8 @@ public class Question {
     Map<String, Object> questionData = new HashMap<>();
     questionData.put("title", this.getTitle());
     questionData.put("isMC", this.getIsMC());
-    questionData.put("previousQuestion", this.getPrevId());
-    questionData.put("nextQuestion", this.getNextId());
+    questionData.put("previousQuestion", (this.getPrevId() == "null" ? null : this.getPrevId()));
+    questionData.put("nextQuestion", (this.getNextId() == "null" ? null : this.getNextId()));
     return questionData;
   }
 
