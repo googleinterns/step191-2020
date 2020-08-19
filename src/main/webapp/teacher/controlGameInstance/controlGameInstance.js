@@ -216,7 +216,7 @@ function queryCurrentQuestion({ gameId, currentQuestionId }) {
 
 // Init the listener to a change in the current question's answers
 function initQuestionAnswerStatsListener({ gameInstanceId, currentQuestionId } = {}) {
-  if (unsubscribeCurrentActiveQuestionAnswersInGameInstance != null) {
+  if (unsubscribeCurrentActiveQuestionAnswersInGameInstance) {
     // This helps remove unnecesary listeners to an answers' collection
     unsubscribeCurrentActiveQuestionAnswersInGameInstance();
 
@@ -288,6 +288,8 @@ function updateCurrentQuestionAnswerStatsHistory({ updatedAnswer, answerId, ques
 
   if (updatedAnswer.correct) {
     answerInQuestionStatsDivElement.innerText += ' (Correct answer)';
+  } else {
+    answerInQuestionStatsDivElement.innerText += ' (Wrong answer)';
   }
 }
 
@@ -538,9 +540,9 @@ function addAnswerToStudentStats({ studentId, questionId, answer } = {}) {
   const questionAnswerDivElement = document.createElement('div');
 
   if (answer.correct) {
-    questionAnswerDivElement.innerText = 'Correctly answered';
+    questionAnswerDivElement.innerText = 'Correctly answered, chose: "' + answer.chosen + '"';
   } else {
-    questionAnswerDivElement.innerText = 'Incorrect answer, chose: ' + answer.chosen;
+    questionAnswerDivElement.innerText = 'Incorrect answer, chose: "' + answer.chosen + '"';
   }
   
   studentAnswerDivElement.appendChild(questionIdDivElement);
