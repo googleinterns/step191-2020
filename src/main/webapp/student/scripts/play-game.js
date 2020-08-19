@@ -114,6 +114,7 @@ function initGameInstanceListener(gameInstanceId) {
     if(gameInstanceUpdate.isFinished) {
         finishGame();
         updatePoints();
+        displayResultsTable();
         return;
     }
 
@@ -329,6 +330,55 @@ function finishGame() {
     questionElement.innerHTML = '';
     quizElement.innerHTML = '';
     document.getElementById('submitButton').disabled = true;
+}
+
+function displayResultsTable() {
+    const resultsTable = document.getElementById("resultsTable");
+    const table = document.createElement('table');
+    createTable(table);
+    createHeaders(table);
+    const tbody = document.createElement('tbody');
+    db.collection("gameInstance").doc(gameInstanceId).collection("students").get().then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+            createElementTable(tbody, doc.id, doc.data().points);
+            console.log(doc.id, " => ", doc.data().points);
+        });
+    });
+    table.appendChild(tbody);
+    resultsTable.appendChild(table);
+}
+
+function createTable(table) {
+    table.classList.add("mdl-data-table")
+    table.classList.add("mdl-js-data-table")
+    table.classList.add("mdl-data-table--selectable")
+    table.classList.add("mdl-shadow--2dp")
+}
+
+function createHeaders(table) {
+    const thead = document.createElement('thead');
+    const tr = document.createElement('tr');
+    const th = document.createElement('th')
+    th.classList.add('mdl-data-table__cell--non-numeric');
+    th.innerText = "Student Id";
+    tr.appendChild(th);
+    const scoreth = document.createElement('th');
+    scoreth.innerText='Score';
+    tr.appendChild(scoreth);
+    thead.appendChild(tr);
+    table.appendChild(thead);
+}
+
+function createElementTable(tbody, id, score) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.classList.add('mdl-data-table__cell--non-numeric');
+    td.innerText = id;
+    tr.appendChild(td);
+    const scoretd = document.createElement('td');
+    scoretd.innerText = score; 
+    tr.appendChild(scoretd);
+    tbody.append(tr);
 }
 
 initAuthStateObserver();

@@ -66,3 +66,9 @@
 .false {
     color: #DB4437;
 }
+
+#resultsTable {
+    text-align: center;
+    display: inline-flex;
+    margin-top: 50px;
+}
