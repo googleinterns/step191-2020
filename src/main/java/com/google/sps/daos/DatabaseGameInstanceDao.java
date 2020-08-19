@@ -22,7 +22,7 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
     this.firestoreDb = firestoreDb;
     this.firebaseAuth = firebaseAuth;
   }
-  
+
   @Override
   public String createNewGameInstance(String idToken, String gameId) {
     DocumentReference newGameInstanceRef = firestoreDb.collection("gameInstance").document();
@@ -42,8 +42,9 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
     newGameInstance.setCreator(userId);
     newGameInstance.setGameId(gameId);
     newGameInstance.setNumberOfMembers(0);
+    newGameInstance.setId(newGameInstanceRef.getId());
 
-    //Post to db
+    // Post to db
     newGameInstanceRef.set(newGameInstance);
 
     // Update the User's entry with game he just started
@@ -52,21 +53,20 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
     return newGameInstanceRef.getId();
   }
 
-
   @Override
   public GameInstance getGameInstance(String gameInstanceId) {
     DocumentReference docRef = firestoreDb.collection("gameInstance").document(gameInstanceId);
     ApiFuture<DocumentSnapshot> future = docRef.get();
     GameInstance gameInstance = new GameInstance();
     try {
-        DocumentSnapshot document = future.get();
-        gameInstance = document.toObject(GameInstance.class);
+      DocumentSnapshot document = future.get();
+      gameInstance = document.toObject(GameInstance.class);
 
-        //Id is not a field in the db document so we add it manually
-        gameInstance.setId(document.getId());
+      // Id is not a field in the db document so we add it manually
+      gameInstance.setId(document.getId());
 
-    } catch(Exception e) {
-        System.out.println(e);
+    } catch (Exception e) {
+      System.out.println(e);
     }
     return gameInstance;
   }
@@ -78,10 +78,11 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
 
   @Override
   public boolean getAnswer(String gameInstance, String student) {
-    //To get current question  
+    // To get current question
     GameInstance actualInstance = this.getGameInstance(gameInstance);
     DocumentReference gameInstanceDocRef = firestoreDb.collection("gameInstance").document(gameInstance);
-    DocumentReference answerInStudentDocRef = gameInstanceDocRef.collection("students").document(student).collection("questions").document(actualInstance.getCurrentQuestion());
+    DocumentReference answerInStudentDocRef = gameInstanceDocRef.collection("students").document(student)
+        .collection("questions").document(actualInstance.getCurrentQuestion());
     ApiFuture<DocumentSnapshot> questionAnswerFuture = answerInStudentDocRef.get();
     try {
       DocumentSnapshot document = questionAnswerFuture.get();
@@ -90,8 +91,8 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    
-  return false;
+
+    return false;
   }
 
 }
