@@ -10,7 +10,7 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
-
+import com.google.sps.data.Game;
 import com.google.sps.data.GameInstance;
 
 public class DatabaseGameInstanceDao implements GameInstanceDao {
@@ -51,6 +51,16 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
     firestoreDb.collection("users").document(userId).update("activeGameInstanceId", newGameInstanceRef.getId());
 
     return newGameInstanceRef.getId();
+  }
+
+  private void initQuestionsInGameInstance() {
+    // first we need to query the game questions
+
+    // Need to get the game that is being used in the gameInstance
+    // Game game = theGame
+
+    // Then add the subcollection for the gameInstance with all the questions to be answered
+
   }
 
   @Override
