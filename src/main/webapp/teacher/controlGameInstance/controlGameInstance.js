@@ -294,12 +294,17 @@ function initQuestionStatsListener({ gameInstanceId, currentQuestionId } = {}) {
     unsubscribeCurrentActiveQuestionInGameInstance();
   }
   unsubscribeCurrentActiveQuestionInGameInstance = db.collection('gameInstance').doc(gameInstanceId).collection('questions').doc(currentQuestionId).onSnapshot(function (doc) {
-    // Update the current question's stats in the "Active" main panel of UI
-    updateCurrentQuestionStats(doc.data());
-
-    // Update the current question's stats in history section of UI
-    updateCurrentQuestionStatsInHistory({ updatedQuestionStats: doc.data(), currentQuestionId })
+    updateQuestionStatsHelper({ updatedQuestionStats: doc.data(), currentQuestionId });
   });
+}
+
+// When there is an update in a question's stats the update must be reflected on the active panel and the question's history section
+function updateQuestionStatsHelper({ updatedQuestionStats, currentQuestionId } = {}) {
+  // Update the current question's stats in the "Active" main panel of UI
+  updateCurrentQuestionStats(updatedQuestionStats);
+
+  // Update the current question's stats in history section of UI
+  updateCurrentQuestionStatsInHistory({ updatedQuestionStats, currentQuestionId });
 }
 
 // Update the current question's stats in the "Active" main panel of UI
