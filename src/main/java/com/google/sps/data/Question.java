@@ -1,6 +1,5 @@
 package com.google.sps.data;
 
-import com.google.sps.data.Answer;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +63,7 @@ public class Question {
     return this.answers;  
   }
 
-  public void setAnswers(List<Answer> answer) {
+  public void setAnswers(List<Answer> answers) {
     this.answers = answers;
   }
 
