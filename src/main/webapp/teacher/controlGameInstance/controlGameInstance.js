@@ -17,6 +17,10 @@
 
 const db = firebase.firestore();
 
+// Variables to identify the change when receiving an update of the game Instance 
+let numberOfMembersInGameInstance = null;
+let currentQuestionId = null;
+
 // These variables will help in detaching listeners to documents we no longer need to listen to in Firestore
 let unsubscribeCurrentActiveQuestionInGameInstance = null;
 let unsubscribeCurrentActiveQuestionAnswersInGameInstance = null;
@@ -169,18 +173,24 @@ function initGameInstanceListener(gameInstanceId) {
     const gameInstanceUpdate = doc.data();
 
     // TODO: this should be initiated once the game is started, not before...
-    // Or detect when its not a change of activeQuestion so that we dont have to update everything when someone just joins
 
-    updateCurrentQuestion({ gameId: gameInstanceUpdate.gameId, currentQuestionId: gameInstanceUpdate.currentQuestion, isCurrentQuestionActive: gameInstanceUpdate.currentQuestionActive });
+    // If currentQuestionId is different from what we have in memory it means it has changed and we must update UI
+    if (currentQuestionId != gameInstanceUpdate.currentQuestion) {
+      updateCurrentQuestion({ gameId: gameInstanceUpdate.gameId, currentQuestionId: gameInstanceUpdate.currentQuestion, isCurrentQuestionActive: gameInstanceUpdate.currentQuestionActive });
 
-    // The listener to the question stats is initiated
-    initQuestionStatsListener({ gameInstanceId, currentQuestionId: gameInstanceUpdate.currentQuestion });
+      // The listener to the question stats is initiated
+      initQuestionStatsListener({ gameInstanceId, currentQuestionId: gameInstanceUpdate.currentQuestion });
 
-    // The listener to the question answers is initiated
-    initQuestionAnswerStatsListener({ gameInstanceId, currentQuestionId: gameInstanceUpdate.currentQuestion });
+      // The listener to the question answers is initiated
+      initQuestionAnswerStatsListener({ gameInstanceId, currentQuestionId: gameInstanceUpdate.currentQuestion });
+    }
 
-    // Show the updated number of members in UI
-    updateNumberOfMembersUI(gameInstanceUpdate.numberOfMembers);
+    // If numberOfMembersInGameInstance is different from what we have in memory it means it has changed and we must update UI
+    if (numberOfMembersInGameInstance != gameInstanceUpdate.numberOfMembers) {
+      // Show the updated number of members in UI
+      updateNumberOfMembersUI(gameInstanceUpdate.numberOfMembers);
+    }
+    
   });
 }
 
@@ -279,7 +289,7 @@ function updateNumberOfMembersUI(numberOfMembers) {
 
 // Listen to the current question's stats for any change
 function initQuestionStatsListener({ gameInstanceId, currentQuestionId } = {}) {
-  if (unsubscribeCurrentActiveQuestionInGameInstance != null) {
+  if (unsubscribeCurrentActiveQuestionInGameInstance) {
     // This is to stop listening to live changes to the previous question which is not active anymore
     unsubscribeCurrentActiveQuestionInGameInstance();
   }
@@ -324,12 +334,6 @@ function updateCurrentQuestionStatsInHistory({ updatedQuestionStats, currentQues
   numberWrongQuestionAnswersHistoryElement.innerText = 'Number of wrong anwers: ' + updatedQuestionStats.numberWrong;
 }
 
-// Show the updated number of members in UI
-function updateNumberOfMembersUI(numberOfMembers) {
-  const numberOfMembersElement = document.getElementById("jsNumberOfStudents");
-  numberOfMembersElement.innerText = "There are " + numberOfMembers + " students registered in your room.";
-}
-
 // Inits the control buttons for the teacher to control the game
 function initUIControlButtons(gameInstanceId) {
   const startGameInstanceButtonElement = document.getElementById('startGameInstanceButton');
@@ -361,7 +365,6 @@ function initUIControlButtons(gameInstanceId) {
   });
 }
 
-// Probably should do this following the Linked List instead of querySnapshot.forEach
 // Get all questions in the "questions" collection in the gameInstance
 function buildQuestionHistory(gameInstanceId) {
   const questionInGameInstanceCollectionRef = db.collection('gameInstance').doc(gameInstanceId).collection('questions');
