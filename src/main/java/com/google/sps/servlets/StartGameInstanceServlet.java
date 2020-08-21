@@ -59,6 +59,7 @@ public class StartGameInstanceServlet extends HttpServlet {
 
     // Activate room
     newRoom.setIsActive(true);
+    newRoom.setIsFinished(false);
 
 
     dao.updateGameInstance(newRoom);

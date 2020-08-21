@@ -85,6 +85,7 @@ public final class EndGameInstanceServletTest {
     verify(mockGameInstanceDao).getGameInstance(roomId);
     verify(mockGameInstanceDao).updateGameInstance(varArgs.capture());
     Assert.assertEquals(false, newRoom.getIsActive());
+    Assert.assertEquals(true, newRoom.getIsFinished());
     Assert.assertEquals(null, newRoom.getCurrentQuestion());
 
   }
