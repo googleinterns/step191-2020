@@ -9,6 +9,11 @@ public class Answer {
   public Answer () {
   }
 
+  public Answer( String title, boolean correct) {
+    this.title = title;
+    this.correct = correct;
+  }
+
   public Answer( String title, boolean correct, String id) {
     this.title = title;
     this.correct = correct;
