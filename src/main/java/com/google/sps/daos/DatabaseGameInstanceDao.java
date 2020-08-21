@@ -1,7 +1,9 @@
 package com.google.sps.daos;
 
-import com.google.api.core.ApiFuture;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.SetOptions;
@@ -10,8 +12,10 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
+import com.google.sps.data.Answer;
 import com.google.sps.data.Game;
 import com.google.sps.data.GameInstance;
+import com.google.sps.data.Question;
 
 public class DatabaseGameInstanceDao implements GameInstanceDao {
 
@@ -24,7 +28,7 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
   }
 
   @Override
-  public String createNewGameInstance(String idToken, String gameId) {
+  public String createNewGameInstance(String idToken, String gameId, Game game) {
     DocumentReference newGameInstanceRef = firestoreDb.collection("gameInstance").document();
 
     FirebaseToken decodedToken = null;
@@ -38,14 +42,50 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
       e.printStackTrace();
     }
 
-    GameInstance newGameInstance = new GameInstance();
-    newGameInstance.setCreator(userId);
-    newGameInstance.setGameId(gameId);
-    newGameInstance.setNumberOfMembers(0);
-    newGameInstance.setId(newGameInstanceRef.getId());
+    // I'm gonna do it manually for now
+
+    // GameInstance newGameInstance = new GameInstance();
+    // newGameInstance.setCreator(userId);
+    // newGameInstance.setGameId(gameId);
+    // newGameInstance.setNumberOfMembers(0);
+    // newGameInstance.setId(newGameInstanceRef.getId());
+
+    Map<String, Object> gameInstanceData = new HashMap<String, Object>();
+    gameInstanceData.put("creator", userId);
+    gameInstanceData.put("currentQuestion", null);
+    gameInstanceData.put("currentQuestionActive", false);
+    gameInstanceData.put("gameId", gameId);
+    gameInstanceData.put("id", newGameInstanceRef.getId());
+    gameInstanceData.put("isActive", false);
+    gameInstanceData.put("numberOfMembers", 0);
 
     // Post to db
-    newGameInstanceRef.set(newGameInstance);
+    newGameInstanceRef.set(gameInstanceData);
+
+    // Now post 
+    for (Question question: game.questions()) {
+      DocumentReference questionDocRef = newGameInstanceRef.collection("questions").document(question.getId());
+      
+      Map<String, Object> questionData = new HashMap<String, Object>();
+      questionData.put("numberAnswered", 0);
+      questionData.put("numberCorrect", 0);
+      questionData.put("numberWrong", 0);
+      questionData.put("title", question.getTitle());
+
+      questionDocRef.set(questionData);
+
+      for (Answer answer: question.getAnswers()) {
+        DocumentReference answerDocRef = questionDocRef.collection("answers").document(answer.getId());
+        
+        Map<String, Object> answerData = new HashMap<String, Object>();
+        answerData.put("correct", answer.isCorrect());
+        answerData.put("numberAnswers", 0);
+        answerData.put("title", answer.getTitle());
+
+        answerDocRef.set(answerData);
+      }
+
+    }
 
     // Update the User's entry with game he just started
     firestoreDb.collection("users").document(userId).update("activeGameInstanceId", newGameInstanceRef.getId());
@@ -53,15 +93,6 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
     return newGameInstanceRef.getId();
   }
 
-  private void initQuestionsInGameInstance() {
-    // first we need to query the game questions
-
-    // Need to get the game that is being used in the gameInstance
-    // Game game = theGame
-
-    // Then add the subcollection for the gameInstance with all the questions to be answered
-
-  }
 
   @Override
   public GameInstance getGameInstance(String gameInstanceId) {

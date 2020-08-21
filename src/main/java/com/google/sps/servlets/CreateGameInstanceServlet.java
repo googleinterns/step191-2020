@@ -10,7 +10,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.sps.daos.GameDao;
 import com.google.sps.daos.GameInstanceDao;
+import com.google.sps.data.Game;
 
 @WebServlet("/newGameInstance")
 public class CreateGameInstanceServlet extends HttpServlet {
@@ -19,9 +21,13 @@ public class CreateGameInstanceServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     JsonObject jsonObj = new Gson().fromJson(request.getReader(), JsonObject.class);
 
-    GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
+    GameDao gameDao = (GameDao) this.getServletContext().getAttribute("gameDao");
 
-    String newGameInstanceId = dao.createNewGameInstance(jsonObj.get("idToken").getAsString(), jsonObj.get("gameId").getAsString());
+    Game game = gameDao.getGame(jsonObj.get("gameId").getAsString());
+
+    GameInstanceDao gameInstanceDao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
+
+    String newGameInstanceId = gameInstanceDao.createNewGameInstance(jsonObj.get("idToken").getAsString(), jsonObj.get("gameId").getAsString(), game);
 
     // Convert the newGameInstanceId to JSON
     String json = convertToJson(newGameInstanceId);
