@@ -230,16 +230,45 @@ function initQuestionAnswerStatsListener({ gameInstanceId, currentQuestionId } =
   if (unsubscribeCurrentActiveQuestionAnswersInGameInstance) {
     // This helps remove unnecesary listeners to an answers' collection
     unsubscribeCurrentActiveQuestionAnswersInGameInstance();
+
+    // Clean the answers' div
+    clearCurrentQuestionAnswersDiv();
   }
   unsubscribeCurrentActiveQuestionAnswersInGameInstance = db.collection('gameInstance').doc(gameInstanceId).collection('questions').doc(currentQuestionId).collection('answers')
   .onSnapshot(function(querySnapshot) {
-    // Clean the answers' div
-    clearCurrentQuestionAnswersDiv();
+    querySnapshot.docChanges().forEach(function(change) {
+      if (change.type === "added") {
+        // Add the answer to the active panel UI
+        addCurrentQuestionAnswerStats({ answer: change.doc.data(), answerId: change.doc.id, questionId: currentQuestionId });
+      }
 
-    querySnapshot.forEach(function(doc) {
-      updateQuestionAnswerStatsHelper({ updatedAnswer: doc.data(), answerId: doc.id, questionId: currentQuestionId });
+      if (change.type === "modified") {
+        updateQuestionAnswerStatsHelper({ updatedAnswer: doc.data(), answerId: doc.id, questionId: currentQuestionId });
+      }
+     
     });
   });
+}
+
+// Clear the current question's answers in UI
+function clearCurrentQuestionAnswersDiv() {
+  const currentQuestionAnswersDivElement = document.getElementById('jsCurrentQuestionAnswers');
+  currentQuestionAnswersDivElement.innerText = '';
+}
+
+// Add the answer to the active panel UI
+function addCurrentQuestionAnswerStats ({ answer, answerId, questionId } = {}) {
+  const currentQuestionAnswersDivElement = document.getElementById('jsCurrentQuestionAnswers');
+  
+  const answerElement = document.createElement('div');
+  answerElement.id = 'currentQuestion-' + questionId + '-' + answerId;
+  answerElement.innerText = answer.title + ' with ' + answer.numberAnswers + ' answers.';
+  
+  if (answer.correct) {
+    answerElement.innerText += ' (Correct answer)';
+  }
+
+  currentQuestionAnswersDivElement.appendChild(answerElement);
 }
 
 // When there is an update in a question's answer's stats the update must be reflected on the active panel and the question's history section
@@ -251,24 +280,15 @@ function updateQuestionAnswerStatsHelper({ updatedAnswer, answerId, questionId }
   updateCurrentQuestionAnswerStatsHistory(updatedAnswer, answerId, questionId);
 }
 
-// Clear the current question's answers in UI
-function clearCurrentQuestionAnswersDiv() {
-  const currentQuestionAnswersDivElement = document.getElementById('jsCurrentQuestionAnswers');
-  currentQuestionAnswersDivElement.innerText = '';
-}
-
 // Update the current question's answer's stats in the main panel
-function updateCurrentQuestionAnswerStats(updatedAnswer) {
-  const currentQuestionAnswersDivElement = document.getElementById('jsCurrentQuestionAnswers');
-  
-  const answerElement = document.createElement('div');
+function updateCurrentQuestionAnswerStats({ updatedAnswer, answerId, questionId } = {}) {
+  const answerElement = document.getElementById('currentQuestion-' + questionId + '-' + answerId);
   answerElement.innerText = updatedAnswer.title + ' with ' + updatedAnswer.numberAnswers + ' answers.';
   
   if (updatedAnswer.correct) {
     answerElement.innerText += ' (Correct answer)';
   }
 
-  currentQuestionAnswersDivElement.appendChild(answerElement);
 }
 
 // Update a question's stats in the history section
@@ -297,7 +317,7 @@ function updateNumberOfMembersUI(numberOfMembers) {
 
 // Listen to the current question's stats for any change
 function initQuestionStatsListener({ gameInstanceId, currentQuestionId } = {}) {
-  if (unsubscribeCurrentActiveQuestionInGameInstance) {
+  if (unsubscribeCurrentActiveQuestionInGameInstance != null) {
     // This is to stop listening to live changes to the previous question which is not active anymore
     unsubscribeCurrentActiveQuestionInGameInstance();
   }
@@ -306,7 +326,6 @@ function initQuestionStatsListener({ gameInstanceId, currentQuestionId } = {}) {
   });
 }
 
-// When there is an update in a question's stats the update must be reflected on the active panel and the question's history section
 function updateQuestionStatsHelper({ updatedQuestionStats, currentQuestionId } = {}) {
   // Update the current question's stats in the "Active" main panel of UI
   updateCurrentQuestionStats(updatedQuestionStats);

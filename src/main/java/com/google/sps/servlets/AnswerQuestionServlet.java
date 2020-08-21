@@ -20,6 +20,7 @@ import com.google.sps.data.GameInstance;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -75,7 +76,11 @@ public class AnswerQuestionServlet extends HttpServlet {
 
     String questionId = jsonObj.get("questionId").getAsString();
 
+    String questionTitle = jsonObj.get("questionTitle").getAsString();
+
     String answerId = jsonObj.get("answerId").getAsString();
+
+    String answerTitle = jsonObj.get("answerTitle").getAsString();
 
     Firestore firestoreDb = (Firestore) this.getServletContext().getAttribute("firestoreDb");
 
@@ -98,23 +103,25 @@ public class AnswerQuestionServlet extends HttpServlet {
       System.out.println("STUDENT DIDN'T ANSWER");
       isAnswerCorrect = false;
     } else {
-      String correctAnswerId = getCorrectAnswer(questionId, questionDocRef);
-      isAnswerCorrect = answerId.equals(correctAnswerId);
+      List<String> correctAnswerId = getCorrectAnswers(questionId, questionDocRef);
+      isAnswerCorrect = correctAnswerId.contains(answerId);
     }
 
     DocumentReference answerInStudentDocRef = gameInstanceDocRef.collection("students").document(userId)
         .collection("questions").document(questionId);
 
     // Store the answer in the user's profile if it does not exist
-    boolean answerNotExists = registerAnswerInStudentAnswers(answerInStudentDocRef, isAnswerCorrect);
+    boolean answerNotExists = registerAnswerInStudentAnswers(answerInStudentDocRef, isAnswerCorrect, questionTitle,
+        answerTitle);
 
     if (answerNotExists) {
       if (isAnswerCorrect) {
         System.out.println("The answer is correct, adding points");
-        addPoints(userId, gameInstanceDocRef, firestoreDb);
       } else {
         System.out.println("The answer is incorrect");
       }
+
+      updateStudentStats(isAnswerCorrect, userId, gameInstanceDocRef, firestoreDb);
 
       DocumentReference questionInGameInstanceDocRef = gameInstanceDocRef.collection("questions").document(questionId);
 
@@ -186,9 +193,9 @@ public class AnswerQuestionServlet extends HttpServlet {
   }
 
   // Right now it only takes one single correct answer
-  private String getCorrectAnswer(String questionId, DocumentReference questionDocRef) {
+  private List<String> getCorrectAnswers(String questionId, DocumentReference questionDocRef) {
 
-    String correctAnswerId = null;
+    List<String> correctAnswerId = new ArrayList<>();
 
     ApiFuture<QuerySnapshot> future = questionDocRef.collection("answers").whereEqualTo("correct", true).get();
 
@@ -196,7 +203,7 @@ public class AnswerQuestionServlet extends HttpServlet {
     try {
       documents = future.get().getDocuments();
       for (DocumentSnapshot document : documents) {
-        correctAnswerId = document.getId();
+        correctAnswerId.add(document.getId());
       }
     } catch (InterruptedException e) {
       // TODO Auto-generated catch block
@@ -209,21 +216,36 @@ public class AnswerQuestionServlet extends HttpServlet {
     return correctAnswerId;
   }
 
-  private void addPoints(String userId, DocumentReference gameInstanceDocRef, Firestore firestoreDb) {
+  private void updateStudentStats(boolean isAnswerCorrect, String userId, DocumentReference gameInstanceDocRef,
+      Firestore firestoreDb) {
     DocumentReference userInGameInstanceDocRef = gameInstanceDocRef.collection("students").document(userId);
 
     firestoreDb.runTransaction(transaction -> {
-      // retrieve document and increment population field
       DocumentSnapshot snapshot = transaction.get(userInGameInstanceDocRef).get();
-      long oldPoints = snapshot.getLong("points");
-      transaction.update(userInGameInstanceDocRef, "points", oldPoints + 10);
+
+      long oldNumberAnswered = snapshot.getLong("numberAnswered");
+      transaction.update(userInGameInstanceDocRef, "numberAnswered", oldNumberAnswered + 1);
+
+      if (isAnswerCorrect) {
+
+        long oldNumberCorrect = snapshot.getLong("numberCorrect");
+        transaction.update(userInGameInstanceDocRef, "numberCorrect", oldNumberCorrect + 1);
+
+        long oldPoints = snapshot.getLong("points");
+        transaction.update(userInGameInstanceDocRef, "points", oldPoints + 10);
+      } else {
+        long oldNumberWrong = snapshot.getLong("numberWrong");
+        transaction.update(userInGameInstanceDocRef, "numberWrong", oldNumberWrong + 1);
+      }
+
       return null;
     });
 
   }
 
   // Returns true if answer had not been aswered yet, else returns false
-  private boolean registerAnswerInStudentAnswers(DocumentReference questionDocRef, boolean isCorrect) {
+  private boolean registerAnswerInStudentAnswers(DocumentReference questionDocRef, boolean isCorrect,
+      String questionTitle, String chosenAnswerTitle) {
     ApiFuture<DocumentSnapshot> questionAnswerFuture = questionDocRef.get();
 
     try {
@@ -231,6 +253,8 @@ public class AnswerQuestionServlet extends HttpServlet {
       if (!document.exists()) {
         Map<String, Object> docData = new HashMap<>();
         docData.put("correct", isCorrect);
+        docData.put("chosen", chosenAnswerTitle);
+        docData.put("title", questionTitle);
         questionDocRef.set(docData);
         return true;
       }

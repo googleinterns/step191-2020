@@ -26,6 +26,8 @@ let submited = false;
 let isFinished = false;
 let isCorrect = null;
 let studentId = null;
+let currentQuestionTitle = null;
+let selectedAnswerTitle = null;
 
 // Is triggered when the User logs in or logs out
 function initAuthStateObserver() {
@@ -156,7 +158,9 @@ function initSubmitButton(gameInstanceId, gameId) {
           gameInstanceId: gameInstanceId, 
           gameId: gameId,
           questionId: currentQuestionId,
-          answerId: selectedAnswerId
+          questionTitle: currentQuestionTitle,
+          answerId: selectedAnswerId,
+          answerTitle: selectedAnswerTitle
         })
       }).then(() => {
         submited = true;
@@ -216,6 +220,7 @@ function queryCurrentQuestion(currentQuestionDocRef) {
 
 // Add the question title to the UI
 function createQuestionObject(title) {
+  currentQuestionTitle = title;
   document.getElementById("question").innerText = title;
 }
 
@@ -260,6 +265,8 @@ function createAnswer(quiz, multipleDiv, doc, i){
           }
           selectedAnswerId = doc.id;
           titleDiv.classList.toggle("selected");
+          selectedAnswerTitle = doc.data().title;
+          console.log(selectedAnswerTitle);
       })
       titleDiv.classList.add("mdl-card__title");
       titleDiv.classList.add("mdl-card--expand");
