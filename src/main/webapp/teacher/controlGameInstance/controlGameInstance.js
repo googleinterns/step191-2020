@@ -16,6 +16,9 @@
 'use strict';
 
 const db = firebase.firestore();
+let questionStarted = false;
+let gameStarted = false;
+let gInstanceId;
 
 // These variables will help in detaching listeners to documents we no longer need to listen to in Firestore
 let unsubscribeCurrentActiveQuestionInGameInstance = null;
@@ -99,6 +102,7 @@ function getActiveGameInstanceId(user) {
 
 // Queries and returns the gameInstance object from the "GameInstance" collections of DB
 function queryActiveGameInstance(gameInstanceId) {
+  gInstanceId = gameInstanceId;
   return db.collection("gameInstance").doc(gameInstanceId).get().then(function(doc) {
     if (doc.exists) {
       return doc.data();
@@ -139,12 +143,8 @@ function buildActiveGameInstanceUI({ gameInstanceId, gameInstance, game} = {}) {
 
 // Adds the GameInstance's ID to the UI
 function addGameInstanceIdToUI(gameInstanceId) {
-  const gameInstanceIdStrElement = document.getElementById("jsGameInstanceIdStr");
-  gameInstanceIdStrElement.innerText = "Game Instace's Id";
-
   const gameInstanceIdElement = document.getElementById("jsGameInstanceId");
-  gameInstanceIdElement.innerText = gameInstanceId;
-
+  gameInstanceIdElement.innerText = "This gameInstance's ID is: " + gameInstanceId;
 }
 
 // Adds the Game's details to the UI
@@ -220,7 +220,7 @@ function queryCurrentQuestion({ gameId, currentQuestionId }) {
 
 // Init the listener to a change in the current question's answers
 function initQuestionAnswerStatsListener({ gameInstanceId, currentQuestionId } = {}) {
-  if (unsubscribeCurrentActiveQuestionAnswersInGameInstance != null) {
+  if (unsubscribeCurrentActiveQuestionAnswersInGameInstance) {
     // This helps remove unnecesary listeners to an answers' collection
     unsubscribeCurrentActiveQuestionAnswersInGameInstance();
 
@@ -292,17 +292,15 @@ function updateCurrentQuestionAnswerStatsHistory({ updatedAnswer, answerId, ques
 
   if (updatedAnswer.correct) {
     answerInQuestionStatsDivElement.innerText += ' (Correct answer)';
+  } else {
+    answerInQuestionStatsDivElement.innerText += ' (Wrong answer)';
   }
 }
 
 // Update the number of students in game in UI
 function updateNumberOfMembersUI(numberOfMembers) {
-  const numberOfMembersStrElement = document.getElementById("jsNumberOfStudentsStr");
-  numberOfMembersStrElement.innerText = "Students" ;
-
   const numberOfMembersElement = document.getElementById("jsNumberOfStudents");
-  numberOfMembersElement.innerText = numberOfMembers ;
-
+  numberOfMembersElement.innerText = "There are " + numberOfMembers + " students registered in your room.";
 }
 
 // Listen to the current question's stats for any change
@@ -352,35 +350,41 @@ function updateCurrentQuestionStatsInHistory({ updatedQuestionStats, currentQues
   numberWrongQuestionAnswersHistoryElement.innerText = 'Number of wrong anwers: ' + updatedQuestionStats.numberWrong;
 }
 
+// Show the updated number of members in UI
+function updateNumberOfMembersUI(numberOfMembers) {
+  const numberOfMembersElement = document.getElementById("jsNumberOfStudents");
+  numberOfMembersElement.innerText = "There are " + numberOfMembers + " students registered in your room.";
+}
 
 // Inits the control buttons for the teacher to control the game
 function initUIControlButtons(gameInstanceId) {
-  const startGameInstanceButtonElement = document.getElementById('startGameInstanceButton');
-  const nextQuestionButton = document.getElementById("nextQuestionButton");
-  const previousQuestionButton = document.getElementById("previousQuestionButton");
-  const endGameInstanceButton = document.getElementById("endGameInstanceButton");
+  const startGameInstanceButtonElement = document.getElementById('startGameButton');
+  const nextQuestionButton = document.getElementById("nextButton");
   const startQuestionButton = document.getElementById("startQuestionButton");
-  const endQuestionButton = document.getElementById("endQuestionButton");
   
   startGameInstanceButtonElement.addEventListener('click', () => {
-      fetch('/startGameInstance?gameInstance='+gameInstanceId, { method: 'POST' });
-  });
-  nextQuestionButton.addEventListener('click', () => {
-      fetch('/nextQuestion?gameInstance='+gameInstanceId, { method: 'POST' });
-  });
-  previousQuestionButton.addEventListener('click', () => {
-      fetch('/previousQuestion?gameInstance='+gameInstanceId, { method: 'POST' });
-  });
-  endGameInstanceButton.addEventListener('click', () => {
+    if (!gameStarted){
       fetch('/endGameInstance?gameInstance='+gameInstanceId, { method: 'POST' }).then(()=>{
           window.location.href = "/teacher/controlGameInstance/controlGameInstance.html";
       });
+    } else {
+      fetch('/startGameInstance?gameInstance='+gameInstanceId, { method: 'POST' });
+    }
+
+    togglePlay()
+  });
+  nextQuestionButton.addEventListener('click', () => {
+      fetch('/nextQuestion?gameInstance='+gameInstanceId, { method: 'POST' });
+      togglePlay()
   });
   startQuestionButton.addEventListener('click', () => {
-      fetch('/controlQuestion?gameInstance='+gameInstanceId+'&action=start', { method: 'POST' });
-  });
-  endQuestionButton.addEventListener('click', () => {
-      fetch('/controlQuestion?gameInstance='+gameInstanceId+'&action=end', { method: 'POST' });
+    if(gameStarted) {
+      if(!questionStarted)      
+        fetch('/controlQuestion?gameInstance='+gameInstanceId+'&action=end', { method: 'POST' });
+      else
+        fetch('/controlQuestion?gameInstance='+gameInstanceId+'&action=start', { method: 'POST' });
+      
+    }
   });
 }
 
@@ -541,9 +545,9 @@ function addAnswerToStudentStats({ studentId, questionId, answer } = {}) {
   const questionAnswerDivElement = document.createElement('div');
 
   if (answer.correct) {
-    questionAnswerDivElement.innerText = 'Correctly answered';
+    questionAnswerDivElement.innerText = 'Correctly answered, chose: "' + answer.chosen + '"';
   } else {
-    questionAnswerDivElement.innerText = 'Incorrect answer, chose: ' + answer.chosen;
+    questionAnswerDivElement.innerText = 'Incorrect answer, chose: "' + answer.chosen + '"';
   }
   
   studentAnswerDivElement.appendChild(questionIdDivElement);
@@ -557,6 +561,29 @@ function addAnswerToStudentStats({ studentId, questionId, answer } = {}) {
 function updateStudentStats({ studentId, student } = {}) {
   const studentStatsDivElement = document.getElementById('studentStats-' + studentId + '-generalStats');
   studentStatsDivElement.innerText = studentId + ': ' + student.points + ' points. ' + student.numberAnswered + ' questions answered: ' + student.numberCorrect + ' correct, ' + student.numberWrong + ' wrong.';
+}
+function togglePlay() {
+  if(gameStarted) {
+    var playIconElement = document.getElementById("playButtonIcon");
+    playIconElement.innerText = questionStarted ? "play_arrow" : "pause";
+
+    var playIconElement = document.getElementById("startStopQToolTip");
+    playIconElement.innerText = questionStarted ? "Start Question" : "Stop Question";
+
+    questionStarted = !questionStarted;
+  }
+}
+
+function toggleGame() {
+  var gameButton = document.getElementById("startGameButton");
+  if (gameStarted) {
+    gameButton.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--teal-400";
+    gameButton.innerText = "START GAME";
+  } else {
+    gameButton.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--pink-400";
+    gameButton.innerText = "STOP GAME";
+  }
+  gameStarted = !gameStarted;
 }
 
 initAuthStateObserver();
