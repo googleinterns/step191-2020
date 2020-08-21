@@ -65,6 +65,8 @@ async function loadControlPanel(user) {
 
   // Add the questions' history to the UI
   buildQuestionHistory(gameInstanceId);
+
+  buildStudentsHistory(gameInstanceId);
 }
 
 // Gets the gameInstanceId from the query string if there is
@@ -173,6 +175,7 @@ function initGameInstanceListener(gameInstanceId) {
     const gameInstanceUpdate = doc.data();
 
     // TODO: this should be initiated once the game is started, not before...
+    // Or detect when its not a change of activeQuestion so that we dont have to update everything when someone just joins
 
     // If currentQuestionId is different from what we have in memory it means it has changed and we must update UI
     if (currentQuestionId != gameInstanceUpdate.currentQuestion) {
@@ -234,13 +237,18 @@ function initQuestionAnswerStatsListener({ gameInstanceId, currentQuestionId } =
     clearCurrentQuestionAnswersDiv();
 
     querySnapshot.forEach(function(doc) {
-      // Update the current question's answers in the "Active" top panel
-      updateCurrentQuestionAnswerStats(doc.data(), doc.id);
-
-      // Update the current question's answers in the history section
-      updateCurrentQuestionAnswerStatsHistory(doc.data(), doc.id, currentQuestionId);
+      updateQuestionAnswerStatsHelper({ updatedAnswer: doc.data(), answerId: doc.id, questionId: currentQuestionId });
     });
   });
+}
+
+// When there is an update in a question's answer's stats the update must be reflected on the active panel and the question's history section
+function updateQuestionAnswerStatsHelper({ updatedAnswer, answerId, questionId } = {}) {
+  // Update the current question's answers in the "Active" top panel
+  updateCurrentQuestionAnswerStats(updatedAnswer, answerId);
+
+  // Update the current question's answers in the history section
+  updateCurrentQuestionAnswerStatsHistory(updatedAnswer, answerId, questionId);
 }
 
 // Clear the current question's answers in UI
@@ -450,6 +458,98 @@ function addQuestionAnswerToHistoryUI({ questionId, answerId, answer } = {}) {
 
   // Add the answer to its component in the DOM
   questionStatsDivElement.appendChild(answerInQuestionStatsDivElement);
+}
+
+// This is called to build the student view initially
+function buildStudentsHistory(gameInstanceId) {
+  const studentsCollectionRef = db.collection('gameInstance').doc(gameInstanceId).collection('students');
+
+  // The .onSnapshot is called when someone joins the game or answers a question
+  studentsCollectionRef.onSnapshot(function(querySnapshot) {
+    querySnapshot.docChanges().forEach(function(change) {
+
+      // If it was just added, add student to UI a
+      if (change.type === "added") {
+        initStudentHistory({ studentId: change.doc.id, student: change.doc.data(), studentsCollectionRef });
+      }
+
+      // If it was modified, a student answered a question
+      if (change.type === "modified") {
+        // Just update the stats of student
+        updateStudentStats({ studentId: change.doc.id, student: change.doc.data() });
+      }
+    });
+  });
+}
+
+// Add student data to UI and startt listening to his "questions" collection
+function initStudentHistory({ studentId, student, studentsCollectionRef } = {}) {
+  addStudentToUI({ studentId, student });
+  initStudentQuestionListener({ studentId, studentsCollectionRef });
+}
+
+// Add student general stats to UI
+function addStudentToUI({ studentId, student } = {}) {
+  const studentsStatsDivElement = document.getElementById('jsStudentStats');
+
+  const newStudentStatsDivElement = document.createElement('div');
+  newStudentStatsDivElement.id = 'studentStats-' + studentId;
+  newStudentStatsDivElement.classList.add('studentInHistory');
+
+  const studentGeneralStatsDivElement = document.createElement('div');
+  studentGeneralStatsDivElement.id = 'studentStats-' + studentId + '-generalStats';
+  studentGeneralStatsDivElement.innerText = studentId + ': ' + student.points + ' points. ' + student.numberAnswered + ' questions answered: ' + student.numberCorrect + ' correct, ' + student.numberWrong + ' wrong.';
+
+  newStudentStatsDivElement.appendChild(studentGeneralStatsDivElement);
+
+  studentsStatsDivElement.appendChild(newStudentStatsDivElement);
+}
+
+// Start listening to the student's individual answers
+function initStudentQuestionListener({ studentId, studentsCollectionRef } = {}) {
+  studentsCollectionRef.doc(studentId).collection('questions')
+  .onSnapshot(function(querySnapshot) {
+    querySnapshot.docChanges().forEach(function(change) {
+      // Only add the added answers, the past answers can't be updated
+      if (change.type === "added") {
+        // Add answers to student stats UI
+        addAnswerToStudentStats({ studentId, questionId:change.doc.id, answer: change.doc.data() });
+      }
+    });
+  });
+}
+
+// Add a student's individual answer to the student's history section
+function addAnswerToStudentStats({ studentId, questionId, answer } = {}) {
+  const singleStudentStatsDivElement = document.getElementById('studentStats-' + studentId);
+
+  const studentAnswerDivElement = document.createElement('div');
+  
+  const questionIdDivElement = document.createElement('div');
+  questionIdDivElement.innerText = 'Question with ID ' + questionId;
+
+  const questionTitleDivElement = document.createElement('div');
+  questionTitleDivElement.innerText = answer.title;
+
+  const questionAnswerDivElement = document.createElement('div');
+
+  if (answer.correct) {
+    questionAnswerDivElement.innerText = 'Correctly answered, chose: "' + answer.chosen + '"';
+  } else {
+    questionAnswerDivElement.innerText = 'Incorrect answer, chose: "' + answer.chosen + '"';
+  }
+  
+  studentAnswerDivElement.appendChild(questionIdDivElement);
+  studentAnswerDivElement.appendChild(questionTitleDivElement);
+  studentAnswerDivElement.appendChild(questionAnswerDivElement);
+
+  singleStudentStatsDivElement.appendChild(studentAnswerDivElement);
+}
+
+// Update general student stats in history
+function updateStudentStats({ studentId, student } = {}) {
+  const studentStatsDivElement = document.getElementById('studentStats-' + studentId + '-generalStats');
+  studentStatsDivElement.innerText = studentId + ': ' + student.points + ' points. ' + student.numberAnswered + ' questions answered: ' + student.numberCorrect + ' correct, ' + student.numberWrong + ' wrong.';
 }
 
 initAuthStateObserver();
