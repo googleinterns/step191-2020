@@ -17,6 +17,14 @@
 
 const db = firebase.firestore();
 
+// Variables to identify the change when receiving an update of the game Instance 
+let numberOfMembersInGameInstance = null;
+let currentQuestionId = null;
+
+// These variables will help in detaching listeners to documents we no longer need to listen to in Firestore
+let unsubscribeCurrentActiveQuestionInGameInstance = null;
+let unsubscribeCurrentActiveQuestionAnswersInGameInstance = null;
+
 // Is triggered when the User logs in or logs out
 function initAuthStateObserver() {
   firebase.auth().onAuthStateChanged(authStateObserver);
@@ -32,11 +40,13 @@ function authStateObserver(user) {
   }
 }
 
+// Build the Teacher Control panel UI
 async function loadControlPanel(user) {
   // Get the Game Instance's ID in which the user is participating
-
+  // First check if it has been provided in the query params
   let gameInstanceId = getGameInstanceIdFromQueryParams();
   
+  // If not, then retrieve it from Firestore
   if (gameInstanceId == null) {
     gameInstanceId = await getActiveGameInstanceId(user);
   }
@@ -52,6 +62,9 @@ async function loadControlPanel(user) {
 
   // Add buttons to control the GameInstance state
   initUIControlButtons(gameInstanceId);
+
+  // Add the questions' history to the UI
+  buildQuestionHistory(gameInstanceId);
 }
 
 // Gets the gameInstanceId from the query string if there is
@@ -161,15 +174,27 @@ function initGameInstanceListener(gameInstanceId) {
 
     // TODO: this should be initiated once the game is started, not before...
 
-    updateCurrentQuestion({ gameId: gameInstanceUpdate.gameId, currentQuestionId: gameInstanceUpdate.currentQuestion, isCurrentQuestionActive: gameInstanceUpdate.currentQuestionActive });
+    // If currentQuestionId is different from what we have in memory it means it has changed and we must update UI
+    if (currentQuestionId != gameInstanceUpdate.currentQuestion) {
+      updateCurrentQuestion({ gameId: gameInstanceUpdate.gameId, currentQuestionId: gameInstanceUpdate.currentQuestion, isCurrentQuestionActive: gameInstanceUpdate.currentQuestionActive });
 
-    updateNumberOfMembersUI(gameInstanceUpdate.numberOfMembers);
+      // The listener to the question stats is initiated
+      initQuestionStatsListener({ gameInstanceId, currentQuestionId: gameInstanceUpdate.currentQuestion });
 
+      // The listener to the question answers is initiated
+      initQuestionAnswerStatsListener({ gameInstanceId, currentQuestionId: gameInstanceUpdate.currentQuestion });
+    }
+
+    // If numberOfMembersInGameInstance is different from what we have in memory it means it has changed and we must update UI
+    if (numberOfMembersInGameInstance != gameInstanceUpdate.numberOfMembers) {
+      // Show the updated number of members in UI
+      updateNumberOfMembersUI(gameInstanceUpdate.numberOfMembers);
+    }
+    
   });
 }
 
 // Updates the panel showing which questions students are seeing
-
 async function updateCurrentQuestion({ gameId, currentQuestionId, isCurrentQuestionActive } = {}) {
   const currentQuestion = await queryCurrentQuestion({ gameId, currentQuestionId });
 
@@ -188,13 +213,6 @@ async function updateCurrentQuestion({ gameId, currentQuestionId, isCurrentQuest
   activeQuestionNumberElement.innerText = "Students are seeing question with ID: " + (currentQuestionId);
 }
 
-
-function updateNumberOfMembersUI(numberOfMembers) {
-  const numberOfMembersElement = document.getElementById("jsNumberOfStudents");
-  numberOfMembersElement.innerText = "There are " + numberOfMembers + " students registered in your room.";
-}
-
-
 // Queries and returns the currentQuestion object
 function queryCurrentQuestion({ gameId, currentQuestionId }) {
   return db.collection('games').doc(gameId).collection('questions').doc(currentQuestionId).get().then(function(doc) {
@@ -202,6 +220,123 @@ function queryCurrentQuestion({ gameId, currentQuestionId }) {
       return doc.data()
     }
   });
+}
+
+// Init the listener to a change in the current question's answers
+function initQuestionAnswerStatsListener({ gameInstanceId, currentQuestionId } = {}) {
+  if (unsubscribeCurrentActiveQuestionAnswersInGameInstance) {
+    // This helps remove unnecesary listeners to an answers' collection
+    unsubscribeCurrentActiveQuestionAnswersInGameInstance();
+  }
+  unsubscribeCurrentActiveQuestionAnswersInGameInstance = db.collection('gameInstance').doc(gameInstanceId).collection('questions').doc(currentQuestionId).collection('answers')
+  .onSnapshot(function(querySnapshot) {
+    // Clean the answers' div
+    clearCurrentQuestionAnswersDiv();
+
+    querySnapshot.forEach(function(doc) {
+      // Update the current question's answers in the "Active" top panel
+      updateCurrentQuestionAnswerStats(doc.data(), doc.id);
+
+      // Update the current question's answers in the history section
+      updateCurrentQuestionAnswerStatsHistory(doc.data(), doc.id, currentQuestionId);
+    });
+  });
+}
+
+// Clear the current question's answers in UI
+function clearCurrentQuestionAnswersDiv() {
+  const currentQuestionAnswersDivElement = document.getElementById('jsCurrentQuestionAnswers');
+  currentQuestionAnswersDivElement.innerText = '';
+}
+
+// Update the current question's answer's stats in the main panel
+function updateCurrentQuestionAnswerStats(updatedAnswer) {
+  const currentQuestionAnswersDivElement = document.getElementById('jsCurrentQuestionAnswers');
+  
+  const answerElement = document.createElement('div');
+  answerElement.innerText = updatedAnswer.title + ' with ' + updatedAnswer.numberAnswers + ' answers.';
+  
+  if (updatedAnswer.correct) {
+    answerElement.innerText += ' (Correct answer)';
+  }
+
+  currentQuestionAnswersDivElement.appendChild(answerElement);
+}
+
+// Update a question's stats in the history section
+function updateCurrentQuestionAnswerStatsHistory({ updatedAnswer, answerId, questionId } = {}) {
+  const answerInQuestionStatsDivElement = document.getElementById('stats-' + questionId + '-' + answerId);
+  if (answerInQuestionStatsDivElement == null) {
+    // This may be executed before the node is created the first time
+    return;
+  }
+
+  // Update question stats
+  answerInQuestionStatsDivElement.innerText = updatedAnswer.title + ' with ' + updatedAnswer.numberAnswers + ' answers.';
+
+  if (updatedAnswer.correct) {
+    answerInQuestionStatsDivElement.innerText += ' (Correct answer)';
+  } else {
+    answerInQuestionStatsDivElement.innerText += ' (Wrong answer)';
+  }
+}
+
+// Update the number of students in game in UI
+function updateNumberOfMembersUI(numberOfMembers) {
+  const numberOfMembersElement = document.getElementById("jsNumberOfStudents");
+  numberOfMembersElement.innerText = "There are " + numberOfMembers + " students registered in your room.";
+}
+
+// Listen to the current question's stats for any change
+function initQuestionStatsListener({ gameInstanceId, currentQuestionId } = {}) {
+  if (unsubscribeCurrentActiveQuestionInGameInstance) {
+    // This is to stop listening to live changes to the previous question which is not active anymore
+    unsubscribeCurrentActiveQuestionInGameInstance();
+  }
+  unsubscribeCurrentActiveQuestionInGameInstance = db.collection('gameInstance').doc(gameInstanceId).collection('questions').doc(currentQuestionId).onSnapshot(function (doc) {
+    updateQuestionStatsHelper({ updatedQuestionStats: doc.data(), currentQuestionId });
+  });
+}
+
+// When there is an update in a question's stats the update must be reflected on the active panel and the question's history section
+function updateQuestionStatsHelper({ updatedQuestionStats, currentQuestionId } = {}) {
+  // Update the current question's stats in the "Active" main panel of UI
+  updateCurrentQuestionStats(updatedQuestionStats);
+
+  // Update the current question's stats in history section of UI
+  updateCurrentQuestionStatsInHistory({ updatedQuestionStats, currentQuestionId });
+}
+
+// Update the current question's stats in the "Active" main panel of UI
+function updateCurrentQuestionStats(updatedQuestionStats) {
+
+  // Update the question in the active panel
+  const numberCurrentQuestionAnswersElement = document.getElementById('jsNumberCurrentQuestionAnswers');
+  numberCurrentQuestionAnswersElement.innerText = 'This question has been answered by ' + updatedQuestionStats.numberAnswered + ' students.';
+
+  const numberCorrectCurrentQuestionAnswersElement = document.getElementById('jsNumberCorrectCurrentQuestionAnswers');
+  numberCorrectCurrentQuestionAnswersElement.innerText = 'Number of answers correct: ' + updatedQuestionStats.numberCorrect
+
+  const numberWrongCurrentQuestionAnswersElement = document.getElementById('jsNumberWrongCurrentQuestionAnswers');
+  numberWrongCurrentQuestionAnswersElement.innerText = 'Number of answers wrong: ' + updatedQuestionStats.numberWrong
+
+}
+
+// Update the current question's stats in history section of UI
+function updateCurrentQuestionStatsInHistory({ updatedQuestionStats, currentQuestionId } = {}) {
+  const numberQuestionAnswersHistoryElement = document.getElementById('stats-' + currentQuestionId + '-numberQuestionAnswers');
+  if (numberQuestionAnswersHistoryElement == null) {
+    // This may be executed before the node is created the first time
+    return;
+  }
+
+  numberQuestionAnswersHistoryElement.innerText = 'Number of answers: ' + updatedQuestionStats.numberAnswered;
+
+  const numberCorrectQuestionAnswersHistoryElement = document.getElementById('stats-' + currentQuestionId + '-numberCorrectQuestionAnswers');
+  numberCorrectQuestionAnswersHistoryElement.innerText = 'Number of correct anwers: ' + updatedQuestionStats.numberCorrect;
+
+  const numberWrongQuestionAnswersHistoryElement = document.getElementById('stats-' + currentQuestionId + '-numberWrongQuestionAnswers');
+  numberWrongQuestionAnswersHistoryElement.innerText = 'Number of wrong anwers: ' + updatedQuestionStats.numberWrong;
 }
 
 // Inits the control buttons for the teacher to control the game
@@ -233,6 +368,88 @@ function initUIControlButtons(gameInstanceId) {
   endQuestionButton.addEventListener('click', () => {
       fetch('/controlQuestion?gameInstance='+gameInstanceId+'&action=end', { method: 'POST' });
   });
+}
+
+// Get all questions in the "questions" collection in the gameInstance
+function buildQuestionHistory(gameInstanceId) {
+  const questionInGameInstanceCollectionRef = db.collection('gameInstance').doc(gameInstanceId).collection('questions');
+  questionInGameInstanceCollectionRef.get().then(function(querySnapshot) {
+    querySnapshot.forEach(function(doc) {
+      // doc.data() is never undefined for query doc snapshots
+      const questionId = doc.id
+
+      // Add the question to the UI
+      addQuestionToHistoryUI({ question: doc.data(), questionId });
+
+      // Add the question's answers to the UI
+      buildQuestionAnswersHistory({ questionId, questionsCollectionRef: questionInGameInstanceCollectionRef });
+    });
+  });
+}
+
+// Add a question to the Question History section of the UI 
+function addQuestionToHistoryUI({ question, questionId } = {}) {
+  const questionStatsDivElement = document.getElementById('jsQuestionStats');
+  
+  // The div for this new question element
+  const singleQuestionStatDivElement = document.createElement('div');
+  singleQuestionStatDivElement.id = 'stats-' + questionId
+  singleQuestionStatDivElement.classList.add('questionInHistory');
+
+  const questionTitle = document.createElement('div');
+  questionTitle.innerText = 'Question title: ' + question.title;
+  singleQuestionStatDivElement.appendChild(questionTitle);
+
+  // How many students have answered the question
+  const numberQuestionAnswersHistoryElement = document.createElement('div');
+  numberQuestionAnswersHistoryElement.id = 'stats-' + questionId + '-numberQuestionAnswers';
+  numberQuestionAnswersHistoryElement.innerText = 'Number of answers: ' + question.numberAnswered;
+  singleQuestionStatDivElement.appendChild(numberQuestionAnswersHistoryElement);
+
+  // How many students have answered correclty the question
+  const numberCorrectQuestionAnswersHistoryElement = document.createElement('div');
+  numberCorrectQuestionAnswersHistoryElement.id = 'stats-' + questionId + '-numberCorrectQuestionAnswers';
+  numberCorrectQuestionAnswersHistoryElement.innerText = 'Number of correct anwers: ' + question.numberCorrect;
+  singleQuestionStatDivElement.appendChild(numberCorrectQuestionAnswersHistoryElement);
+
+  // How many students have answered incorreclty the question
+  const numberWrongQuestionAnswersHistoryElement = document.createElement('div');
+  numberWrongQuestionAnswersHistoryElement.id = 'stats-' + questionId + '-numberWrongQuestionAnswers';
+  numberWrongQuestionAnswersHistoryElement.innerText = 'Number of wrong anwers: ' + question.numberWrong;
+  singleQuestionStatDivElement.appendChild(numberWrongQuestionAnswersHistoryElement);
+
+  // Add the question to the questions history section
+  questionStatsDivElement.appendChild(singleQuestionStatDivElement);
+}
+
+// Add a question's answers to its history stats
+function buildQuestionAnswersHistory({ questionId, questionsCollectionRef } = {}) {
+  // Get the reference to the question's answers
+  const answersCollectionRef = questionsCollectionRef.doc(questionId).collection('answers');
+  answersCollectionRef.get().then(function(querySnapshot) {
+    querySnapshot.forEach(function(doc) {
+      // Add the answer and its stats to the history section in UI
+      addQuestionAnswerToHistoryUI({ questionId, answerId: doc.id, answer: doc.data() });
+    });
+  });
+}
+
+// Add an answer's stats to the history section of the UI
+function addQuestionAnswerToHistoryUI({ questionId, answerId, answer } = {}) {
+  // The div in which the answer will be inserted
+  const questionStatsDivElement = document.getElementById('stats-' + questionId);
+
+  // Build the answer element
+  const answerInQuestionStatsDivElement = document.createElement('div');
+  answerInQuestionStatsDivElement.id = 'stats-' + questionId + '-' + answerId;
+  answerInQuestionStatsDivElement.innerText = answer.title + ' with ' + answer.numberAnswers + ' answers.';
+
+  if (answer.correct) {
+    answerInQuestionStatsDivElement.innerText += ' (Correct answer)';
+  }
+
+  // Add the answer to its component in the DOM
+  questionStatsDivElement.appendChild(answerInQuestionStatsDivElement);
 }
 
 initAuthStateObserver();
