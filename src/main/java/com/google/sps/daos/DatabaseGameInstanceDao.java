@@ -62,7 +62,7 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
     // Post to db
     newGameInstanceRef.set(gameInstanceData);
 
-    // Now post 
+    // Now post the questions collection
     for (Question question: game.questions()) {
       DocumentReference questionDocRef = newGameInstanceRef.collection("questions").document(question.getId());
       
@@ -74,6 +74,7 @@ public class DatabaseGameInstanceDao implements GameInstanceDao {
 
       questionDocRef.set(questionData);
 
+      // For each question add its answers
       for (Answer answer: question.getAnswers()) {
         DocumentReference answerDocRef = questionDocRef.collection("answers").document(answer.getId());
         
