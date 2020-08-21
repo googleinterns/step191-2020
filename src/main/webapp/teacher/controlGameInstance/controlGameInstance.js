@@ -237,13 +237,18 @@ function initQuestionAnswerStatsListener({ gameInstanceId, currentQuestionId } =
     clearCurrentQuestionAnswersDiv();
 
     querySnapshot.forEach(function(doc) {
-      // Update the current question's answers in the "Active" top panel
-      updateCurrentQuestionAnswerStats(doc.data(), doc.id);
-
-      // Update the current question's answers in the history section
-      updateCurrentQuestionAnswerStatsHistory(doc.data(), doc.id, currentQuestionId);
+      updateQuestionAnswerStatsHelper({ updatedAnswer: doc.data(), answerId: doc.id, questionId: currentQuestionId });
     });
   });
+}
+
+// When there is an update in a question's answer's stats the update must be reflected on the active panel and the question's history section
+function updateQuestionAnswerStatsHelper({ updatedAnswer, answerId, questionId } = {}) {
+  // Update the current question's answers in the "Active" top panel
+  updateCurrentQuestionAnswerStats(updatedAnswer, answerId);
+
+  // Update the current question's answers in the history section
+  updateCurrentQuestionAnswerStatsHistory(updatedAnswer, answerId, questionId);
 }
 
 // Clear the current question's answers in UI
