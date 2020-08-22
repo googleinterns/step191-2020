@@ -1,6 +1,9 @@
 package com.google.sps.daos;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -16,6 +19,24 @@ public class DatabaseUserDao implements UserDao {
 
   private FirebaseAuth firebaseAuth;
   private Firestore firestoreDb;
+
+  private List<String> animalList = new ArrayList<String>(Arrays.asList(
+    "Tiger",
+    "Penguin",
+    "Panda",
+    "Grizzly",
+    "Eagle",
+    "Cheetah",
+    "Lion",
+    "Goat",
+    "Eagle",
+    "Falcon",
+    "Shark",
+    "Goose",
+    "Raindeer"
+  ));
+
+  private int animalListSize = 13;
 
   public DatabaseUserDao(Firestore firestoreDb, FirebaseAuth firebaseAuth) {
     this.firestoreDb = firestoreDb;
@@ -79,8 +100,8 @@ public class DatabaseUserDao implements UserDao {
     try {
       DocumentSnapshot document = UserInGameInstanceFuture.get();
       if (!document.exists()) {
-        registerUserInGameInstance(userInGameInstanceDocRef, userId);
-        addOneToMembersCounter(gameInstanceDocRef);
+        int numberOfStudent = addOneToMembersCounter(gameInstanceDocRef);
+        registerUserInGameInstance(userInGameInstanceDocRef, userId, getAnimal(numberOfStudent));
       } 
     } catch (InterruptedException e) {
       // TODO Auto-generated catch block
@@ -105,25 +126,38 @@ public class DatabaseUserDao implements UserDao {
   }
 
 
-  private void registerUserInGameInstance(DocumentReference userInGameInstanceDocRef, String userId) {
+  private void registerUserInGameInstance(DocumentReference userInGameInstanceDocRef, String userId, String animal) {
     Map<String, Object> docData = new HashMap<>();
     docData.put("points", 0);
     docData.put("numberAnswered", 0);
     docData.put("numberCorrect", 0);
     docData.put("numberWrong", 0);
+    docData.put("alias", animal);
 
     userInGameInstanceDocRef.set(docData);
   }
 
-  private void addOneToMembersCounter(DocumentReference gameInstanceDocRef) {
-    firestoreDb.runTransaction(transaction -> {
-      // retrieve document and increment population field
+  private int addOneToMembersCounter(DocumentReference gameInstanceDocRef)
+      throws InterruptedException, ExecutionException {
+    ApiFuture<Long> futureTransaction = firestoreDb.runTransaction(transaction -> {
       DocumentSnapshot snapshot = transaction.get(gameInstanceDocRef).get();
-      long oldNumberOfMembers = snapshot.getLong("numberOfMembers");
-      transaction.update(gameInstanceDocRef, "numberOfMembers", oldNumberOfMembers + 1);
-      return null;
+      Long newNumberOfMembers = snapshot.getLong("numberOfMembers") + 1;
+      transaction.update(gameInstanceDocRef, "numberOfMembers", newNumberOfMembers);
+      return newNumberOfMembers;
     });
+    return Math.toIntExact(futureTransaction.get());
+    // firestoreDb.runTransaction(transaction -> {
+    //   // retrieve document and increment population field
+    //   DocumentSnapshot snapshot = transaction.get(gameInstanceDocRef).get();
+    //   long oldNumberOfMembers = snapshot.getLong("numberOfMembers");
+    //   transaction.update(gameInstanceDocRef, "numberOfMembers", oldNumberOfMembers + 1);
+    //   return null;
+    // });
+  }
+  
+  private String getAnimal(int index) {
+    
+    return animalList.get((index % animalListSize));
   }
 
-  
 }
