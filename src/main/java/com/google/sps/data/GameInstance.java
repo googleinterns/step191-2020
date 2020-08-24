@@ -7,6 +7,7 @@ public class GameInstance {
 
   private String id;
   private boolean isActive;
+  private boolean isFinished;
   private String creator;
   private String gameId;
   private String currentQuestion;
@@ -17,12 +18,14 @@ public class GameInstance {
   public GameInstance() {
     this.members = new ArrayList<Member>();
     this.isActive = false;
+    this.isFinished = false;
   }
 
   public GameInstance(String id) {
     this.id = id;
     this.members = new ArrayList<Member>();
     this.isActive = false;
+    this.isFinished = false;
   }
 
   public String getId() {
@@ -93,5 +96,14 @@ public class GameInstance {
     this.members.add(member);
     return this.members;
   }
+
+  public boolean getIsFinished() {
+    return this.isFinished;
+  }
+
+  public void setIsFinished(boolean isFinished) {
+    this.isFinished = isFinished;
+  }
+
   
 }

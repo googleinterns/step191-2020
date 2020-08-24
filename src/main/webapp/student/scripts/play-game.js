@@ -23,8 +23,11 @@ let currentQuestionActive = false;
 let gameInstanceId = getGameInstanceIdFromQueryParams();
 const resultObject = document.getElementById("result");
 let submited = false;
+let isFinished = false;
 let isCorrect = null;
 let studentId = null;
+let currentQuestionTitle = null;
+let selectedAnswerTitle = null;
 
 // Is triggered when the User logs in or logs out
 function initAuthStateObserver() {
@@ -52,6 +55,17 @@ async function loadGamePanel(user) {
 
   // Start listening to the GameInstance
   initGameInstanceListener(gameInstanceId);
+
+  // Get and display the user's id and alias
+  initStudentAlias(user, gameInstanceId);
+}
+
+// // Get and display the user's id and alias in the UI
+function initStudentAlias(user, gameInstanceId) {
+  db.collection("gameInstance").doc(gameInstanceId).collection("students").doc(user.uid).get().then(function(doc) {
+    const userIdDivElement = document.getElementById('userId');
+    userIdDivElement.innerText = `You are: ${doc.data().alias}`
+  });
 }
 
 // Gets the gameInstanceId from the query string if there is
@@ -74,6 +88,7 @@ function resetDOM() {
 
 // Inits listener to User's points in Firestore DB
 function updatePoints() {
+    console.log("Updating points");
   db.collection("gameInstance").doc(gameInstanceId).collection("students").doc(studentId.uid).get().then(function(doc) {
     const studentInGameInstaneUpdate = doc.data();
     updatePointsInUI(studentInGameInstaneUpdate.points);
@@ -108,6 +123,14 @@ function getActiveGameInstanceId(user) {
 function initGameInstanceListener(gameInstanceId) {
   db.collection('gameInstance').doc(gameInstanceId).onSnapshot(function(doc) {
     const gameInstanceUpdate = doc.data();
+
+    if(gameInstanceUpdate.isFinished) {
+        finishGame();
+        updatePoints();
+        displayResultsTable();
+        return;
+    }
+
     if (!active && gameInstanceUpdate.isActive) {
       const readyHeadingElement = document.getElementById("getReady");
       const gameElement = document.getElementById("gameSection");
@@ -146,7 +169,9 @@ function initSubmitButton(gameInstanceId, gameId) {
           gameInstanceId: gameInstanceId, 
           gameId: gameId,
           questionId: currentQuestionId,
-          answerId: selectedAnswerId
+          questionTitle: currentQuestionTitle,
+          answerId: selectedAnswerId,
+          answerTitle: selectedAnswerTitle
         })
       }).then(() => {
         submited = true;
@@ -206,6 +231,7 @@ function queryCurrentQuestion(currentQuestionDocRef) {
 
 // Add the question title to the UI
 function createQuestionObject(title) {
+  currentQuestionTitle = title;
   document.getElementById("question").innerText = title;
 }
 
@@ -236,22 +262,6 @@ function createAnswersObject(currentQuestionDocRef) {
     });
 }
 
-function createAnswer(quiz, multipleDiv, answerTitle, i){
-      const boxDiv = document.createElement("div");
-      boxDiv.classList.add("demo-card-square");
-      boxDiv.classList.add("mdl-card");
-      boxDiv.classList.add("mdl-shadow--2dp");
-      const titleDiv = document.createElement("div");
-      titleDiv.classList.add("mdl-card__title");
-      titleDiv.classList.add("mdl-card--expand")
-      titleDiv.setAttribute("id", "card-"+(i-1));
-      const title = document.createElement("h2");
-      title.classList.add("mdl-card__title-text");
-      title.innerText = answerTitle;
-      titleDiv.appendChild(title);
-      boxDiv.appendChild(titleDiv);
-      multipleDiv.appendChild(boxDiv);
-}
 const handlers = [];
 function createAnswer(quiz, multipleDiv, doc, i){
       const boxDiv = document.createElement("div");
@@ -266,6 +276,8 @@ function createAnswer(quiz, multipleDiv, doc, i){
           }
           selectedAnswerId = doc.id;
           titleDiv.classList.toggle("selected");
+          selectedAnswerTitle = doc.data().title;
+          console.log(selectedAnswerTitle);
       })
       titleDiv.classList.add("mdl-card__title");
       titleDiv.classList.add("mdl-card--expand");
@@ -320,5 +332,71 @@ function disableAnswers(){
     });
 }
 
+function finishGame() {
+    document.getElementById('results').innerHTML='';
+    const questionElement = document.getElementById("question");
+    const quizElement = document.getElementById("quiz");
+    const readyHeadingElement = document.getElementById("getReady");
+    const gameElement = document.getElementById("gameSection");
+    if(gameElement.classList.length < 2) {
+      gameElement.classList.toggle("active");
+    }
+    if(1 < readyHeadingElement.classList.length) {
+    readyHeadingElement.classList.toggle("ready");
+    }
+    readyHeadingElement.innerText='Game Over';
+    questionElement.innerHTML = '';
+    quizElement.innerHTML = '';
+    document.getElementById('submitButton').disabled = true;
+}
+
+function displayResultsTable() {
+    const resultsTable = document.getElementById("resultsTable");
+    const table = document.createElement('table');
+    createTable(table);
+    createHeaders(table);
+    const tbody = document.createElement('tbody');
+    db.collection("gameInstance").doc(gameInstanceId).collection("students").get().then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+            createElementTable(tbody, doc.id, doc.data().points);
+            console.log(doc.id, " => ", doc.data().points);
+        });
+    });
+    table.appendChild(tbody);
+    resultsTable.appendChild(table);
+}
+
+function createTable(table) {
+    table.classList.add("mdl-data-table")
+    table.classList.add("mdl-js-data-table")
+    table.classList.add("mdl-data-table--selectable")
+    table.classList.add("mdl-shadow--2dp")
+}
+
+function createHeaders(table) {
+    const thead = document.createElement('thead');
+    const tr = document.createElement('tr');
+    const th = document.createElement('th')
+    th.classList.add('mdl-data-table__cell--non-numeric');
+    th.innerText = "Student Id";
+    tr.appendChild(th);
+    const scoreth = document.createElement('th');
+    scoreth.innerText='Score';
+    tr.appendChild(scoreth);
+    thead.appendChild(tr);
+    table.appendChild(thead);
+}
+
+function createElementTable(tbody, id, score) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.classList.add('mdl-data-table__cell--non-numeric');
+    td.innerText = id;
+    tr.appendChild(td);
+    const scoretd = document.createElement('td');
+    scoretd.innerText = score; 
+    tr.appendChild(scoretd);
+    tbody.append(tr);
+}
 
 initAuthStateObserver();

@@ -52,10 +52,17 @@ public class NextQuestionServlet extends HttpServlet {
     if(nextQuestionId == null || nextQuestionId.isEmpty()){
         response.setStatus(404);
         response.getWriter().println("Error, there's no more questions");
-        return;        
+        System.out.println("Error, there's no more questions");
+        //End Game
+        newRoom.setIsActive(false);
+        newRoom.setCurrentQuestion(null);
+        newRoom.setCurrentQuestionActive(false);
+        newRoom.setIsFinished(true);
+ 
+    } else {
+        newRoom.setCurrentQuestion(nextQuestionId);
+        newRoom.setCurrentQuestionActive(true);
     }
-    newRoom.setCurrentQuestion(nextQuestionId);
-    newRoom.setCurrentQuestionActive(true);
     dao.updateGameInstance(newRoom);
 
   }

@@ -20,6 +20,7 @@ import com.google.sps.data.GameInstance;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -36,33 +37,32 @@ public class AnswerQuestionServlet extends HttpServlet {
 
     String gameInstance = request.getParameter("gameInstance");
 
-    if(gameInstance==null || gameInstance.isEmpty()){
-        response.setStatus(500);
-        response.getWriter().println("Room not specified");
-        return;
+    if (gameInstance == null || gameInstance.isEmpty()) {
+      response.setStatus(500);
+      response.getWriter().println("Room not specified");
+      return;
     }
 
     String token = request.getParameter("student");
-    if(token==null || token.isEmpty()){
-        response.setStatus(500);
-        response.getWriter().println("User token not specified");
-        return;
+    if (token == null || token.isEmpty()) {
+      response.setStatus(500);
+      response.getWriter().println("User token not specified");
+      return;
     }
 
-    //Get student id 
+    // Get student id
     String student = getUserId(token);
 
-
     GameInstanceDao dao = (GameInstanceDao) this.getServletContext().getAttribute("gameInstanceDao");
-    //ToDo: Check if !currentQuestionActive
-    boolean isAnswerCorrect = dao.getAnswer(gameInstance, student);  
+    // ToDo: Check if !currentQuestionActive
+    boolean isAnswerCorrect = dao.getAnswer(gameInstance, student);
 
     Map<String, Object> answerJson = new HashMap<>();
     answerJson.put("correct", isAnswerCorrect);
     Gson gson = new Gson();
     response.getWriter().println(gson.toJson(answerJson));
 
-  }  
+  }
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -76,15 +76,19 @@ public class AnswerQuestionServlet extends HttpServlet {
 
     String questionId = jsonObj.get("questionId").getAsString();
 
+    String questionTitle = jsonObj.get("questionTitle").getAsString();
+
     String answerId = jsonObj.get("answerId").getAsString();
+
+    String answerTitle = jsonObj.get("answerTitle").getAsString();
 
     Firestore firestoreDb = (Firestore) this.getServletContext().getAttribute("firestoreDb");
 
     DocumentReference gameInstanceDocRef = firestoreDb.collection("gameInstance").document(gameInstanceId);
 
     boolean isQuestionActive = isQuestionActive(questionId, gameInstanceDocRef);
-    
-    //ToDo: Check is currentQuestionActive (if students can answer)
+
+    // ToDo: Check is currentQuestionActive (if students can answer)
     if (!isQuestionActive) {
       return;
     }
@@ -94,36 +98,40 @@ public class AnswerQuestionServlet extends HttpServlet {
 
     boolean isAnswerCorrect;
 
-    //If there was no answer it's wrong
-    if(answerId == null || answerId.isEmpty()){
-        System.out.println("STUDENT DIDN'T ANSWER");
-        isAnswerCorrect = false;
+    // If there was no answer it's wrong
+    if (answerId == null || answerId.isEmpty()) {
+      System.out.println("STUDENT DIDN'T ANSWER");
+      isAnswerCorrect = false;
     } else {
-        String correctAnswerId = getCorrectAnswer(questionId, questionDocRef);
-        isAnswerCorrect = answerId.equals(correctAnswerId);
+      List<String> correctAnswerId = getCorrectAnswers(questionId, questionDocRef);
+      isAnswerCorrect = correctAnswerId.contains(answerId);
     }
 
-    DocumentReference answerInStudentDocRef = gameInstanceDocRef.collection("students").document(userId).collection("questions").document(questionId);
+    DocumentReference answerInStudentDocRef = gameInstanceDocRef.collection("students").document(userId)
+        .collection("questions").document(questionId);
 
     // Store the answer in the user's profile if it does not exist
-    boolean answerNotExists = registerAnswerInStudentAnswers(answerInStudentDocRef, isAnswerCorrect);
+    boolean answerNotExists = registerAnswerInStudentAnswers(answerInStudentDocRef, isAnswerCorrect, questionTitle,
+        answerTitle);
 
     if (answerNotExists) {
       if (isAnswerCorrect) {
         System.out.println("The answer is correct, adding points");
-        addPoints(userId, gameInstanceDocRef, firestoreDb);
       } else {
         System.out.println("The answer is incorrect");
       }
+
+      updateStudentStats(isAnswerCorrect, userId, gameInstanceDocRef, firestoreDb);
 
       DocumentReference questionInGameInstanceDocRef = gameInstanceDocRef.collection("questions").document(questionId);
 
       // register the the question's general answer statistics
       updateGeneralQuestionStats(questionInGameInstanceDocRef, isAnswerCorrect, firestoreDb);
-      if(answerId != null && !answerId.isEmpty()){
-      // update the answer's statistics in the answer document in the question document
-      DocumentReference answerDocRef = questionInGameInstanceDocRef.collection("answers").document(answerId);
-      updateAnswerInQuestionStats(answerDocRef, isAnswerCorrect, firestoreDb);
+      if (answerId != null && !answerId.isEmpty()) {
+        // update the answer's statistics in the answer document in the question
+        // document
+        DocumentReference answerDocRef = questionInGameInstanceDocRef.collection("answers").document(answerId);
+        updateAnswerInQuestionStats(answerDocRef, isAnswerCorrect, firestoreDb);
       }
 
       System.out.println("running supposedly");
@@ -131,11 +139,6 @@ public class AnswerQuestionServlet extends HttpServlet {
     } else {
       System.out.println("Answer had already been answered");
     }
-
-   
-
-    
-    
 
     // GameInstanceDao dao = (GameInstanceDao)
     // this.getServletContext().getAttribute("gameInstanceDao");
@@ -190,9 +193,9 @@ public class AnswerQuestionServlet extends HttpServlet {
   }
 
   // Right now it only takes one single correct answer
-  private String getCorrectAnswer(String questionId, DocumentReference questionDocRef) {
+  private List<String> getCorrectAnswers(String questionId, DocumentReference questionDocRef) {
 
-    String correctAnswerId = null;
+    List<String> correctAnswerId = new ArrayList<>();
 
     ApiFuture<QuerySnapshot> future = questionDocRef.collection("answers").whereEqualTo("correct", true).get();
 
@@ -200,7 +203,7 @@ public class AnswerQuestionServlet extends HttpServlet {
     try {
       documents = future.get().getDocuments();
       for (DocumentSnapshot document : documents) {
-        correctAnswerId = document.getId();
+        correctAnswerId.add(document.getId());
       }
     } catch (InterruptedException e) {
       // TODO Auto-generated catch block
@@ -209,26 +212,40 @@ public class AnswerQuestionServlet extends HttpServlet {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    
 
     return correctAnswerId;
   }
 
-  private void addPoints(String userId, DocumentReference gameInstanceDocRef, Firestore firestoreDb) {
+  private void updateStudentStats(boolean isAnswerCorrect, String userId, DocumentReference gameInstanceDocRef,
+      Firestore firestoreDb) {
     DocumentReference userInGameInstanceDocRef = gameInstanceDocRef.collection("students").document(userId);
 
     firestoreDb.runTransaction(transaction -> {
-      // retrieve document and increment population field
       DocumentSnapshot snapshot = transaction.get(userInGameInstanceDocRef).get();
-      long oldPoints = snapshot.getLong("points");
-      transaction.update(userInGameInstanceDocRef, "points", oldPoints + 10);
+
+      long oldNumberAnswered = snapshot.getLong("numberAnswered");
+      transaction.update(userInGameInstanceDocRef, "numberAnswered", oldNumberAnswered + 1);
+
+      if (isAnswerCorrect) {
+
+        long oldNumberCorrect = snapshot.getLong("numberCorrect");
+        transaction.update(userInGameInstanceDocRef, "numberCorrect", oldNumberCorrect + 1);
+
+        long oldPoints = snapshot.getLong("points");
+        transaction.update(userInGameInstanceDocRef, "points", oldPoints + 10);
+      } else {
+        long oldNumberWrong = snapshot.getLong("numberWrong");
+        transaction.update(userInGameInstanceDocRef, "numberWrong", oldNumberWrong + 1);
+      }
+
       return null;
     });
 
   }
 
   // Returns true if answer had not been aswered yet, else returns false
-  private boolean registerAnswerInStudentAnswers(DocumentReference questionDocRef, boolean isCorrect) {
+  private boolean registerAnswerInStudentAnswers(DocumentReference questionDocRef, boolean isCorrect,
+      String questionTitle, String chosenAnswerTitle) {
     ApiFuture<DocumentSnapshot> questionAnswerFuture = questionDocRef.get();
 
     try {
@@ -236,9 +253,11 @@ public class AnswerQuestionServlet extends HttpServlet {
       if (!document.exists()) {
         Map<String, Object> docData = new HashMap<>();
         docData.put("correct", isCorrect);
+        docData.put("chosen", chosenAnswerTitle);
+        docData.put("title", questionTitle);
         questionDocRef.set(docData);
         return true;
-      } 
+      }
     } catch (InterruptedException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -250,7 +269,8 @@ public class AnswerQuestionServlet extends HttpServlet {
     return false;
   }
 
-  private void updateGeneralQuestionStats(DocumentReference questionDocRef, boolean isAnswerCorrect, Firestore firestoreDb) {
+  private void updateGeneralQuestionStats(DocumentReference questionDocRef, boolean isAnswerCorrect,
+      Firestore firestoreDb) {
     firestoreDb.runTransaction(transaction -> {
       // retrieve document and increment population field
       DocumentSnapshot snapshot = transaction.get(questionDocRef).get();
@@ -264,12 +284,13 @@ public class AnswerQuestionServlet extends HttpServlet {
         long oldNumberOfWrongAnswers = snapshot.getLong("numberWrong");
         transaction.update(questionDocRef, "numberWrong", oldNumberOfWrongAnswers + 1);
       }
-      
+
       return null;
     });
   }
 
-  private void updateAnswerInQuestionStats(DocumentReference answerDocRef, boolean isAnswerCorrect, Firestore firestoreDb) {
+  private void updateAnswerInQuestionStats(DocumentReference answerDocRef, boolean isAnswerCorrect,
+      Firestore firestoreDb) {
     firestoreDb.runTransaction(transaction -> {
       // retrieve document and increment population field
       DocumentSnapshot snapshot = transaction.get(answerDocRef).get();

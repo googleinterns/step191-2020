@@ -48,6 +48,7 @@
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
   <link rel="stylesheet" href="../../styles/main.css">
+  <link rel="stylesheet" href="controlGameInstance.css">
 
 </head>
 
@@ -95,6 +96,12 @@
             <div id="jsActiveQuestionNumber"></div>
             <div id="jsActiveQuestionText"></div>
             <div id="jsCanStudentsAnswer"></div>
+            <div id="jsCurrentQuestionStats">
+              <div id="jsNumberCurrentQuestionAnswers"></div>
+              <div id="jsNumberCorrectCurrentQuestionAnswers"></div>
+              <div id="jsNumberWrongCurrentQuestionAnswers"></div>
+              <div id="jsCurrentQuestionAnswers"></div>
+            </div>
           </div>
 
           <div id="questionControls">
@@ -111,12 +118,16 @@
             <button id="startQuestionButton" type="button">Start Question</button>
             <button id="endQuestionButton" type="button">End Question</button>
           </div>
+
+          <div id="stats">
+            <h2>Game History</h2>
+            <h3>Question Stats</h3>
+            <div id="jsQuestionStats"></div>
+            <h3>Student Stats</h3>
+            <div id="jsStudentStats"></div>
+          </div>
         </div>
-
-
       </div>
-
-
     </main>
   </div>
 
