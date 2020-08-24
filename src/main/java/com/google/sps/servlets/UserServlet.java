@@ -15,7 +15,7 @@ import com.google.sps.daos.UserDao;
 public class UserServlet extends HttpServlet {
 
   @Override
-  protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     JsonObject jsonObj = new Gson().fromJson(request.getReader(), JsonObject.class);
 
     UserDao dao = (UserDao) this.getServletContext().getAttribute("userDao");
