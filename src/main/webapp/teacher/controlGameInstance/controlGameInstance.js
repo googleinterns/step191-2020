@@ -243,7 +243,7 @@ function initQuestionAnswerStatsListener({ gameInstanceId, currentQuestionId } =
       }
 
       if (change.type === "modified") {
-        updateQuestionAnswerStatsHelper({ updatedAnswer: doc.data(), answerId: doc.id, questionId: currentQuestionId });
+        updateQuestionAnswerStatsHelper({ updatedAnswer: change.doc.data(), answerId: change.doc.id, questionId: currentQuestionId });
       }
      
     });
@@ -274,10 +274,10 @@ function addCurrentQuestionAnswerStats ({ answer, answerId, questionId } = {}) {
 // When there is an update in a question's answer's stats the update must be reflected on the active panel and the question's history section
 function updateQuestionAnswerStatsHelper({ updatedAnswer, answerId, questionId } = {}) {
   // Update the current question's answers in the "Active" top panel
-  updateCurrentQuestionAnswerStats(updatedAnswer, answerId);
+  updateCurrentQuestionAnswerStats({ updatedAnswer, answerId, questionId });
 
   // Update the current question's answers in the history section
-  updateCurrentQuestionAnswerStatsHistory(updatedAnswer, answerId, questionId);
+  updateCurrentQuestionAnswerStatsHistory({ updatedAnswer, answerId, questionId });
 }
 
 // Update the current question's answer's stats in the main panel
@@ -568,7 +568,7 @@ function addAnswerToStudentStats({ studentId, questionId, answer } = {}) {
 // Update general student stats in history
 function updateStudentStats({ studentId, student } = {}) {
   const studentStatsDivElement = document.getElementById('studentStats-' + studentId + '-generalStats');
-  studentStatsDivElement.innerText = studentId + ': ' + student.points + ' points. ' + student.numberAnswered + ' questions answered: ' + student.numberCorrect + ' correct, ' + student.numberWrong + ' wrong.';
+  studentStatsDivElement.innerText = student.alias + ': ' + student.points + ' points. ' + student.numberAnswered + ' questions answered: ' + student.numberCorrect + ' correct, ' + student.numberWrong + ' wrong.';
 }
 
 initAuthStateObserver();
