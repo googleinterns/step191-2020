@@ -55,6 +55,17 @@ async function loadGamePanel(user) {
 
   // Start listening to the GameInstance
   initGameInstanceListener(gameInstanceId);
+
+  // Get and display the user's id and alias
+  initStudentAlias(user, gameInstanceId);
+}
+
+// // Get and display the user's id and alias in the UI
+function initStudentAlias(user, gameInstanceId) {
+  db.collection("gameInstance").doc(gameInstanceId).collection("students").doc(user.uid).get().then(function(doc) {
+    const userIdDivElement = document.getElementById('userId');
+    userIdDivElement.innerText = `You are: ${doc.data().alias}`
+  });
 }
 
 // Gets the gameInstanceId from the query string if there is

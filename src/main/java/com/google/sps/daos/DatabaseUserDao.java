@@ -1,6 +1,9 @@
 package com.google.sps.daos;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -16,6 +19,63 @@ public class DatabaseUserDao implements UserDao {
 
   private FirebaseAuth firebaseAuth;
   private Firestore firestoreDb;
+
+  private List<String> animalList = new ArrayList<String>(Arrays.asList(
+    "Anonymous Tiger",
+    "Anonymous Penguin",
+    "Anonymous Quetzal",
+    "Anonymous Leopard",
+    "Anonymous Panda",
+    "Anonymous Jaguar",
+    "Anonymous Zebra",
+    "Anonymous Grizzly",
+    "Anonymous Porcupine",
+    "Anonymous Hawk",
+    "Anonymous Eagle",
+    "Anonymous Cheetah",
+    "Anonymous Lion",
+    "Anonymous Goat",
+    "Anonymous Eagle",
+    "Anonymous Grasshopper",
+    "Anonymous Falcon",
+    "Anonymous Shark",
+    "Anonymous Racoon",
+    "Anonymous Turtle",
+    "Anonymous Goose",
+    "Anonymous Mantis",
+    "Anonymous Squirrel",
+    "Anonymous Raindeer",
+    "Anonymous Guinea-pig",
+    "Anonymous Pelican",
+    "Anonymous Albatross",
+    "Anonymous Dolphin",
+    "Anonymous Alpaca",
+    "Anonymous Antelope",
+    "Anonymous Armadillo",
+    "Anonymous Bat",
+    "Anonymous Panther",
+    "Anonymous Beaver",
+    "Anonymous Salmon",
+    "Anonymous Duck",
+    "Anonymous Spider",
+    "Anonymous Buffalo",
+    "Anonymous Mouse",
+    "Anonymous Flamingo",
+    "Anonymous Camel",
+    "Anonymous Cat",
+    "Anonymous Giraffe",
+    "Anonymous Caterpillar",
+    "Anonymous Gnu",
+    "Anonymous Chinchilla",
+    "Anonymous Seal",
+    "Anonymous Coyote",
+    "Anonymous Goose",
+    "Anonymous Snake",
+    "Anonymous Crocodile",
+    "Anonymous Octopus"
+  ));
+
+  private int animalListSize = 52;
 
   public DatabaseUserDao(Firestore firestoreDb, FirebaseAuth firebaseAuth) {
     this.firestoreDb = firestoreDb;
@@ -79,8 +139,8 @@ public class DatabaseUserDao implements UserDao {
     try {
       DocumentSnapshot document = UserInGameInstanceFuture.get();
       if (!document.exists()) {
-        registerUserInGameInstance(userInGameInstanceDocRef, userId);
-        addOneToMembersCounter(gameInstanceDocRef);
+        int numberOfStudent = addOneToMembersCounter(gameInstanceDocRef);
+        registerUserInGameInstance(userInGameInstanceDocRef, userId, getAnimal(numberOfStudent));
       } 
     } catch (InterruptedException e) {
       // TODO Auto-generated catch block
@@ -105,25 +165,38 @@ public class DatabaseUserDao implements UserDao {
   }
 
 
-  private void registerUserInGameInstance(DocumentReference userInGameInstanceDocRef, String userId) {
+  private void registerUserInGameInstance(DocumentReference userInGameInstanceDocRef, String userId, String animal) {
     Map<String, Object> docData = new HashMap<>();
     docData.put("points", 0);
     docData.put("numberAnswered", 0);
     docData.put("numberCorrect", 0);
     docData.put("numberWrong", 0);
+    docData.put("alias", animal);
 
     userInGameInstanceDocRef.set(docData);
   }
 
-  private void addOneToMembersCounter(DocumentReference gameInstanceDocRef) {
-    firestoreDb.runTransaction(transaction -> {
-      // retrieve document and increment population field
+  private int addOneToMembersCounter(DocumentReference gameInstanceDocRef)
+      throws InterruptedException, ExecutionException {
+    ApiFuture<Long> futureTransaction = firestoreDb.runTransaction(transaction -> {
       DocumentSnapshot snapshot = transaction.get(gameInstanceDocRef).get();
-      long oldNumberOfMembers = snapshot.getLong("numberOfMembers");
-      transaction.update(gameInstanceDocRef, "numberOfMembers", oldNumberOfMembers + 1);
-      return null;
+      Long newNumberOfMembers = snapshot.getLong("numberOfMembers") + 1;
+      transaction.update(gameInstanceDocRef, "numberOfMembers", newNumberOfMembers);
+      return newNumberOfMembers;
     });
+    return Math.toIntExact(futureTransaction.get());
+    // firestoreDb.runTransaction(transaction -> {
+    //   // retrieve document and increment population field
+    //   DocumentSnapshot snapshot = transaction.get(gameInstanceDocRef).get();
+    //   long oldNumberOfMembers = snapshot.getLong("numberOfMembers");
+    //   transaction.update(gameInstanceDocRef, "numberOfMembers", oldNumberOfMembers + 1);
+    //   return null;
+    // });
+  }
+  
+  private String getAnimal(int index) {
+    
+    return animalList.get((index % animalListSize));
   }
 
-  
 }

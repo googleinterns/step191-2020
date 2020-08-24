@@ -517,7 +517,7 @@ function addStudentToUI({ studentId, student } = {}) {
 
   const studentGeneralStatsDivElement = document.createElement('div');
   studentGeneralStatsDivElement.id = 'studentStats-' + studentId + '-generalStats';
-  studentGeneralStatsDivElement.innerText = studentId + ': ' + student.points + ' points. ' + student.numberAnswered + ' questions answered: ' + student.numberCorrect + ' correct, ' + student.numberWrong + ' wrong.';
+  studentGeneralStatsDivElement.innerText = student.alias + ': ' + student.points + ' points. ' + student.numberAnswered + ' questions answered: ' + student.numberCorrect + ' correct, ' + student.numberWrong + ' wrong.';
 
   newStudentStatsDivElement.appendChild(studentGeneralStatsDivElement);
 
