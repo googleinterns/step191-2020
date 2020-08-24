@@ -64,7 +64,7 @@ async function loadGamePanel(user) {
 function initStudentAlias(user, gameInstanceId) {
   db.collection("gameInstance").doc(gameInstanceId).collection("students").doc(user.uid).get().then(function(doc) {
     const userIdDivElement = document.getElementById('userId');
-    userIdDivElement.innerText = `You are: ${doc.data().alias} (${user.uid})`
+    userIdDivElement.innerText = `You are: ${doc.data().alias}`
   });
 }
 
