@@ -290,7 +290,9 @@ function updateCurrentQuestionAnswerStats({ updatedAnswer, answerId, questionId 
   
   if (updatedAnswer.correct) {
     answerElement.innerText += ' (Correct answer)';
-  }
+  }else {
+    answerInQuestionStatsDivElement.innerText += ' (Wrong answer)';
+  }	  
 
 }
 
@@ -477,7 +479,9 @@ function addQuestionAnswerToHistoryUI({ questionId, answerId, answer } = {}) {
   answerInQuestionStatsDivElement.innerText = answer.title + ' with ' + answer.numberAnswers + ' answers.';
 
   if (answer.correct) {
-    answerInQuestionStatsDivElement.innerText += ' (Correct answer)';
+    questionAnswerDivElement.innerText = 'Correctly answered, chose: "' + answer.chosen + '"';
+  } else {
+    questionAnswerDivElement.innerText = 'Incorrect answer, chose: "' + answer.chosen + '"';
   }
 
   // Add the answer to its component in the DOM

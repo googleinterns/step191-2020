@@ -93,10 +93,38 @@ public class DatabaseGameDao implements GameDao {
       ApiFuture<QuerySnapshot> futureQuestions = firestoreDb.collection("games").document(id).collection("questions").get();
       Game newGame = null;
       try {
-        List<QueryDocumentSnapshot> documents = futureQuestions.get().getDocuments();
-        List<Question> questions = new ArrayList(Arrays.asList());
-        for (DocumentSnapshot document : documents) {
-          questions.add(document.toObject(Question.class));
+        List<QueryDocumentSnapshot> questionDocuments = futureQuestions.get().getDocuments();
+        List<Question> questions = new ArrayList<Question>();
+        for (DocumentSnapshot document : questionDocuments) {
+          Question newQuestion = new Question();
+
+          Map<String, Object> questionData = document.getData();
+          
+          newQuestion.setId(document.getId());
+          newQuestion.setIsMC((boolean) questionData.get("isMC"));
+          newQuestion.setTitle((String) questionData.get("title"));
+          newQuestion.setNextId((String) questionData.get("nextQuestion"));
+          newQuestion.setPrevId((String) questionData.get("previousQuestion"));
+
+          
+          ApiFuture<QuerySnapshot> futureAnswers = firestoreDb.collection("games").document(id).collection("questions").document(document.getId()).collection("answers").get();
+          List<QueryDocumentSnapshot> answerDocuments = futureAnswers.get().getDocuments();
+          List<Answer> answers = new ArrayList<Answer>();
+          for (DocumentSnapshot answerDocument : answerDocuments) {
+            Answer newAnswer = new Answer();
+
+            Map<String, Object> answerData = answerDocument.getData();
+
+            newAnswer.setId(answerDocument.getId());
+            newAnswer.setTitle((String) answerData.get("title"));
+            newAnswer.setCorrect((boolean) answerData.get("correct"));
+
+            answers.add(newAnswer);
+          }
+
+          newQuestion.setAnswers(answers);
+
+          questions.add(newQuestion);
         }
         
         DocumentReference docRef = firestoreDb.collection("games").document(id);

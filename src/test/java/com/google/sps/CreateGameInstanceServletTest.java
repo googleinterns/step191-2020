@@ -34,7 +34,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.sps.daos.GameDao;
 import com.google.sps.daos.GameInstanceDao;
+import com.google.sps.data.Game;
 import com.google.sps.servlets.CreateGameInstanceServlet;
 
 import org.springframework.mock.web.DelegatingServletInputStream;
@@ -47,8 +49,11 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public final class CreateGameInstanceServletTest {
 
+  private GameDao mockGameDao = mock(GameDao.class);
   private GameInstanceDao mockGameInstanceDao = mock(GameInstanceDao.class);
   private ServletContext mockServletContext = mock(ServletContext.class);
+
+  private Game mockGame = mock(Game.class);
 
   private HttpServletRequest request = mock(HttpServletRequest.class);
   private HttpServletResponse response = mock(HttpServletResponse.class);
@@ -66,8 +71,13 @@ public final class CreateGameInstanceServletTest {
       }
     };
 
+    when(mockServletContext.getAttribute("gameDao")).thenReturn(mockGameDao);
+
+    when(mockGameDao.getGame("222")).thenReturn(mockGame);
+
     when(mockServletContext.getAttribute("gameInstanceDao")).thenReturn(mockGameInstanceDao);
-    when(mockGameInstanceDao.createNewGameInstance("asdfqwerty","222")).thenReturn("qwertyuiop");
+
+    when(mockGameInstanceDao.createNewGameInstance("asdfqwerty","222", mockGame)).thenReturn("qwertyuiop");
 
     responseWriter = new StringWriter();
     when(response.getWriter()).thenReturn(new PrintWriter(responseWriter));
@@ -90,7 +100,7 @@ public final class CreateGameInstanceServletTest {
 
     String responseString = responseWriter.toString();
 
-    verify(mockGameInstanceDao).createNewGameInstance("asdfqwerty", "222");
+    verify(mockGameInstanceDao).createNewGameInstance("asdfqwerty", "222", mockGame);
     
     assertThat(responseString).contains("qwertyuiop");
   }
