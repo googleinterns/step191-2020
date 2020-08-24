@@ -16,6 +16,9 @@
 'use strict';
 
 const db = firebase.firestore();
+let questionStarted = false;
+let gameStarted = false;
+let gInstanceId;
 
 // Variables to identify the change when receiving an update of the game Instance 
 let numberOfMembersInGameInstance = null;
@@ -287,7 +290,9 @@ function updateCurrentQuestionAnswerStats({ updatedAnswer, answerId, questionId 
   
   if (updatedAnswer.correct) {
     answerElement.innerText += ' (Correct answer)';
-  }
+  }else {
+    answerInQuestionStatsDivElement.innerText += ' (Wrong answer)';
+  }	  
 
 }
 
@@ -368,32 +373,33 @@ function updateCurrentQuestionStatsInHistory({ updatedQuestionStats, currentQues
 
 // Inits the control buttons for the teacher to control the game
 function initUIControlButtons(gameInstanceId) {
-  const startGameInstanceButtonElement = document.getElementById('startGameInstanceButton');
-  const nextQuestionButton = document.getElementById("nextQuestionButton");
-  const previousQuestionButton = document.getElementById("previousQuestionButton");
-  const endGameInstanceButton = document.getElementById("endGameInstanceButton");
+  const startGameInstanceButtonElement = document.getElementById('startGameButton');
+  const nextQuestionButton = document.getElementById("nextButton");
   const startQuestionButton = document.getElementById("startQuestionButton");
-  const endQuestionButton = document.getElementById("endQuestionButton");
   
   startGameInstanceButtonElement.addEventListener('click', () => {
-      fetch('/startGameInstance?gameInstance='+gameInstanceId, { method: 'POST' });
-  });
-  nextQuestionButton.addEventListener('click', () => {
-      fetch('/nextQuestion?gameInstance='+gameInstanceId, { method: 'POST' });
-  });
-  previousQuestionButton.addEventListener('click', () => {
-      fetch('/previousQuestion?gameInstance='+gameInstanceId, { method: 'POST' });
-  });
-  endGameInstanceButton.addEventListener('click', () => {
+    if (!gameStarted){
       fetch('/endGameInstance?gameInstance='+gameInstanceId, { method: 'POST' }).then(()=>{
           window.location.href = "/teacher/controlGameInstance/controlGameInstance.html";
       });
+    } else {
+      fetch('/startGameInstance?gameInstance='+gameInstanceId, { method: 'POST' });
+    }
+
+    togglePlay()
+  });
+  nextQuestionButton.addEventListener('click', () => {
+      fetch('/nextQuestion?gameInstance='+gameInstanceId, { method: 'POST' });
+      togglePlay()
   });
   startQuestionButton.addEventListener('click', () => {
-      fetch('/controlQuestion?gameInstance='+gameInstanceId+'&action=start', { method: 'POST' });
-  });
-  endQuestionButton.addEventListener('click', () => {
-      fetch('/controlQuestion?gameInstance='+gameInstanceId+'&action=end', { method: 'POST' });
+    if(gameStarted) {
+      if(!questionStarted)      
+        fetch('/controlQuestion?gameInstance='+gameInstanceId+'&action=end', { method: 'POST' });
+      else
+        fetch('/controlQuestion?gameInstance='+gameInstanceId+'&action=start', { method: 'POST' });
+      
+    }
   });
 }
 
@@ -472,7 +478,9 @@ function addQuestionAnswerToHistoryUI({ questionId, answerId, answer } = {}) {
   answerInQuestionStatsDivElement.innerText = answer.title + ' with ' + answer.numberAnswers + ' answers.';
 
   if (answer.correct) {
-    answerInQuestionStatsDivElement.innerText += ' (Correct answer)';
+    questionAnswerDivElement.innerText = 'Correctly answered, chose: "' + answer.chosen + '"';
+  } else {
+    questionAnswerDivElement.innerText = 'Incorrect answer, chose: "' + answer.chosen + '"';
   }
 
   // Add the answer to its component in the DOM
@@ -571,4 +579,27 @@ function updateStudentStats({ studentId, student } = {}) {
   studentStatsDivElement.innerText = studentId + ': ' + student.points + ' points. ' + student.numberAnswered + ' questions answered: ' + student.numberCorrect + ' correct, ' + student.numberWrong + ' wrong.';
 }
 
+function togglePlay() {
+  if(gameStarted) {
+    var playIconElement = document.getElementById("playButtonIcon");
+    playIconElement.innerText = questionStarted ? "play_arrow" : "pause";
+
+    var playIconElement = document.getElementById("startStopQToolTip");
+    playIconElement.innerText = questionStarted ? "Start Question" : "Stop Question";
+
+    questionStarted = !questionStarted;
+  }
+}
+
+function toggleGame() {
+  var gameButton = document.getElementById("startGameButton");
+  if (gameStarted) {
+    gameButton.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--teal-400";
+    gameButton.innerText = "START GAME";
+  } else {
+    gameButton.className = "mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--pink-400";
+    gameButton.innerText = "STOP GAME";
+  }
+  gameStarted = !gameStarted;
+}
 initAuthStateObserver();
