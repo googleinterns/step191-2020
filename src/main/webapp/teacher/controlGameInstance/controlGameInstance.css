@@ -5,3 +5,26 @@
 .studentInHistory {
   margin: 10px;
 }
+
+#gameCard {
+
+  margin: auto;
+  text-align: left;
+}
+
+#forwardButtonIcon {
+  top: 50%;
+  left: 40%;
+}
+
+#rewindButtonIcon {
+  top: 50%;
+  left: 40%;
+}
+#playButtonIcon {
+  top: 50%;
+  left: 40%;
+}
+#cardActions {
+  text-align: center;
+}

@@ -41,8 +41,8 @@
 
   <!-- Material Design Lite -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.orange-indigo.min.css">
-  <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+  <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.orange-indigo.min.css">
+  <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 
   <!-- App Styling -->
   <link rel="stylesheet"
@@ -81,50 +81,87 @@
     text-align: center;">
 
         <div id="controlPanel">
-
-          <div id="gameInfo">
-            <div id="jsGameInstanceId"></div>
-            <div id="jsNumberOfStudents"></div>
-            <div id="jsGameDetails">
-              <div id="jsGameId"></div>
-              <div id="jsGameTitle"></div>
-              <div id="jsNumberOfQuestionsOfGame"></div>
+          <div class="demo-card-wide mdl-card mdl-shadow--2dp" id="gameCard">
+            <div class="mdl-card__title">
+              <h1 class="mdl-card__title-text"><b>Game Info</b></h1>
             </div>
-          </div>
-
-          <div id="questionInfo">
-            <div id="jsActiveQuestionNumber"></div>
-            <div id="jsActiveQuestionText"></div>
-            <div id="jsCanStudentsAnswer"></div>
-            <div id="jsCurrentQuestionStats">
-              <div id="jsNumberCurrentQuestionAnswers"></div>
-              <div id="jsNumberCorrectCurrentQuestionAnswers"></div>
-              <div id="jsNumberWrongCurrentQuestionAnswers"></div>
-              <div id="jsCurrentQuestionAnswers"></div>
+            <div class="mdl-card__supporting-text">
+              <div id="gameInfo">
+                <div id="jsGameInstanceId"></div>
+                <div id="jsNumberOfStudents"></div>
+                <div id="jsGameDetails">
+                  <div id="jsGameId"></div>
+                  <div id="jsGameTitle"></div>
+                  <div id="jsNumberOfQuestionsOfGame"></div>
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div id="questionControls">
-            <button id="nextQuestionButton" type="button">Next question</button>
+            <div class="mdl-card__title">
+              <h1 class="mdl-card__title-text"><b>Question Info</b></h1>
+            </div>
+            <div class="mdl-card__supporting-text">
+              <div id="questionInfo">
+                <div id="jsActiveQuestionNumber"></div>
+                <div id="jsActiveQuestionText"></div>
+                <div id="jsCanStudentsAnswer"></div>
+                <div id="jsCurrentQuestionStats">
+                  <div id="jsNumberCurrentQuestionAnswers"></div>
+                  <div id="jsNumberCorrectCurrentQuestionAnswers"></div>
+                  <div id="jsNumberWrongCurrentQuestionAnswers"></div>
+                  <div id="jsCurrentQuestionAnswers"></div>
+                </div>
+              </div>
+            </div>      
             <br>
-            <button id="previousQuestionButton" type="button">Previous question</button>
+            <div class="mdl-card__actions mdl-card--border" id="cardActions">
+              <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-color--teal-400" onClick="toggleGame()" id="startGameButton">
+                Start Game
+              </button>
+            </div>
           </div>
-
+          <br>
           <div id="startGameInstance">
-            <button id="startGameInstanceButton" type="button">Start game</button>
-            <br>
-            <button id="endGameInstanceButton" type="button">End Game</button>
-            <br>
-            <button id="startQuestionButton" type="button">Start Question</button>
-            <button id="endQuestionButton" type="button">End Question</button>
+            <!-- Colored FAB button with ripple -->
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-color--teal-400" id="rewindButton">
+              <i class="material-icons" id="rewindButtonIcon">fast_rewind</i>
+            </button>
+            <div class="mdl-tooltip mdl-tooltip--large" for="rewindButton">
+              Previous Question
+            </div>
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-color--amber-600" onclick="togglePlay()" id="startQuestionButton">
+              <i class="material-icons" id="playButtonIcon">play_arrow</i>
+            </button>
+            <div class="mdl-tooltip mdl-tooltip--large" for="startQuestionButton" id="startStopQToolTip">
+            Start Question
+            </div>
+            <!-- Colored FAB button with ripple -->
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-color--teal-400" id="nextButton">
+              <i class="material-icons" id="forwardButtonIcon">fast_forward</i>
+            </button>
+            <div class="mdl-tooltip mdl-tooltip--large" for="nextButton">
+              Next Question
+            </div>
           </div>
 
           <div id="stats">
             <h2>Game History</h2>
-            <h3>Question Stats</h3>
-            <div id="jsQuestionStats"></div>
-            <h3>Student Stats</h3>
-            <div id="jsStudentStats"></div>
+            <div class="demo-card-wide mdl-card mdl-shadow--2dp" id="gameCard">
+              <div class="mdl-card__title">
+                <h1 class="mdl-card__title-text"><b>Question Stats</b></h1>
+              </div>
+              <div class="mdl-card__supporting-text">
+                <div id="jsQuestionStats"></div>
+              </div>
+            </div>
+            <br>
+            <div class="demo-card-wide mdl-card mdl-shadow--2dp" id="gameCard">
+              <div class="mdl-card__title">
+                <h1 class="mdl-card__title-text"><b>Student Stats</b></h1>
+              </div>
+              <div class="mdl-card__supporting-text">
+                <div id="jsStudentStats"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
