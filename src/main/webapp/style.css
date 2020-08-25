@@ -28,4 +28,41 @@
   font-size: 35px;
   color: red;
 }
+.teacher-card-wide.mdl-card {
+  width: 512px;
+  margin: auto;
+  margin-top: 25px;
+  margin-bottom: 50px;
+}
+.teacher-card-wide > .mdl-card__title {
+  color: #fff;
+  height: 176px;
+  background: url('https://cdn.pixabay.com/photo/2017/06/29/14/24/teacher-2454399_960_720.jpg') center / cover;
+}
+.teacher-card-wide > .mdl-card__menu {
+  color: #fff;
+}
 
+.student-card-wide.mdl-card {
+  width: 512px;
+  margin: auto;
+  margin-top: 25px;
+  margin-bottom: 50px;
+}
+.student-card-wide > .mdl-card__title {
+  color: #fff;
+  height: 176px;
+  background: url('https://cdn.pixabay.com/photo/2016/12/21/09/40/student-1922567_960_720.jpg') center / cover;
+}
+.student-card-wide > .mdl-card__menu {
+  color: #fff;
+}
+.mdl-card__title-text {
+  text-shadow: 2px 2px 4px #000;
+}
+
+.mdl-card__supporting-text { 
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
