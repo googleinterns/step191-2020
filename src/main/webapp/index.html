@@ -80,27 +80,38 @@
     margin-left: auto;
     margin-right: auto;
     text-align: center;">
-
-      <div id="teachers">
-        <h1>Teachers</h1>
-        <div id="newGame" class="spaced">
-          <a href="teacher/newGameInstance/newGameInstance.html">Click here to start a game!</a>
+          
+      <div class="teacher-card-wide mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title">
+          <h1 class="mdl-card__title-text"><b>Teachers</b></h1>
         </div>
-        
-        <div id="controlGame" class="spaced">
-          <a href="teacher/controlGameInstance/controlGameInstance.html">Or click here if you want to resume a game you had in progress</a>
+        <div class="mdl-card__supporting-text">
+          Teachers can create games for students to collaborate. When a game is created you can start a game room with the game template that's already been done.
         </div>
-
-        <div id="designGame" class="spaced">
-          <a href="teacher/createGame.html">New here? Click here to design your own game!</a>
+        <div class="mdl-card__actions mdl-card--border">
+          <!-- Accent-colored raised button with ripple -->
+          <a  href="teacher/newGameInstance/newGameInstance.html" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent mdl-color--cyan-600">
+            Start A Game Room
+          </a>
+          <!-- Accent-colored raised button with ripple -->
+          <a href="teacher/createGame.html" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent mdl-color--cyan-600">
+            Create Game
+          </a>
         </div>
-        
       </div>
-        
-      <div id="students">
-        <h1>Students</h1>
-        <div id="joinGame" class="spaced">
-          <a href="student/enter-game.html">Click here to join a game!</a>
+
+      <div class="student-card-wide mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title">
+          <h1 class="mdl-card__title-text"><b>Students</b></h1>
+        </div>
+        <div class="mdl-card__supporting-text">
+          Students can join the Game Rooms that their teachers create with just two clicks away. These game rooms function just as activities at presential classes.
+        </div>
+        <div class="mdl-card__actions mdl-card--border">
+          <!-- Accent-colored raised button with ripple -->
+          <a href="student/enter-game.html" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent mdl-color--cyan-600">
+            Join A Game Room
+          </a>
         </div>
       </div>
 

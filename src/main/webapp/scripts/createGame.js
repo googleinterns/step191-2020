@@ -7,6 +7,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 
 
 var dialog = document.querySelector('#modal-example');
+var exitDialog = document.querySelector('#modal-exit');
 
 function closeClickHandler() {
     dialog.close();
@@ -15,6 +16,13 @@ function showClickHandler() {
     dialog.showModal();
 };
   
+function closeExitClickHandler() {
+  exitDialog.close();
+  location.replace("..")
+};
+function showExitClickHandler() {
+  exitDialog.showModal();
+};
 // Hides all of the questions except for the 'n' question 
 function hideAllExcept(n) {
   // Get the size of the number of questions (it's -2 because you remove the title form and we start from 0)
@@ -183,6 +191,7 @@ function trueOrFalseGrid(num) {
 }
 
 function sendQuestions() {
+  showExitClickHandler()
   let title = document.getElementsByName("gameTitle")[0].value;
   const questionTitles = document.getElementsByName("questionTitle");
   const questionType = document.getElementsByName("isMC");
@@ -243,5 +252,5 @@ function sendQuestions() {
   }
   var postParams = new URLSearchParams();
   postParams.append("game", JSON.stringify(gameJSON));
-  fetch("/newGame", {method: "POST", body: postParams})
+  fetch("/newGame", {method: "POST", body: postParams});
 }
