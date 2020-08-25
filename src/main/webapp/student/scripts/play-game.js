@@ -358,7 +358,7 @@ function displayResultsTable() {
     const tbody = document.createElement('tbody');
     db.collection("gameInstance").doc(gameInstanceId).collection("students").get().then(function(querySnapshot) {
         querySnapshot.forEach(function(doc) {
-            createElementTable(tbody, doc.id, doc.data().points);
+            createElementTable(tbody, doc.data().alias, doc.data().points);
             console.log(doc.id, " => ", doc.data().points);
         });
     });
