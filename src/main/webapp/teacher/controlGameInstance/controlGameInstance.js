@@ -150,7 +150,10 @@ function addGameInstanceIdToUI(gameInstanceId) {
   gameInstanceIdElement.innerText = "This gameInstance's ID is: " + gameInstanceId;
 
   const shareGameInstanceElement = document.getElementById('jsShareGameInstance');
-  shareGameInstanceElement.innerText = "Share this link with your students for them to join: " + "https://quizzy-step-2020.uc.r.appspot.com/student/play-game.html?gameInstanceId=" + gameInstanceId;
+  shareGameInstanceElement.innerText = "Share this link with your students for them to join (click to copy to clipboard): " + "https://quizzy-step-2020.uc.r.appspot.com/student/play-game.html?gameInstanceId=" + gameInstanceId;
+  shareGameInstanceElement.addEventListener('click', () => {
+    navigator.clipboard.writeText("https://quizzy-step-2020.uc.r.appspot.com/student/play-game.html?gameInstanceId=" + gameInstanceId);
+  });
 }
 
 // Adds the Game's details to the UI
