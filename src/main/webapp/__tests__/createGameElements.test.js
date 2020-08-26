@@ -105,7 +105,7 @@ describe('createGameGrids', () => {
     expect(document.getElementById('titleGrid').innerHTML).toContain(expectedTitleDiv.innerHTML);
   });
 
-  test("Every two question one is MC and the other is ToF", () => {
+  test("Randomly generated question type", () => {
     var title = "Test Question ";
 
     var n = 50;
