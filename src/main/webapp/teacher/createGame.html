@@ -44,7 +44,7 @@
 
             <span class="mdl-layout-title">
               <!-- Accent-colored raised button with ripple -->
-              <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent " onclick="sendQuestions()">
+              <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent mdl-color--cyan-500" onclick="sendQuestions()">
                 Send Questions
               </button>
             </span>
@@ -170,6 +170,15 @@
     </div>
   </dialog>
     
+  <dialog class="mdl-dialog" id="modal-exit">
+    <div class="mdl-dialog__content">
+      <h3>Game Created!</h3>
+    </div>
+    <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
+        <button type="button" class="mdl-button" onclick="closeExitClickHandler()">Close</button>
+    </div>
+  </dialog>
+
     <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase-performance.js"></script>
