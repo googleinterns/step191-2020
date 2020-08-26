@@ -6,7 +6,7 @@ const { trueOrFalseGrid, multipleChoiceGrid, titleGrid, questionElement } = requ
 // `describe` blocks can be used to group related tests together.
 describe('createGameGrids', () => {
   // `test` is a single unit test
-  test('is the true or false grid appearing', () => {
+  test('Is the true or false grid appearing', () => {
     // Set up our document body
     var num = 0;
     document.body.innerHTML = "<div id='trueOrFalseDiv'>" + `
@@ -44,8 +44,50 @@ describe('createGameGrids', () => {
     const expectedTrueOrFalseDiv = trueOrFalseGrid(num);
     expect(document.getElementById('trueOrFalseDiv').innerHTML).toContain(expectedTrueOrFalseDiv.innerHTML);
   });
+  test('Is the multiple choice grid appearing', () => {
+    // Set up our document body
+    var num = 0;
+    var answersStr = '<input name="isMC" value=true hidden>';
+    for (var i = 0; i < 4; i += 2) {
+      answersStr += `
+      <!-- The first line -->
+      <div class="mdl-grid">
+        <div class="mdl-cell mdl-cell--1-col"></div>
+        <div class="mdl-cell mdl-cell--5-col">
+          <!-- First answer -->
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="answer` + i + `"> <label class="mdl-textfield__label" > Answer ` + (i+1) + `</label>
+          </div>
+    
+          <!-- Check if it's correct -->
+          <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question` + num + `checkbox` + i + `">
+            <input type="checkbox" id="question` + num + `checkbox` + i + `" class="mdl-checkbox__input" name="correct` + i + `">
+            <span class="mdl-checkbox__label">Correct</span>
+          </label>
+        </div>
+        <div class="mdl-cell mdl-cell--5-col">
+          <!-- Second answer -->
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="mdl-textfield__input" type="text" id="game-correct-answer" name="answer` + (i+1) + `"> <label class="mdl-textfield__label" > Answer ` + (i+2) + `</label>
+          </div>
+    
+          <!-- Check if it's correct -->
+          <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="question` + num + `checkbox` + (i+1) + `">
+            <input type="checkbox" id="question` + num + `checkbox` + (i+1) + `" class="mdl-checkbox__input" name="correct` + (i+1) + `">
+            <span class="mdl-checkbox__label">Correct</span>
+          </label>
+        </div>
+        <div class="mdl-cell mdl-cell--1-col"></div>
+      </div>
+      `
+    }
+    document.body.innerHTML = "<div id='multipleChoiceDiv'>" + answersStr + "<div>";
 
-  test("There's a title grid appearing", () => {
+    // Call the function under test
+    const expectedmultipleChoiceDiv = multipleChoiceGrid(num);
+    expect(document.getElementById('multipleChoiceDiv').innerHTML).toContain(expectedmultipleChoiceDiv.innerHTML);
+  });
+  test("Is the title grid appearing", () => {
     var title = "Hello this is a test!!!";
 
     document.body.innerHTML =  "<div id='titleGrid'>" + '<div class="mdl-grid">' +
@@ -63,17 +105,24 @@ describe('createGameGrids', () => {
     expect(document.getElementById('titleGrid').innerHTML).toContain(expectedTitleDiv.innerHTML);
   });
 
-  test("Every two question one is multiple choice and the other is ToF", () => {
+  test("Every two question one is MC and the other is ToF", () => {
     var title = "Test Question ";
-    var n = 100;
+
+    var n = 50;
+
+    var isMc = new Array(n);
     for(var i = 0; i < n; i++) {
-        document.body.appendChild( questionElement(i, (title+i), (i%2)) );
+      isMc[i] = Math.random() >= 0.5;
+    }
+
+    for(var i = 0; i < n; i++) {
+        document.body.appendChild( questionElement(i, (title+i), isMc[i]) );
     }
 
     const questionTitles = document.getElementsByName("isMC");
     
     for(var i = 0; i < n; i++) {    
-        expect(questionTitles[i].value === 'true').toEqual((i%2 == 1));
+        expect(questionTitles[i].value === 'true').toEqual(isMc[i]);
     }
   });
 });
