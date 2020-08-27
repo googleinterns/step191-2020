@@ -51,7 +51,22 @@ public class JoinGameInstanceServlet extends HttpServlet {
 
     UserDao dao = (UserDao) this.getServletContext().getAttribute("userDao");
 
-    dao.joinGameInstance(jsonObj.get("idToken").getAsString(), jsonObj.get("gameInstanceId").getAsString());
+    String animal = dao.joinGameInstance(jsonObj.get("idToken").getAsString(), jsonObj.get("gameInstanceId").getAsString());
+    
+    // Convert the newGameInstanceId to JSON
+    String json = convertToJson(animal);
+    // Send the JSON as response
+    response.setContentType("application/json;");
+    response.getWriter().println(json);
+  }
+
+  /**
+   * Convert to JSON using Gson
+   */
+  private String convertToJson(String newGameInstanceId) {
+    Gson gson = new Gson();
+    String json = gson.toJson(newGameInstanceId);
+    return json;
   }
 
 }
