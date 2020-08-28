@@ -62,7 +62,7 @@ async function loadGamePanel(user) {
   initGameInstanceListener(gameInstanceId);
 }
 
-// Register and get animal alias from Firestore, or if exists just retrieve animal alias
+// Register and get animal alias from Firestore, or if exists just retrieve assigned animal alias
 function registerStudentInGameInstance(gameInstanceId) {
   firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function(idToken) {
     fetch('/joinGameInstance', {

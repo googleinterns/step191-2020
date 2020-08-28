@@ -117,6 +117,8 @@ public class DatabaseUserDao implements UserDao {
     
   }
 
+  // Register a user in a gameInstance and return its newly assigned animal alias
+  // If user is already registered, just return the animal alias that was already assigned before
   @Override
   public String joinGameInstance(String idToken, String gameInstanceId) {
     FirebaseToken decodedToken = null;
@@ -158,6 +160,8 @@ public class DatabaseUserDao implements UserDao {
 
     // Add the active GameInstance to the User's entry in "Users" collection
     firestoreDb.collection("users").document(userId).update("activeGameInstanceId", gameInstanceId);
+
+    // Return the animal that was assigned to the user
     return animal;
   }
 

@@ -51,9 +51,11 @@ public class JoinGameInstanceServlet extends HttpServlet {
 
     UserDao dao = (UserDao) this.getServletContext().getAttribute("userDao");
 
+    // Register a user in a gameInstance and get its newly assigned animal alias to return it to the client
+    // If user is already registered, just get the animal alias that was already assigned before 
     String animal = dao.joinGameInstance(jsonObj.get("idToken").getAsString(), jsonObj.get("gameInstanceId").getAsString());
     
-    // Convert the newGameInstanceId to JSON
+    // Convert the anima alias to JSON
     String json = convertToJson(animal);
     // Send the JSON as response
     response.setContentType("application/json;");
