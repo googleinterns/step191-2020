@@ -50,21 +50,7 @@ function verifyGameInstanceExists(gameInstanceId) {
 
 // Send the request to join the Game Instance
 function joinGameInstance(gameInstanceId) {
-  firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function(idToken) {
-    fetch('/joinGameInstance', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({idToken: idToken, gameInstanceId: gameInstanceId})
-    }).then(() => {
-      window.location.href = "/student/play-game.html?gameInstanceId=" + gameInstanceId;
-    });
-  }).catch(function(error) {
-    // Handle error
-    console.log("Please log in");
-  });
+  window.location.href = "/student/play-game.html?gameInstanceId=" + gameInstanceId;
 }
 
 // Display a message saying that GameInstanceId is not valid

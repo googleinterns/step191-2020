@@ -11,6 +11,7 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
@@ -116,8 +117,10 @@ public class DatabaseUserDao implements UserDao {
     
   }
 
+  // Register a user in a gameInstance and return its newly assigned animal alias
+  // If user is already registered, just return the animal alias that was already assigned before
   @Override
-  public void joinGameInstance(String idToken, String gameInstanceId) {
+  public String joinGameInstance(String idToken, String gameInstanceId) {
     FirebaseToken decodedToken = null;
     String userId = null;
 
@@ -136,12 +139,17 @@ public class DatabaseUserDao implements UserDao {
 
     ApiFuture<DocumentSnapshot> UserInGameInstanceFuture = userInGameInstanceDocRef.get();
     
+    String animal = "";
+
     try {
       DocumentSnapshot document = UserInGameInstanceFuture.get();
       if (!document.exists()) {
         int numberOfStudent = addOneToMembersCounter(gameInstanceDocRef);
-        registerUserInGameInstance(userInGameInstanceDocRef, userId, getAnimal(numberOfStudent));
-      } 
+        animal = getAnimal(numberOfStudent);
+        registerUserInGameInstance(userInGameInstanceDocRef, userId, animal);
+      } else {
+        animal = (String) document.getData().get("alias");
+      }
     } catch (InterruptedException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -153,6 +161,8 @@ public class DatabaseUserDao implements UserDao {
     // Add the active GameInstance to the User's entry in "Users" collection
     firestoreDb.collection("users").document(userId).update("activeGameInstanceId", gameInstanceId);
 
+    // Return the animal that was assigned to the user
+    return animal;
   }
 
 
@@ -165,7 +175,8 @@ public class DatabaseUserDao implements UserDao {
   }
 
 
-  private void registerUserInGameInstance(DocumentReference userInGameInstanceDocRef, String userId, String animal) {
+  private void registerUserInGameInstance(DocumentReference userInGameInstanceDocRef, String userId, String animal)
+      throws InterruptedException, ExecutionException {
     Map<String, Object> docData = new HashMap<>();
     docData.put("points", 0);
     docData.put("numberAnswered", 0);
@@ -173,7 +184,8 @@ public class DatabaseUserDao implements UserDao {
     docData.put("numberWrong", 0);
     docData.put("alias", animal);
 
-    userInGameInstanceDocRef.set(docData);
+    ApiFuture<WriteResult> future = userInGameInstanceDocRef.set(docData);
+    future.get();
   }
 
   private int addOneToMembersCounter(DocumentReference gameInstanceDocRef)

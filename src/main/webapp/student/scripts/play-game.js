@@ -20,7 +20,7 @@ let active = false;
 let currentQuestionId = null;
 let selectedAnswerId = "";
 let currentQuestionActive = false;
-let gameInstanceId = getGameInstanceIdFromQueryParams();
+let gameInstanceId = null; 
 const resultObject = document.getElementById("result");
 let submited = false;
 let isFinished = false;
@@ -49,23 +49,45 @@ function authStateObserver(user) {
 async function loadGamePanel(user) {
   // Get the Game Instance's ID in which the user is participating
   
+  gameInstanceId = getGameInstanceIdFromQueryParams();
+
   if (gameInstanceId == null) {
     gameInstanceId = await getActiveGameInstanceId(user);
   }
 
+  // Register and get animal alias from Firestore, or if exists just retrieve animal alias
+  registerStudentInGameInstance(gameInstanceId);
+
   // Start listening to the GameInstance
   initGameInstanceListener(gameInstanceId);
-
-  // Get and display the user's id and alias
-  initStudentAlias(user, gameInstanceId);
 }
 
-// // Get and display the user's id and alias in the UI
-function initStudentAlias(user, gameInstanceId) {
-  db.collection("gameInstance").doc(gameInstanceId).collection("students").doc(user.uid).get().then(function(doc) {
-    const userIdDivElement = document.getElementById('userId');
-    userIdDivElement.innerText = `You are: ${doc.data().alias}`
+// Register and get animal alias from Firestore, or if exists just retrieve assigned animal alias
+function registerStudentInGameInstance(gameInstanceId) {
+  firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function(idToken) {
+    fetch('/joinGameInstance', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({idToken: idToken, gameInstanceId: gameInstanceId})
+    }).then((response) => {
+      response.json().then(animal => {
+        // Display the user's alias
+        initStudentAlias(animal);
+      });
+    });
+  }).catch(function(error) {
+    // Handle error
+    console.log("Please log in");
   });
+}
+
+// Display the user's alias in the UI
+function initStudentAlias(animalAlias) {
+  const userIdDivElement = document.getElementById('userId');
+  userIdDivElement.innerText = `You are: ${animalAlias}`
 }
 
 // Gets the gameInstanceId from the query string if there is

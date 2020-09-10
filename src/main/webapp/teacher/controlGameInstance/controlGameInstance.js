@@ -148,6 +148,12 @@ function buildActiveGameInstanceUI({ gameInstanceId, gameInstance, game} = {}) {
 function addGameInstanceIdToUI(gameInstanceId) {
   const gameInstanceIdElement = document.getElementById("jsGameInstanceId");
   gameInstanceIdElement.innerText = "This gameInstance's ID is: " + gameInstanceId;
+
+  const shareGameInstanceElement = document.getElementById('jsShareGameInstance');
+  shareGameInstanceElement.innerText = "Share this link with your students for them to join (click to copy to clipboard): " + "https://quizzy-step-2020.uc.r.appspot.com/student/play-game.html?gameInstanceId=" + gameInstanceId;
+  shareGameInstanceElement.addEventListener('click', () => {
+    navigator.clipboard.writeText("https://quizzy-step-2020.uc.r.appspot.com/student/play-game.html?gameInstanceId=" + gameInstanceId);
+  });
 }
 
 // Adds the Game's details to the UI
@@ -479,9 +485,7 @@ function addQuestionAnswerToHistoryUI({ questionId, answerId, answer } = {}) {
   answerInQuestionStatsDivElement.innerText = answer.title + ' with ' + answer.numberAnswers + ' answers.';
 
   if (answer.correct) {
-    questionAnswerDivElement.innerText = 'Correctly answered, chose: "' + answer.chosen + '"';
-  } else {
-    questionAnswerDivElement.innerText = 'Incorrect answer, chose: "' + answer.chosen + '"';
+    answerInQuestionStatsDivElement.innerText += ' (Correct answer)';
   }
 
   // Add the answer to its component in the DOM
